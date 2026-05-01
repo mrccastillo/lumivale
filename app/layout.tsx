@@ -5,7 +5,7 @@ import { SiteNavbar } from "@/components/site-navbar";
 
 export const metadata: Metadata = {
   title: "Lumivale",
-  description: "Structure-first marketing site skeleton for Lumivale.",
+  description: "Premium websites and growth systems for service brands.",
 };
 
 export default function RootLayout({
@@ -18,7 +18,9 @@ export default function RootLayout({
       <body className="min-h-full bg-[var(--background)] text-[var(--foreground)]">
         <div className="flex min-h-screen flex-col">
           <SiteNavbar />
-          <main className="flex-1">{children}</main>
+          <main data-nav-surface="light" className="flex-1">
+            {children}
+          </main>
           <SiteFooter />
         </div>
       </body>

@@ -15,7 +15,7 @@ export default async function ClientAccessPage({
 
   return (
     <section className="mx-auto flex w-full max-w-4xl flex-col gap-6 px-6 py-16">
-      <h1 className="text-4xl font-semibold text-stone-900">Client Access</h1>
+      <h1 className="text-3xl font-medium text-stone-900">Client Access</h1>
       <p className="max-w-2xl text-stone-600">
         Enter your approved email address and we&apos;ll send a pricing access link.
       </p>
@@ -25,7 +25,7 @@ export default async function ClientAccessPage({
         method="post"
         className="flex max-w-xl flex-col gap-4 rounded-[1.5rem] border border-stone-200 bg-white p-6"
       >
-        <label htmlFor="email" className="text-sm font-semibold text-stone-900">
+        <label htmlFor="email" className="text-sm font-medium text-stone-900">
           Email
         </label>
         <input
@@ -38,7 +38,7 @@ export default async function ClientAccessPage({
         />
         <button
           type="submit"
-          className="inline-flex w-fit items-center rounded-full bg-stone-900 px-5 py-3 text-sm font-semibold text-stone-50 transition hover:bg-stone-700"
+          className="inline-flex w-fit items-center rounded-full bg-stone-900 px-5 py-3 text-sm font-medium text-stone-50 transition hover:bg-stone-700"
         >
           Send magic link
         </button>
@@ -58,7 +58,7 @@ export default async function ClientAccessPage({
 
       {params.preview ? (
         <div className="max-w-2xl rounded-xl border border-sky-200 bg-sky-50 px-4 py-3 text-sm text-sky-950">
-          <p className="font-semibold">Development preview</p>
+          <p className="font-medium">Development preview</p>
           <p className="mt-1">SMTP is not configured, so the magic link is shown here.</p>
           <Link href={params.preview} className="mt-3 inline-block underline">
             Open preview magic link
