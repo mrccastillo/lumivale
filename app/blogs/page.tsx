@@ -1,78 +1,76 @@
-const posts = [
-  {
-    category: "Positioning",
-    title: "Why premium service brands need proof before polish",
-    excerpt:
-      "A modern website works harder when the offer, buyer pain, and credibility signals are visible before the design tries to impress.",
-    readTime: "6 min read",
-  },
-  {
-    category: "Website Strategy",
-    title: "The SaaS page patterns service brands can borrow",
-    excerpt:
-      "Clear hero copy, proof blocks, productized process sections, and confident CTAs can make expert-led services easier to evaluate.",
-    readTime: "8 min read",
-  },
-  {
-    category: "Conversion",
-    title: "How to turn a simple website into a sales asset",
-    excerpt:
-      "A stronger site does not need more pages. It needs sharper hierarchy, fewer distractions, and a better path to the next call.",
-    readTime: "5 min read",
-  },
-];
+import Link from "next/link";
+
+import { getAllBlogPosts } from "@/lib/blogs";
 
 export default function BlogsPage() {
+  const posts = getAllBlogPosts();
+
   return (
     <div className="bg-[#f7f8fb] text-[var(--lumivale-ink)]">
-      <section data-nav-surface="dark" className="bg-[radial-gradient(circle_at_50%_0%,rgba(20,201,131,0.22),transparent_28%),linear-gradient(180deg,#063322_0%,#031410_56%,#010807_100%)] px-6 py-24 text-white">
+      <section className="bg-white px-6 py-16 pt-32">
         <div className="mx-auto max-w-7xl text-center">
-          <p className="text-sm font-semibold uppercase text-[var(--lumivale-accent-soft)]">
-            Insights
-          </p>
-          <h1 className="mt-5 text-4xl font-semibold leading-[1.04] sm:text-5xl">Blogs</h1>
-          <p className="mx-auto mt-6 max-w-3xl text-base leading-8 text-[#c7e7d7] sm:text-lg">
-            Field notes on positioning, website strategy, and building a digital presence
-            that earns trust faster.
+          <h1 className="text-3xl font-semibold leading-[1.04] text-[var(--lumivale-ink)] sm:text-4xl">Blogs</h1>
+          <p className="mx-auto mt-5 max-w-3xl text-sm leading-7 text-[var(--lumivale-muted)] sm:text-base">
+            Field notes on comment campaigns, creator-led content, outreach, and direct
+            response systems that help teams find traction.
           </p>
         </div>
       </section>
 
-      <section className="px-6 py-24">
+      <section className="px-6 py-12">
         <div className="mx-auto max-w-7xl">
           <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr] lg:items-end">
             <div>
-              <p className="text-sm font-semibold uppercase text-[var(--lumivale-accent)]">
+              <p className="text-xs font-semibold uppercase tracking-[0.08em] text-[var(--lumivale-accent)]">
                 Latest thinking
               </p>
-              <h2 className="mt-4 text-3xl font-semibold leading-tight">
-                Practical ideas for making expert services easier to buy.
+              <h2 className="mt-3 text-[1.75rem] font-semibold leading-tight sm:text-[1.9rem]">
+                Practical ideas for turning attention into growth activity.
               </h2>
             </div>
-            <p className="leading-7 text-[var(--lumivale-muted)]">
-              Short articles for founders and service teams who want a cleaner site,
-              stronger proof, and a sharper path from attention to inquiry.
+            <p className="text-sm leading-6 text-[var(--lumivale-muted)] sm:text-[0.95rem]">
+              Short articles for founders and lean teams that want simple, affordable,
+              and consistent growth execution.
             </p>
           </div>
 
-          <div className="mt-14 grid gap-5 lg:grid-cols-3">
+          <div className="mt-7 grid gap-4 lg:grid-cols-3">
             {posts.map((post) => (
-              <article
+              <Link
                 key={post.title}
-                className="flex min-h-[320px] flex-col rounded-lg border border-[var(--lumivale-line)] bg-white p-7 shadow-[0_20px_60px_rgba(42,47,82,0.06)]"
+                href={`/blogs/${post.slug}`}
+                aria-label={`Read ${post.title}`}
+                className="group flex min-h-[320px] flex-col overflow-hidden rounded-lg border border-[var(--lumivale-line)] bg-white shadow-[0_20px_60px_rgba(42,47,82,0.06)] transition hover:-translate-y-1 hover:border-[var(--lumivale-accent)] hover:shadow-[0_24px_70px_rgba(42,47,82,0.1)]"
               >
-                <div className="flex items-center justify-between gap-4 text-sm">
-                  <span className="rounded-full bg-[#eef8f2] px-3 py-1 font-semibold text-[var(--lumivale-ink)]">
-                    {post.category}
-                  </span>
-                  <span className="text-[var(--lumivale-muted)]">{post.readTime}</span>
+                <div
+                  aria-label={`${post.category} placeholder image`}
+                  className="grid aspect-[16/9] place-items-center bg-[linear-gradient(135deg,#eafaf2_0%,#f7f8fb_52%,#ffffff_100%)]"
+                >
+                  <div className="flex flex-col items-center gap-2">
+                    <span className="rounded-full bg-white/80 px-4 py-2 text-sm font-semibold text-[var(--lumivale-accent)] shadow-[0_10px_30px_rgba(42,47,82,0.08)]">
+                      {post.category}
+                    </span>
+                    <span className="text-[11px] font-medium uppercase tracking-[0.08em] text-[var(--lumivale-muted)]">
+                      Image placeholder
+                    </span>
+                  </div>
                 </div>
-                <h2 className="mt-8 text-xl font-semibold leading-tight">{post.title}</h2>
-                <p className="mt-4 leading-7 text-[var(--lumivale-muted)]">{post.excerpt}</p>
-                <p className="mt-auto pt-8 text-sm font-semibold text-[var(--lumivale-ink)]">
-                  Coming soon
-                </p>
-              </article>
+                <article className="flex flex-1 flex-col p-4 sm:p-5">
+                  <div className="flex items-center justify-between gap-4 text-xs sm:text-sm">
+                    <span className="rounded-full bg-[#eef8f2] px-3 py-1 font-semibold text-[var(--lumivale-ink)]">
+                      {post.category}
+                    </span>
+                    <span className="text-[var(--lumivale-muted)]">{post.readTime}</span>
+                  </div>
+                  <h2 className="mt-5 text-[1.05rem] font-semibold leading-tight transition group-hover:text-[var(--lumivale-accent)] sm:text-[1.12rem]">
+                    {post.title}
+                  </h2>
+                  <p className="mt-3 text-sm leading-7 text-[var(--lumivale-muted)]">{post.excerpt}</p>
+                  <p className="mt-auto pt-5 text-sm font-semibold text-[var(--lumivale-ink)]">
+                    Read more
+                  </p>
+                </article>
+              </Link>
             ))}
           </div>
         </div>

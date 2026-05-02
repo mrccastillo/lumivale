@@ -4,7 +4,10 @@ import { SiteNavbarClient } from "@/components/site-navbar-client";
 
 const publicLinks = [
   { href: "/", label: "Home" },
-  { href: "/about", label: "About" },
+  { href: "/#services", label: "Services" },
+  { href: "/#case-studies", label: "Case Studies" },
+  { href: "/#testimonials", label: "Testimonials" },
+  { href: "/about", label: "About Us" },
   { href: "/blogs", label: "Blogs" },
 ] as const;
 

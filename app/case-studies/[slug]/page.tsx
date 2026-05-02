@@ -19,7 +19,7 @@ export default async function CaseStudyDetailPage({
   }
 
   return (
-    <article className="mx-auto flex w-full max-w-4xl flex-col gap-8 px-6 py-16">
+    <article className="mx-auto flex w-full max-w-4xl flex-col gap-8 px-6 pb-[54px] pt-32">
       <header className="space-y-4">
         <h1 className="text-3xl font-medium text-stone-900">{caseStudy.title}</h1>
         <p className="max-w-2xl text-stone-600">{caseStudy.summary}</p>

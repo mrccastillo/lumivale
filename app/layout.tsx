@@ -5,7 +5,7 @@ import { SiteNavbar } from "@/components/site-navbar";
 
 export const metadata: Metadata = {
   title: "Lumivale",
-  description: "Premium websites and growth systems for service brands.",
+  description: "Simple, affordable growth services for early-stage teams.",
 };
 
 export default function RootLayout({

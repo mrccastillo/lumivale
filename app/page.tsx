@@ -1,83 +1,152 @@
 import Link from "next/link";
 
+import { CaseStudyCards } from "@/components/case-study-cards";
 import { getAllCaseStudies } from "@/lib/case-studies";
+import { getAllServices } from "@/lib/services";
 import { CALENDLY_URL } from "@/lib/site-config";
 
-const platformNames = ["Webflow", "Shopify", "Wix", "Framer", "Squarespace"];
+const platformNames = ["Reddit", "Quora", "X", "TikTok", "LinkedIn"];
 
 const metrics = [
-  { value: "3x", label: "clearer offer hierarchy", client: "Positioning" },
-  { value: "+42%", label: "more qualified inquiries", client: "Conversion" },
-  { value: "<30 days", label: "to a sharper launch plan", client: "Delivery" },
-  { value: "100%", label: "built around your buyer", client: "Strategy" },
-];
-
-const services = [
   {
-    step: "1",
-    title: "Clarify the offer",
-    copy: "We tighten your positioning, page story, and buyer logic before a single section gets designed.",
+    value: "We keep it Simple.",
+    label:
+      "No complex strategies or agency jargon. Clear, actionable steps that work.",
   },
   {
-    step: "2",
-    title: "Design the system",
-    copy: "We shape a modern web presence with focused pages, proof points, CTAs, and clean visual hierarchy.",
+    value: "Make it Affordable.",
+    label:
+      "Dedicated growth support for a fraction of agency cost with flat-rate packages.",
   },
   {
-    step: "3",
-    title: "Launch with momentum",
-    copy: "You get a site and campaign-ready messaging system that can support calls, content, and follow-up.",
+    value: "Ensure Excellence.",
+    label:
+      "Hands-on experience with startups, experiments, and quality execution.",
   },
 ];
 
 const faqs = [
   {
-    question: "Is this only for SaaS companies?",
+    question: "Is this only for startups?",
     answer:
-      "No. The visual direction is SaaS-grade, but the work is built for expert-led service brands, consultants, and studios.",
+      "No. Lumivale is built for early teams, founders, and lean brands that need practical growth execution without agency overhead.",
   },
   {
-    question: "Do you handle copy and structure?",
+    question: "Do you handle the growth channels?",
     answer:
-      "Yes. Messaging, page structure, proof hierarchy, and conversion paths are part of the core engagement.",
+      "Yes. Lumivale supports targeted comments, UGC content, creator collaborations, LinkedIn outreach, and B2B email campaigns.",
   },
   {
-    question: "Can this work with our current platform?",
+    question: "How does pricing work?",
     answer:
-      "Yes. The strategy and interface system can be adapted to common platforms or prepared for a custom build.",
+      "Packages are flat-rate so you know exactly what you are paying for before the work starts.",
+  },
+  {
+    question: "How soon can Lumivale start?",
+    answer:
+      "Most projects can begin after a short discovery call, once the channel focus, package, and first priorities are clear.",
+  },
+  {
+    question: "Can we choose only one channel?",
+    answer:
+      "Yes. You can start with one focused growth channel, then add more support once the activity and results are easier to repeat.",
   },
 ];
 
+function ServiceIcon({ slug, title }: { slug: string; title: string }) {
+  const iconClass = "size-6";
+  const commonProps = {
+    "aria-label": `${title} icon`,
+    className: iconClass,
+    fill: "none",
+    role: "img",
+    stroke: "currentColor",
+    strokeLinecap: "round" as const,
+    strokeLinejoin: "round" as const,
+    strokeWidth: 2,
+    viewBox: "0 0 24 24",
+  };
+
+  switch (slug) {
+    case "comment-campaign":
+      return (
+        <svg {...commonProps}>
+          <path d="M5 7.5h14" />
+          <path d="M5 12h9" />
+          <path d="M8 18h4l4 3v-3h1.5A3.5 3.5 0 0 0 21 14.5v-8A3.5 3.5 0 0 0 17.5 3h-11A3.5 3.5 0 0 0 3 6.5v8A3.5 3.5 0 0 0 6.5 18H8Z" />
+        </svg>
+      );
+    case "ugc-content-creation":
+      return (
+        <svg {...commonProps}>
+          <path d="M7 4h10a3 3 0 0 1 3 3v10a3 3 0 0 1-3 3H7a3 3 0 0 1-3-3V7a3 3 0 0 1 3-3Z" />
+          <path d="m10 9 5 3-5 3V9Z" />
+        </svg>
+      );
+    case "creator-collabs":
+      return (
+        <svg {...commonProps}>
+          <path d="M8 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z" />
+          <path d="M2.5 21a5.5 5.5 0 0 1 11 0" />
+          <path d="M17 8h4" />
+          <path d="M19 6v4" />
+          <path d="M16 15h5" />
+          <path d="M16 19h5" />
+        </svg>
+      );
+    case "linkedin-outreaching":
+      return (
+        <svg {...commonProps}>
+          <path d="M6 10v8" />
+          <path d="M6 6.5v.01" />
+          <path d="M10 18v-8" />
+          <path d="M10 13a3 3 0 0 1 6 0v5" />
+          <path d="M4 3h16a1 1 0 0 1 1 1v16a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1Z" />
+        </svg>
+      );
+    default:
+      return (
+        <svg {...commonProps}>
+          <path d="M4 6h16v12H4z" />
+          <path d="m4 7 8 6 8-6" />
+          <path d="M18 4v4" />
+          <path d="M20 6h-4" />
+        </svg>
+      );
+  }
+}
+
 export default function Home() {
-  const [featuredStudy, ...supportingStudies] = getAllCaseStudies();
+  const caseStudies = getAllCaseStudies();
+  const services = getAllServices();
 
   return (
     <div className="bg-[#f7f8fb] text-[var(--lumivale-ink)]">
       <div data-nav-surface="dark" className="relative isolate overflow-hidden bg-[radial-gradient(circle_at_50%_0%,rgba(20,201,131,0.26),transparent_26%),radial-gradient(circle_at_50%_44%,rgba(20,201,131,0.12),transparent_30%),linear-gradient(180deg,#063322_0%,#031410_48%,#031410_74%,#010807_100%)] text-white">
-        <section id="hero" data-theme="dark" className="px-6 pb-16 pt-20">
-          <div className="mx-auto flex min-h-[68vh] max-w-7xl flex-col items-center justify-center text-center">
+        <section id="hero" data-theme="dark" className="px-6 pb-8 pt-20">
+          <div className="mx-auto flex min-h-[56vh] max-w-7xl flex-col items-center justify-center text-center">
             <div className="inline-flex items-center gap-2 rounded-full border border-white/12 bg-white/10 px-4 py-2 text-sm font-medium text-[#d7f0e3] shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]">
               <span className="flex -space-x-2">
                 <span className="grid size-7 place-items-center rounded-full bg-[#ff8a3d] text-xs text-white">Y</span>
                 <span className="grid size-7 place-items-center rounded-full bg-[#4ecdc4] text-xs text-white">L</span>
                 <span className="grid size-7 place-items-center rounded-full bg-[#7dba99] text-xs text-white">S</span>
               </span>
-              Backed by strategy, design, and launch systems
+              Light up your growth
             </div>
 
-            <h1 className="mt-8 max-w-6xl text-4xl font-semibold leading-[1.04] text-white sm:text-5xl lg:text-6xl">
-              Launch a premium website that turns trust into{" "}
-              <span className="text-[var(--lumivale-accent-soft)]">booked calls</span>
+            <h1 className="mt-8 max-w-6xl text-3xl font-semibold leading-[1.08] text-white sm:text-4xl lg:text-5xl">
+              Light up your growth with{" "}
+              <span className="text-[var(--lumivale-accent-soft)]">simple execution systems</span>
             </h1>
 
             <p className="mt-7 max-w-3xl text-base leading-8 text-[#c7e7d7] sm:text-lg">
-              Lumivale builds modern websites, message systems, and conversion paths for
-              service brands that need to look credible before the first sales call.
+              Lumivale helps early-stage teams find the channels that actually bring
+              customers, then turns those channels into clear, repeatable growth actions.
             </p>
 
             <div className="mt-9 flex w-full max-w-xl flex-col gap-3 rounded-full border border-white/14 bg-white/12 p-2 shadow-[0_24px_80px_rgba(0,0,0,0.28)] sm:flex-row">
               <div className="flex flex-1 items-center px-5 py-3 text-left text-sm text-[#add7c2]">
-                Enter your domain...
+                Ready to grow?
               </div>
               <a
                 href={CALENDLY_URL}
@@ -85,7 +154,7 @@ export default function Home() {
                 rel="noopener noreferrer"
                 className="rounded-full bg-[var(--lumivale-accent)] px-7 py-3 text-sm font-semibold text-[#010807] shadow-[0_10px_28px_rgba(20,201,131,0.34)] transition hover:bg-[var(--lumivale-accent-soft)]"
               >
-                Start
+                Book a call
               </a>
             </div>
 
@@ -97,21 +166,19 @@ export default function Home() {
           </div>
         </section>
 
-        <section id="proof" className="px-6 pb-28 pt-8 text-white">
+        <section id="proof" className="px-6 pb-[68px] pt-0 text-white">
           <div className="mx-auto max-w-7xl text-center">
             <p className="text-sm font-medium uppercase text-[#8ebba4]">
-              Trusted by ambitious service teams
+              Built for lean growth teams
             </p>
             <h2 className="mx-auto mt-10 max-w-5xl text-3xl font-semibold leading-tight sm:text-4xl">
-              Lumivale drives premium positioning and conversion-ready websites at a
-              fraction of agency bloat.
+              Keep growth simple, affordable, and excellent without the agency overhead.
             </h2>
-            <div className="mt-16 grid overflow-hidden rounded-lg border border-white/10 bg-white/[0.03] md:grid-cols-4">
+            <div className="mx-auto mt-12 grid max-w-5xl overflow-hidden rounded-lg border border-white/10 bg-white/[0.03] md:grid-cols-3">
               {metrics.map((metric) => (
                 <article key={metric.value} className="border-white/10 p-8 text-left md:border-r last:border-r-0">
                   <p className="text-4xl font-semibold text-white">{metric.value}</p>
                   <p className="mt-3 text-sm text-[#b9d9c8]">{metric.label}</p>
-                  <p className="mt-8 text-base font-semibold text-white">{metric.client}</p>
                 </article>
               ))}
             </div>
@@ -119,145 +186,134 @@ export default function Home() {
         </section>
       </div>
 
-      <section id="services" className="bg-white px-6 py-28">
+      <section id="services" className="bg-white px-6 py-24">
         <div className="mx-auto max-w-7xl">
-          <div className="text-center">
-            <h2 className="text-3xl font-semibold leading-tight text-[var(--lumivale-ink)] sm:text-4xl">
-              Lumivale works like a compact growth team.
-            </h2>
-            <p className="mx-auto mt-4 max-w-2xl text-base text-[var(--lumivale-muted)]">
-              Strategy, design, and launch structure move together so the website feels
-              expensive and performs like a system.
-            </p>
-          </div>
-
-          <div className="mt-16 grid gap-14 lg:grid-cols-2 lg:items-center">
-            <div className="space-y-8">
-              {services.map((service) => (
-                <article key={service.step} className="grid gap-5 sm:grid-cols-[48px_1fr]">
-                  <span className="grid size-12 place-items-center rounded-lg bg-[#efecff] text-sm font-semibold text-[var(--lumivale-accent)]">
-                    {service.step}
-                  </span>
-                  <div>
-                    <h3 className="text-xl font-semibold text-[var(--lumivale-ink)]">
-                      {service.title}
-                    </h3>
-                    <p className="mt-3 leading-7 text-[var(--lumivale-muted)]">
-                      {service.copy}
-                    </p>
-                  </div>
-                </article>
-              ))}
-            </div>
-
-            <div className="rounded-lg border border-[var(--lumivale-line)] bg-[#fbfcff] p-5 shadow-[0_28px_80px_rgba(42,47,82,0.12)]">
-              <div className="rounded-md border border-[var(--lumivale-line)] bg-white">
-                <div className="flex items-center gap-2 border-b border-[var(--lumivale-line)] px-4 py-3">
-                  <span className="size-2 rounded-full bg-[#d6dbe8]" />
-                  <span className="size-2 rounded-full bg-[#d6dbe8]" />
-                  <span className="size-2 rounded-full bg-[#d6dbe8]" />
-                  <span className="ml-auto rounded-full bg-[#f4f6fb] px-16 py-2" />
-                </div>
-                <div className="grid gap-4 p-5">
-                  <div className="grid gap-4 md:grid-cols-[1fr_160px]">
-                    <div className="h-44 rounded-md bg-[#f3f5fb]" />
-                    <div className="space-y-3">
-                      <div className="h-16 rounded-md bg-[#efecff]" />
-                      <div className="h-16 rounded-md bg-[#f3f5fb]" />
-                    </div>
-                  </div>
-                  <div className="grid gap-3 sm:grid-cols-3">
-                    <div className="h-20 rounded-md bg-[#f3f5fb]" />
-                    <div className="h-20 rounded-md bg-[#f3f5fb]" />
-                    <div className="h-20 rounded-md bg-[#f3f5fb]" />
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section id="results" className="bg-[#f7f8fb] px-6 py-28">
-        <div className="mx-auto max-w-7xl">
-          <div className="grid gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:items-end">
-            <div>
+          <div className="mx-auto max-w-3xl text-center">
               <p className="text-sm font-semibold uppercase text-[var(--lumivale-accent)]">
-                Case studies
+                Services
               </p>
               <h2 className="mt-4 text-3xl font-semibold leading-tight text-[var(--lumivale-ink)] sm:text-4xl">
-                Designed to make expertise easier to believe.
+                Our services
               </h2>
-              <p className="mt-5 max-w-2xl leading-7 text-[var(--lumivale-muted)]">
-                {featuredStudy.summary}
+              <p className="mx-auto mt-5 max-w-2xl text-base leading-7 text-[var(--lumivale-muted)]">
+                Choose focused growth support across targeted comments, UGC content,
+                creator collaborations, LinkedIn outreach, and B2B email campaigns.
               </p>
-              <Link
-                href={`/case-studies/${featuredStudy.slug}`}
-                className="mt-8 inline-flex rounded-full bg-[var(--lumivale-ink)] px-6 py-3 text-sm font-semibold text-white transition hover:bg-[var(--lumivale-deep)]"
+          </div>
+
+          <div className="mt-14 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+            {services.map((service) => (
+              <article
+                key={service.slug}
+                className="flex min-h-[220px] flex-col rounded-lg border border-[var(--lumivale-line)] bg-[#fbfcff] p-7 shadow-[0_20px_60px_rgba(42,47,82,0.06)] transition hover:-translate-y-1 hover:border-[var(--lumivale-accent)] hover:shadow-[0_24px_70px_rgba(42,47,82,0.1)]"
               >
-                {featuredStudy.title}
-              </Link>
-            </div>
-            <div className="grid gap-4">
-              {supportingStudies.slice(0, 2).map((study) => (
-                <article key={study.slug} className="rounded-lg border border-[var(--lumivale-line)] bg-white p-6">
-                  <h3 className="text-lg font-semibold text-[var(--lumivale-ink)]">{study.title}</h3>
-                  <p className="mt-3 text-sm leading-6 text-[var(--lumivale-muted)]">
-                    {study.summary}
-                  </p>
-                </article>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section data-nav-surface="dark" id="testimonials" className="bg-[var(--lumivale-ink)] px-6 py-28 text-white">
-        <div className="mx-auto max-w-5xl text-center">
-          <p className="text-sm font-semibold uppercase text-[var(--lumivale-accent-soft)]">
-            Client signal
-          </p>
-          <blockquote className="mt-6 text-3xl font-semibold leading-tight sm:text-4xl">
-            The site stopped feeling like a brochure and started working like a serious
-            sales asset.
-          </blockquote>
-          <p className="mx-auto mt-6 max-w-2xl leading-7 text-[#b9d9c8]">
-            The strongest brands do not need louder pages. They need sharper hierarchy,
-            stronger proof, and fewer reasons for a buyer to hesitate.
-          </p>
-        </div>
-      </section>
-
-      <section id="faqs" className="bg-white px-6 py-28">
-        <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[0.8fr_1.2fr]">
-          <div>
-            <p className="text-sm font-semibold uppercase text-[var(--lumivale-accent)]">
-              Questions
-            </p>
-            <h2 className="mt-4 text-3xl font-semibold leading-tight text-[var(--lumivale-ink)]">
-              What teams ask before we start.
-            </h2>
-          </div>
-          <div className="divide-y divide-[var(--lumivale-line)] border-y border-[var(--lumivale-line)]">
-            {faqs.map((faq) => (
-              <article key={faq.question} className="py-6">
-                <h3 className="text-lg font-semibold text-[var(--lumivale-ink)]">
-                  {faq.question}
-                </h3>
-                <p className="mt-3 leading-7 text-[var(--lumivale-muted)]">{faq.answer}</p>
+                <div className="flex items-start gap-4">
+                  <span className="grid size-12 shrink-0 place-items-center rounded-lg bg-[#eafaf2] text-[var(--lumivale-accent)]">
+                    <ServiceIcon slug={service.slug} title={service.title} />
+                  </span>
+                  <Link
+                    href={`/services/${service.slug}`}
+                    className="pt-2 text-xl font-semibold text-[var(--lumivale-ink)] transition hover:text-[var(--lumivale-accent)]"
+                  >
+                    {service.title}
+                  </Link>
+                </div>
+                <p className="mt-5 flex-1 text-sm leading-7 text-[var(--lumivale-muted)]">
+                  {service.summary}
+                </p>
+                <Link
+                  href={`/services/${service.slug}`}
+                  aria-label={`Learn more: ${service.title}`}
+                  className="mt-6 w-fit text-sm font-semibold text-[var(--lumivale-accent)] transition hover:text-[var(--lumivale-ink)]"
+                >
+                  Learn more
+                </Link>
               </article>
             ))}
           </div>
         </div>
       </section>
 
-      <section id="conversion" className="bg-[#f7f8fb] px-6 py-28">
+      <section id="case-studies" className="bg-[#f7f8fb] px-6 py-24">
+        <div className="mx-auto max-w-7xl">
+          <div className="mx-auto max-w-3xl text-center">
+            <p className="text-sm font-semibold uppercase text-[var(--lumivale-accent)]">
+              Case studies
+            </p>
+            <h2 className="mt-4 text-3xl font-semibold leading-tight text-[var(--lumivale-ink)] sm:text-4xl">
+              Measured Growth, Built with Lumivale
+            </h2>
+            <p className="mx-auto mt-5 max-w-2xl leading-7 text-[var(--lumivale-muted)]">
+              Each card shows practical growth activity across awareness, content, and
+              outbound channels.
+            </p>
+          </div>
+
+          <div className="mt-14">
+            <CaseStudyCards caseStudies={caseStudies} />
+          </div>
+        </div>
+      </section>
+
+      <section data-nav-surface="dark" id="testimonials" className="bg-[var(--lumivale-ink)] px-6 py-24 text-white">
+        <div className="mx-auto max-w-5xl text-center">
+          <p className="text-sm font-semibold uppercase text-[var(--lumivale-accent-soft)]">
+            Client signal
+          </p>
+          <blockquote className="mt-6 text-3xl font-semibold leading-tight sm:text-4xl">
+            Lumivale keeps growth focused on the channels that can actually bring users,
+            awareness, and website traffic.
+          </blockquote>
+          <p className="mx-auto mt-6 max-w-2xl leading-7 text-[#b9d9c8]">
+            The strongest early teams do not need more agency jargon. They need simple
+            execution, clear packages, and consistent growth activity.
+          </p>
+        </div>
+      </section>
+
+      <section id="faqs" className="bg-white px-6 py-24">
+        <div className="mx-auto grid max-w-7xl gap-12 lg:grid-cols-[0.74fr_1.26fr] lg:gap-20">
+          <div className="lg:pt-2">
+            <p className="text-sm font-semibold uppercase text-[var(--lumivale-accent)]">
+              Questions
+            </p>
+            <h2 className="mt-6 text-5xl font-semibold leading-none text-[var(--lumivale-ink)] sm:text-6xl">
+              FAQ
+            </h2>
+            <p className="mt-7 max-w-md text-base leading-8 text-[var(--lumivale-muted)]">
+              Everything you need to know about Lumivale and how we help grow
+              your customer channels.
+            </p>
+          </div>
+          <div className="border-t border-[var(--lumivale-line)]">
+            {faqs.map((faq, index) => (
+              <details
+                key={faq.question}
+                open={index === 0}
+                className="group border-b border-[var(--lumivale-line)] py-6"
+              >
+                <summary className="flex cursor-pointer list-none items-start justify-between gap-6 text-lg font-semibold leading-7 text-[var(--lumivale-ink)] transition hover:text-[var(--lumivale-accent)] [&::-webkit-details-marker]:hidden">
+                  {faq.question}
+                  <span className="mt-0.5 shrink-0 text-2xl font-light leading-none text-[var(--lumivale-muted)] transition group-open:rotate-45 group-open:text-[var(--lumivale-accent)]">
+                    +
+                  </span>
+                </summary>
+                <p className="mt-4 max-w-3xl text-sm leading-7 text-[var(--lumivale-muted)] sm:text-base">
+                  {faq.answer}
+                </p>
+              </details>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section id="conversion" className="bg-[#f7f8fb] px-6 py-24">
         <div className="mx-auto max-w-4xl text-center">
           <p className="text-sm font-semibold uppercase text-[var(--lumivale-accent)]">
             Start here
           </p>
           <h2 className="mt-4 text-3xl font-semibold leading-tight text-[var(--lumivale-ink)] sm:text-4xl">
-            Build a website that makes the next conversation easier to win.
+            Light up the next growth channel for your brand.
           </h2>
           <a
             href={CALENDLY_URL}

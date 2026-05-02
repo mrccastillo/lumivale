@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 type NavSurface = "dark" | "light";
 type SiteNavbarLink = {
@@ -20,29 +21,27 @@ export function SiteNavbarClient({
   hasTrustedAccess,
   publicLinks,
 }: SiteNavbarClientProps) {
+  const pathname = usePathname() || "/";
   const [surface, setSurface] = useState<NavSurface>("dark");
-  const [pathname, setPathname] = useState("/");
   const [isScrolled, setIsScrolled] = useState(false);
   const isLight = surface === "light";
+  const sampleY = 56;
+
+  const updateSurface = () => {
+    const surfaces = Array.from(
+      document.querySelectorAll<HTMLElement>("[data-nav-surface]"),
+    ).reverse();
+    const activeSurface = surfaces.find((element) => {
+      const rect = element.getBoundingClientRect();
+
+      return rect.top <= sampleY && rect.bottom > sampleY;
+    });
+
+    setSurface((activeSurface?.dataset.navSurface as NavSurface) ?? "dark");
+    setIsScrolled(window.scrollY > 8);
+  };
 
   useEffect(() => {
-    const sampleY = 56;
-
-    const updateSurface = () => {
-      const surfaces = Array.from(
-        document.querySelectorAll<HTMLElement>("[data-nav-surface]"),
-      ).reverse();
-      const activeSurface = surfaces.find((element) => {
-        const rect = element.getBoundingClientRect();
-
-        return rect.top <= sampleY && rect.bottom > sampleY;
-      });
-
-      setSurface((activeSurface?.dataset.navSurface as NavSurface) ?? "dark");
-      setPathname(window.location.pathname || "/");
-      setIsScrolled(window.scrollY > 8);
-    };
-
     updateSurface();
     window.addEventListener("scroll", updateSurface, { passive: true });
     window.addEventListener("resize", updateSurface);
@@ -52,6 +51,10 @@ export function SiteNavbarClient({
       window.removeEventListener("resize", updateSurface);
     };
   }, []);
+
+  useEffect(() => {
+    updateSurface();
+  }, [pathname]);
 
   const shellClass = isLight
     ? "border-[var(--lumivale-line)] bg-white text-[var(--lumivale-ink)]"
