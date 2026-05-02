@@ -22,6 +22,7 @@ export function SiteNavbarClient({
 }: SiteNavbarClientProps) {
   const [surface, setSurface] = useState<NavSurface>("dark");
   const [pathname, setPathname] = useState("/");
+  const [isScrolled, setIsScrolled] = useState(false);
   const isLight = surface === "light";
 
   useEffect(() => {
@@ -39,6 +40,7 @@ export function SiteNavbarClient({
 
       setSurface((activeSurface?.dataset.navSurface as NavSurface) ?? "dark");
       setPathname(window.location.pathname || "/");
+      setIsScrolled(window.scrollY > 8);
     };
 
     updateSurface();
@@ -53,7 +55,9 @@ export function SiteNavbarClient({
 
   const shellClass = isLight
     ? "border-[var(--lumivale-line)] bg-white text-[var(--lumivale-ink)]"
-    : "border-transparent bg-[#063322] text-white";
+    : isScrolled
+      ? "border-white/10 bg-[#031410]/68 text-white shadow-[0_16px_42px_rgba(0,0,0,0.22)] backdrop-blur-xl"
+      : "border-transparent bg-transparent text-white";
   const logoChipClass = isLight
     ? "bg-[var(--lumivale-ink)] text-[var(--lumivale-accent-soft)]"
     : "bg-[var(--lumivale-accent-soft)]/14 text-[var(--lumivale-accent-soft)] ring-1 ring-white/10";
