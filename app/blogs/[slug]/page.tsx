@@ -1,10 +1,16 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
-import { getAllBlogPosts, getBlogPostBySlug } from "@/lib/blogs";
+import { getPublicBlogPostBySlug, getPublicBlogPosts } from "@/lib/blogs";
+import { getMongoDb } from "@/lib/mongodb";
 
 export async function generateStaticParams() {
-  return getAllBlogPosts().map((post) => ({ slug: post.slug }));
+  const db = await getMongoDb();
+  const posts = await getPublicBlogPosts(db);
+
+  return posts.map((post) => ({ slug: post.slug }));
 }
 
 export default async function BlogDetailPage({
@@ -13,7 +19,8 @@ export default async function BlogDetailPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const post = getBlogPostBySlug(slug);
+  const db = await getMongoDb();
+  const post = await getPublicBlogPostBySlug(db, slug);
 
   if (!post) {
     notFound();
@@ -35,18 +42,26 @@ export default async function BlogDetailPage({
         <p className="max-w-2xl text-stone-600">{post.excerpt}</p>
       </header>
 
-      <div
-        aria-label={`${post.category} placeholder image`}
-        className="grid aspect-[16/9] place-items-center rounded-lg border border-[var(--lumivale-line)] bg-[linear-gradient(135deg,#eafaf2_0%,#f7f8fb_52%,#ffffff_100%)]"
-      >
-        <span className="rounded-full bg-white/80 px-5 py-2 text-sm font-semibold text-[var(--lumivale-accent)] shadow-[0_10px_30px_rgba(42,47,82,0.08)]">
-          {post.category}
-        </span>
-      </div>
+      {post.coverImageId ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={`/api/blog-images/${post.coverImageId}`}
+          alt={post.coverAlt || post.title}
+          className="aspect-[16/9] w-full rounded-lg border border-[var(--lumivale-line)] object-cover"
+        />
+      ) : (
+        <div
+          aria-label={`${post.category} placeholder image`}
+          className="grid aspect-[16/9] place-items-center rounded-lg border border-[var(--lumivale-line)] bg-[linear-gradient(135deg,#eafaf2_0%,#f7f8fb_52%,#ffffff_100%)]"
+        >
+          <span className="rounded-full bg-white/80 px-5 py-2 text-sm font-semibold text-[var(--lumivale-accent)] shadow-[0_10px_30px_rgba(42,47,82,0.08)]">
+            {post.category}
+          </span>
+        </div>
+      )}
 
-      <section className="space-y-3">
-        <h2 className="text-xl font-medium text-stone-900">Overview</h2>
-        <p className="text-stone-600">{post.body}</p>
+      <section className="prose prose-stone max-w-none">
+        <ReactMarkdown remarkPlugins={[remarkGfm]}>{post.body}</ReactMarkdown>
       </section>
     </article>
   );

@@ -39,7 +39,16 @@ export function SiteFooter() {
       </div>
       <div className="border-t border-white/10 px-6 py-[17px]">
         <div className="mx-auto flex max-w-7xl flex-col gap-2 text-xs text-[#8ebba4] sm:flex-row sm:items-center sm:justify-between">
-          <p>lumivale.net</p>
+          <div className="flex items-center gap-3">
+            <p>lumivale.net</p>
+            <Link
+              href="/admin/login"
+              aria-label="Admin login"
+              className="grid size-3 place-items-center rounded-full bg-[#8ebba4] opacity-35 transition hover:opacity-80"
+            >
+              <span className="sr-only">Admin login</span>
+            </Link>
+          </div>
           <p>Simple, affordable growth support for early-stage teams.</p>
         </div>
       </div>

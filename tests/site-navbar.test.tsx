@@ -1,5 +1,7 @@
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { afterEach, describe, expect, test, vi } from "vitest";
+
+import { CALENDLY_URL } from "@/lib/site-config";
 
 const hasTrustedClientAccessMock = vi.hoisted(() => vi.fn());
 const pathnameMock = vi.hoisted(() => vi.fn());
@@ -59,7 +61,7 @@ describe("site navbar", () => {
     );
     expect(screen.getByRole("link", { name: "Contact Us" })).toHaveAttribute(
       "href",
-      "https://calendly.com/lumivale/discovery-call",
+      CALENDLY_URL,
     );
     expect(screen.getByRole("link", { name: "Contact Us" })).toHaveAttribute(
       "target",
@@ -69,6 +71,64 @@ describe("site navbar", () => {
       "rel",
       "noopener noreferrer",
     );
+    expect(screen.getByRole("link", { name: "Contact Us" })).toHaveClass(
+      "hidden",
+      "md:inline-flex",
+    );
+    expect(screen.getByRole("button", { name: "Open menu" })).toHaveClass(
+      "md:hidden",
+    );
+  });
+
+  test("opens a mobile menu with navigation links and a book a call CTA", async () => {
+    hasTrustedClientAccessMock.mockResolvedValue(false);
+    pathnameMock.mockReturnValue("/");
+    const { SiteNavbar } = await import("@/components/site-navbar");
+
+    render(await SiteNavbar());
+
+    const menuButton = screen.getByRole("button", { name: "Open menu" });
+
+    expect(menuButton).toHaveAttribute("aria-expanded", "false");
+    expect(screen.queryByRole("navigation", { name: "Mobile" })).not.toBeInTheDocument();
+
+    fireEvent.click(menuButton);
+
+    expect(screen.getByRole("button", { name: "Close menu" })).toHaveAttribute(
+      "aria-expanded",
+      "true",
+    );
+
+    const mobileNav = screen.getByRole("navigation", { name: "Mobile" });
+    expect(within(mobileNav).getByRole("link", { name: "Services" })).toHaveAttribute(
+      "href",
+      "/#services",
+    );
+    expect(within(mobileNav).getByRole("link", { name: "Book a call" })).toHaveAttribute(
+      "href",
+      CALENDLY_URL,
+    );
+    expect(
+      within(mobileNav).getByRole("link", { name: "Book a call" }),
+    ).toHaveAttribute("target", "_blank");
+  });
+
+  test("closes the mobile menu after route changes", async () => {
+    hasTrustedClientAccessMock.mockResolvedValue(false);
+    pathnameMock.mockReturnValue("/");
+    const { SiteNavbar } = await import("@/components/site-navbar");
+
+    const { rerender } = render(await SiteNavbar());
+
+    fireEvent.click(screen.getByRole("button", { name: "Open menu" }));
+    expect(screen.getByRole("navigation", { name: "Mobile" })).toBeInTheDocument();
+
+    pathnameMock.mockReturnValue("/blogs");
+    rerender(await SiteNavbar());
+
+    await waitFor(() => {
+      expect(screen.queryByRole("navigation", { name: "Mobile" })).not.toBeInTheDocument();
+    });
   });
 
   test("hides the pricing link for public visitors", async () => {
@@ -158,6 +218,22 @@ describe("site navbar", () => {
     render(await SiteNavbar());
 
     expect(screen.getByRole("link", { name: "Pricing" })).toHaveAttribute(
+      "href",
+      "/pricing",
+    );
+  });
+
+  test("includes pricing inside the mobile menu for trusted visitors", async () => {
+    hasTrustedClientAccessMock.mockResolvedValue(true);
+    pathnameMock.mockReturnValue("/");
+    const { SiteNavbar } = await import("@/components/site-navbar");
+
+    render(await SiteNavbar());
+
+    fireEvent.click(screen.getByRole("button", { name: "Open menu" }));
+
+    const mobileNav = screen.getByRole("navigation", { name: "Mobile" });
+    expect(within(mobileNav).getByRole("link", { name: "Pricing" })).toHaveAttribute(
       "href",
       "/pricing",
     );

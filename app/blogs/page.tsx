@@ -1,9 +1,10 @@
 import Link from "next/link";
 
-import { getAllBlogPosts } from "@/lib/blogs";
+import { getPublicBlogPosts } from "@/lib/blogs";
+import { getMongoDb } from "@/lib/mongodb";
 
-export default function BlogsPage() {
-  const posts = getAllBlogPosts();
+export default async function BlogsPage() {
+  const posts = await getBlogsPagePosts();
 
   return (
     <div className="bg-[#f7f8fb] text-[var(--lumivale-ink)]">
@@ -35,26 +36,30 @@ export default function BlogsPage() {
           </div>
 
           <div className="mt-7 grid gap-4 lg:grid-cols-3">
-            {posts.map((post) => (
+            {posts.length ? posts.map((post) => (
               <Link
                 key={post.title}
                 href={`/blogs/${post.slug}`}
                 aria-label={`Read ${post.title}`}
                 className="group flex min-h-[320px] flex-col overflow-hidden rounded-lg border border-[var(--lumivale-line)] bg-white shadow-[0_20px_60px_rgba(42,47,82,0.06)] transition hover:-translate-y-1 hover:border-[var(--lumivale-accent)] hover:shadow-[0_24px_70px_rgba(42,47,82,0.1)]"
               >
-                <div
-                  aria-label={`${post.category} placeholder image`}
-                  className="grid aspect-[16/9] place-items-center bg-[linear-gradient(135deg,#eafaf2_0%,#f7f8fb_52%,#ffffff_100%)]"
-                >
-                  <div className="flex flex-col items-center gap-2">
+                {post.coverImageId ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={`/api/blog-images/${post.coverImageId}`}
+                    alt={post.coverAlt || post.title}
+                    className="aspect-[16/9] w-full object-cover"
+                  />
+                ) : (
+                  <div
+                    aria-label={`${post.category} placeholder image`}
+                    className="grid aspect-[16/9] place-items-center bg-[linear-gradient(135deg,#eafaf2_0%,#f7f8fb_52%,#ffffff_100%)]"
+                  >
                     <span className="rounded-full bg-white/80 px-4 py-2 text-sm font-semibold text-[var(--lumivale-accent)] shadow-[0_10px_30px_rgba(42,47,82,0.08)]">
                       {post.category}
                     </span>
-                    <span className="text-[11px] font-medium uppercase tracking-[0.08em] text-[var(--lumivale-muted)]">
-                      Image placeholder
-                    </span>
                   </div>
-                </div>
+                )}
                 <article className="flex flex-1 flex-col p-4 sm:p-5">
                   <div className="flex items-center justify-between gap-4 text-xs sm:text-sm">
                     <span className="rounded-full bg-[#eef8f2] px-3 py-1 font-semibold text-[var(--lumivale-ink)]">
@@ -71,10 +76,26 @@ export default function BlogsPage() {
                   </p>
                 </article>
               </Link>
-            ))}
+            )) : (
+              <p className="rounded-lg border border-[var(--lumivale-line)] bg-white p-6 text-sm text-[var(--lumivale-muted)]">
+                Blog posts are temporarily unavailable. Please check back soon.
+              </p>
+            )}
           </div>
         </div>
       </section>
     </div>
   );
+}
+
+async function getBlogsPagePosts() {
+  try {
+    const db = await getMongoDb();
+
+    return getPublicBlogPosts(db);
+  } catch (error) {
+    console.error("Unable to load blog posts", error);
+
+    return [];
+  }
 }

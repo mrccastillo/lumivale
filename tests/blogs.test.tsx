@@ -1,59 +1,72 @@
 import { render, screen } from "@testing-library/react";
-import { describe, expect, test } from "vitest";
+import { describe, expect, test, vi } from "vitest";
 
 import BlogDetailPage, {
   generateStaticParams,
 } from "@/app/blogs/[slug]/page";
-import { getAllBlogPosts, getBlogPostBySlug } from "@/lib/blogs";
+import { getPublicBlogPostBySlug, getPublicBlogPosts } from "@/lib/blogs";
+
+vi.mock("@/lib/mongodb", () => ({
+  getMongoDb: vi.fn().mockResolvedValue("test-db"),
+}));
+
+vi.mock("@/lib/blogs", () => ({
+  getPublicBlogPosts: vi.fn(),
+  getPublicBlogPostBySlug: vi.fn(),
+}));
+
+const publishedPost = {
+  id: "post-1",
+  slug: "published-post",
+  category: "CMS",
+  title: "Published Post",
+  excerpt: "A published MongoDB post.",
+  body: "## Launch notes\n\nMarkdown body content.",
+  readTime: "5 min read",
+  tags: ["cms"],
+  seoTitle: "Published Post SEO",
+  seoDescription: "Published SEO description",
+  status: "published" as const,
+  coverImageId: "cover-1",
+  coverAlt: "Published post cover",
+  createdAt: new Date("2026-05-03T08:00:00.000Z"),
+  updatedAt: new Date("2026-05-03T08:00:00.000Z"),
+};
 
 describe("blog data and detail pages", () => {
-  test("lists blog posts with slugs for index and detail routes", () => {
-    const posts = getAllBlogPosts();
+  test("generates static params for every published blog post", async () => {
+    vi.mocked(getPublicBlogPosts).mockResolvedValue([publishedPost]);
 
-    expect(posts.map((post) => post.slug)).toEqual([
-      "comment-campaigns-create-early-awareness",
-      "short-form-content-needs-consistent-output",
-      "direct-outreach-easier-to-repeat",
-    ]);
-    expect(posts.every((post) => post.title && post.body)).toBe(true);
-  });
-
-  test("looks up blog posts by slug", () => {
-    const [firstPost] = getAllBlogPosts();
-
-    expect(getBlogPostBySlug(firstPost.slug)).toEqual(firstPost);
-    expect(getBlogPostBySlug("missing-post")).toBeUndefined();
-  });
-
-  test("generates static params for every blog post", async () => {
     const params = await generateStaticParams();
 
-    expect(params).toEqual(
-      getAllBlogPosts().map((post) => ({ slug: post.slug })),
-    );
+    expect(params).toEqual([{ slug: "published-post" }]);
   });
 
-  test("renders the full blog detail page", async () => {
-    const post = getBlogPostBySlug("comment-campaigns-create-early-awareness");
-
-    if (!post) {
-      throw new Error("Expected seeded comment campaign blog post");
-    }
+  test("renders the full blog detail page from MongoDB content", async () => {
+    vi.mocked(getPublicBlogPostBySlug).mockResolvedValue(publishedPost);
 
     render(
       await BlogDetailPage({
-        params: Promise.resolve({ slug: post.slug }),
+        params: Promise.resolve({ slug: publishedPost.slug }),
       }),
     );
 
-    expect(screen.getByRole("heading", { level: 1, name: post.title })).toBeInTheDocument();
-    expect(screen.getByLabelText(`${post.category} placeholder image`)).toBeInTheDocument();
-    expect(screen.getByText(post.excerpt)).toBeInTheDocument();
-    expect(screen.getByText(post.body)).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { level: 1, name: publishedPost.title }),
+    ).toBeInTheDocument();
+    expect(screen.getByRole("img", { name: publishedPost.coverAlt })).toHaveAttribute(
+      "src",
+      `/api/blog-images/${publishedPost.coverImageId}`,
+    );
+    expect(screen.getByText(publishedPost.excerpt)).toBeInTheDocument();
+    expect(screen.getByRole("heading", { level: 2, name: "Launch notes" })).toBeInTheDocument();
+    expect(screen.getByText("Markdown body content.")).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Blogs" })).toHaveAttribute("href", "/blogs");
   });
 
   test("rejects unknown blog slugs", async () => {
+    vi.mocked(getPublicBlogPostBySlug).mockResolvedValue(null);
+
     await expect(
       BlogDetailPage({
         params: Promise.resolve({ slug: "missing-post" }),

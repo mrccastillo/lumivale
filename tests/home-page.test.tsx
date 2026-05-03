@@ -1,9 +1,20 @@
 import { render, screen, within } from "@testing-library/react";
-import { describe, expect, test } from "vitest";
+import { describe, expect, test, vi } from "vitest";
 
 import Home from "@/app/page";
 import { getAllCaseStudies } from "@/lib/case-studies";
+import { getMongoDb } from "@/lib/mongodb";
 import { getAllServices } from "@/lib/services";
+import { CALENDLY_URL } from "@/lib/site-config";
+import { getPublishedTestimonials } from "@/lib/testimonials";
+
+vi.mock("@/lib/mongodb", () => ({
+  getMongoDb: vi.fn().mockResolvedValue("test-db"),
+}));
+
+vi.mock("@/lib/testimonials", () => ({
+  getPublishedTestimonials: vi.fn().mockResolvedValue([]),
+}));
 
 describe("home page", () => {
   test("renders the landing sections in order", async () => {
@@ -22,28 +33,40 @@ describe("home page", () => {
     ]);
   });
 
-  test("reduces vertical section padding while leaving the hero unchanged", async () => {
+  test("uses tighter mobile section spacing", async () => {
     const { container } = render(await Home());
 
-    expect(container.querySelector("#hero")).toHaveClass("pb-8", "pt-20");
-    expect(container.querySelector("#proof")).toHaveClass("pb-[68px]", "pt-0");
-    expect(container.querySelector("#services")).toHaveClass("py-24");
-    expect(container.querySelector("#case-studies")).toHaveClass("py-24");
-    expect(container.querySelector("#testimonials")).toHaveClass("py-24");
-    expect(container.querySelector("#faqs")).toHaveClass("py-24");
-    expect(container.querySelector("#conversion")).toHaveClass("py-24");
+    expect(container.querySelector("#hero")).toHaveClass(
+      "px-4",
+      "pb-6",
+      "pt-[72px]",
+      "sm:px-6",
+      "sm:pb-8",
+      "sm:pt-20",
+    );
+    expect(container.querySelector("#proof")).toHaveClass(
+      "px-4",
+      "pb-14",
+      "sm:px-6",
+      "sm:pb-[68px]",
+    );
+    expect(container.querySelector("#services")).toHaveClass("py-16", "sm:py-24");
+    expect(container.querySelector("#case-studies")).toHaveClass("py-16", "sm:py-24");
+    expect(container.querySelector("#testimonials")).toHaveClass("py-16", "sm:py-24");
+    expect(container.querySelector("#faqs")).toHaveClass("py-16", "sm:py-24");
+    expect(container.querySelector("#conversion")).toHaveClass("py-16", "sm:py-24");
   });
 
   test("renders Lumivale growth copy and a seeded case study link", async () => {
-    render(await Home());
+    const { container } = render(await Home());
 
     const heroHeading = screen.getByRole("heading", {
       level: 1,
       name: /Light up your growth with simple execution systems/i,
     });
     expect(heroHeading).toBeInTheDocument();
-    expect(heroHeading).toHaveClass("text-3xl", "sm:text-4xl", "lg:text-5xl");
-    expect(heroHeading).not.toHaveClass("text-4xl", "sm:text-5xl", "lg:text-6xl");
+    expect(heroHeading).toHaveClass("text-[1.7rem]", "sm:text-4xl", "lg:text-5xl");
+    expect(heroHeading).not.toHaveClass("text-3xl", "text-4xl", "sm:text-5xl", "lg:text-6xl");
     expect(
       screen.getByText(
         "Lumivale helps early-stage teams find the channels that actually bring customers, then turns those channels into clear, repeatable growth actions.",
@@ -58,10 +81,34 @@ describe("home page", () => {
         .getAllByRole("link", { name: "Book a call" })
         .some(
           (link) =>
-            link.getAttribute("href") ===
-            "https://calendly.com/lumivale/discovery-call",
+            link.getAttribute("href") === CALENDLY_URL,
         ),
     ).toBe(true);
+
+    const hero = container.querySelector("#hero");
+    const heroCta = hero?.querySelector("[data-testid='hero-cta-card']");
+    const platformRow = hero?.querySelector("[data-testid='platform-row']");
+
+    expect(heroCta).toHaveClass(
+      "max-w-[22rem]",
+      "flex-row",
+      "gap-2",
+      "p-1.5",
+      "sm:max-w-xl",
+      "sm:gap-3",
+      "sm:p-2",
+    );
+    expect(heroCta).not.toHaveClass("flex-col");
+    expect(platformRow).toHaveClass(
+      "max-w-full",
+      "flex-nowrap",
+      "gap-x-4",
+      "text-sm",
+      "sm:max-w-none",
+      "sm:gap-x-12",
+      "sm:text-xl",
+    );
+    expect(platformRow).not.toHaveClass("flex-wrap", "gap-y-4", "text-base");
 
     const [featuredStudy] = getAllCaseStudies();
     expect(
@@ -147,6 +194,60 @@ describe("home page", () => {
     ).not.toBeInTheDocument();
   });
 
+  test("renders published text and video testimonials from MongoDB", async () => {
+    vi.mocked(getPublishedTestimonials).mockResolvedValueOnce([
+      {
+        id: "testimonial-1",
+        personName: "Maya Lee",
+        personTitle: "Founder, Northstar",
+        quote: "Lumivale made growth activity simpler to repeat.",
+        sortOrder: 1,
+        status: "published",
+        type: "text",
+        videoFileId: "",
+        createdAt: new Date("2026-05-03T08:00:00.000Z"),
+        updatedAt: new Date("2026-05-03T08:00:00.000Z"),
+      },
+      {
+        id: "testimonial-2",
+        personName: "Jon Ramos",
+        personTitle: "CEO, Signal Labs",
+        quote: "The execution support helped us move faster.",
+        sortOrder: 2,
+        status: "published",
+        type: "video",
+        videoFileId: "video-1",
+        createdAt: new Date("2026-05-03T08:01:00.000Z"),
+        updatedAt: new Date("2026-05-03T08:01:00.000Z"),
+      },
+    ]);
+
+    const { container } = render(await Home());
+    const testimonialSection = container.querySelector("#testimonials");
+
+    expect(testimonialSection).toHaveTextContent("Maya Lee");
+    expect(testimonialSection).toHaveTextContent("Founder, Northstar");
+    expect(testimonialSection).toHaveTextContent(
+      "Lumivale made growth activity simpler to repeat.",
+    );
+    expect(testimonialSection).toHaveTextContent("Jon Ramos");
+    expect(testimonialSection?.querySelector("video")).toHaveAttribute(
+      "src",
+      "/api/testimonial-videos/video-1",
+    );
+    expect(testimonialSection?.querySelector("video")).toHaveAttribute("controls");
+  });
+
+  test("keeps the homepage available when MongoDB authentication fails", async () => {
+    vi.mocked(getMongoDb).mockRejectedValueOnce(new Error("bad auth"));
+
+    const { container } = render(await Home());
+
+    expect(container.querySelector("#testimonials")).toHaveTextContent(
+      "Lumivale keeps growth focused on the channels that can actually bring users, awareness, and website traffic.",
+    );
+  });
+
   test("renders at least five collapsible FAQs", async () => {
     const { container } = render(await Home());
     const faqSection = container.querySelector("#faqs");
@@ -168,7 +269,12 @@ describe("home page", () => {
       ),
     ).toBeInTheDocument();
     expect(firstFaq).toHaveAttribute("open");
-    expect(firstFaq).toHaveClass("border-b", "border-[var(--lumivale-line)]", "py-6");
+    expect(firstFaq).toHaveClass(
+      "border-b",
+      "border-[var(--lumivale-line)]",
+      "py-5",
+      "sm:py-6",
+    );
     expect(firstFaq).not.toHaveClass("rounded-lg", "bg-[#fbfcff]", "shadow-[0_14px_40px_rgba(42,47,82,0.04)]");
     expect(
       within(faqSection as HTMLElement).getByText("How soon can Lumivale start?"),
