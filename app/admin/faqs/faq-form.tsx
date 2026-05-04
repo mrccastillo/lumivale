@@ -1,38 +1,30 @@
-"use client";
+import type { ReactNode } from "react";
 
-import { useId, useState, type ReactNode } from "react";
-
-import type { Testimonial } from "@/lib/testimonials";
+import type { Faq } from "@/lib/faqs";
 
 const fieldClassName =
   "min-h-12 w-full rounded-[18px] border border-[var(--lumivale-line)] bg-white px-4 py-3 text-sm text-[var(--lumivale-ink)] outline-none transition focus:border-[var(--lumivale-accent)]";
 
-export function TestimonialForm({
+export function FaqForm({
   cancelHref,
   errorMessage,
+  faq,
   submitLabel,
-  testimonial,
 }: {
   cancelHref?: string;
   errorMessage?: string;
+  faq?: Faq;
   submitLabel?: string;
-  testimonial?: Testimonial;
 }) {
-  const action = testimonial
-    ? `/api/admin/testimonials/${testimonial.id}`
-    : "/api/admin/testimonials";
-  const [selectedType, setSelectedType] = useState(testimonial?.type ?? "text");
-  const typeHintId = useId();
+  const action = faq ? `/api/admin/faqs/${faq.id}` : "/api/admin/faqs";
 
   return (
     <form
       action={action}
       method="post"
-      encType="multipart/form-data"
       className="grid gap-6 rounded-[24px] border border-[var(--lumivale-line)] bg-white p-6 shadow-[0_20px_60px_rgba(42,47,82,0.06)] sm:p-7"
     >
       <input type="hidden" name="action" value="save" />
-      <input type="hidden" name="videoFileId" value={testimonial?.videoFileId ?? ""} />
 
       {errorMessage ? (
         <div
@@ -43,86 +35,48 @@ export function TestimonialForm({
         </div>
       ) : null}
 
+      <Field
+        label="Question"
+        name="question"
+        required
+        defaultValue={faq?.question}
+      />
+
+      <TextArea
+        label="Answer"
+        name="answer"
+        required
+        defaultValue={faq?.answer}
+        rows={6}
+      />
+
       <div className="grid gap-5 sm:grid-cols-2">
-        <Field label="Name" name="personName" required defaultValue={testimonial?.personName} />
         <Field
-          label="Title or company"
-          name="personTitle"
-          defaultValue={testimonial?.personTitle}
+          label="Sort order"
+          name="sortOrder"
+          type="number"
+          defaultValue={String(faq?.sortOrder ?? 0)}
         />
-      </div>
-
-      <TextArea label="Quote" name="quote" required defaultValue={testimonial?.quote} rows={5} />
-
-      <div className="grid gap-5 sm:grid-cols-3">
         <div>
-          <FieldLabel htmlFor="testimonial-type">Type</FieldLabel>
+          <FieldLabel htmlFor="faq-status">Status</FieldLabel>
           <select
-            id="testimonial-type"
-            name="type"
-            value={selectedType}
-            aria-describedby={typeHintId}
-            onChange={(event) =>
-              setSelectedType(event.target.value === "video" ? "video" : "text")
-            }
-            className={fieldClassName}
-          >
-            <option value="text">Text</option>
-            <option value="video">Video</option>
-          </select>
-          <p id={typeHintId} className="mt-2 text-xs leading-6 text-[var(--lumivale-muted)]">
-            Video testimonials still include a written quote for preview and context.
-          </p>
-        </div>
-
-        <div>
-          <FieldLabel htmlFor="testimonial-status">Status</FieldLabel>
-          <select
-            id="testimonial-status"
+            id="faq-status"
             name="status"
-            defaultValue={testimonial?.status ?? "draft"}
+            defaultValue={faq?.status ?? "draft"}
             className={fieldClassName}
           >
             <option value="draft">Draft</option>
             <option value="published">Published</option>
           </select>
         </div>
-
-        <Field
-          label="Sort order"
-          name="sortOrder"
-          type="number"
-          defaultValue={String(testimonial?.sortOrder ?? 0)}
-        />
       </div>
-
-      {selectedType === "video" ? (
-        <div className="rounded-[22px] border border-[var(--lumivale-line)] bg-[#fbfcff] p-5">
-          <FieldLabel htmlFor="testimonial-video">Upload video</FieldLabel>
-          <input
-            id="testimonial-video"
-            name="videoFile"
-            type="file"
-            accept="video/mp4,video/webm,video/quicktime"
-            className={fieldClassName}
-          />
-          <p className="mt-2 text-xs leading-6 text-[var(--lumivale-muted)]">
-            Supported formats: MP4, WEBM, and MOV. Maximum file size: 50MB.
-          </p>
-          {testimonial?.videoFileId ? (
-            <p className="mt-2 text-xs leading-6 text-[var(--lumivale-muted)]">
-              A saved video is already attached. Upload a new file to replace it.
-            </p>
-          ) : null}
-        </div>
-      ) : null}
 
       <div className="flex flex-wrap gap-3">
         <button
           type="submit"
           className="inline-flex min-h-12 items-center justify-center rounded-xl bg-[var(--lumivale-accent)] px-6 text-sm font-semibold text-[#010807] transition hover:bg-[var(--lumivale-accent-soft)]"
         >
-          {submitLabel ?? (testimonial ? "Save testimonial" : "Create testimonial")}
+          {submitLabel ?? (faq ? "Save FAQ" : "Create FAQ")}
         </button>
         {cancelHref ? (
           <a

@@ -36,16 +36,16 @@ export default async function AdminBlogsPage({ searchParams }: AdminBlogsPagePro
 
   return (
     <section className="mx-auto flex w-full max-w-7xl flex-col gap-7">
-      <section className="overflow-hidden rounded-lg border border-[#cfe0e8] bg-[#eef9fc] shadow-[0_26px_80px_rgba(49,88,106,0.1)]">
+      <section className="overflow-hidden rounded-lg border border-[var(--lumivale-admin-panel-soft)] bg-[linear-gradient(135deg,var(--lumivale-panel),var(--lumivale-ink))] shadow-[0_26px_80px_rgba(5,43,32,0.2)]">
         <div className="flex flex-col gap-6 p-6 sm:p-8 lg:flex-row lg:items-start lg:justify-between">
           <div className="max-w-2xl">
-            <p className="text-xs font-semibold uppercase tracking-[0.34em] text-[#31586a]">
+            <p className="text-xs font-semibold uppercase tracking-[0.34em] text-white/72">
               Content Management
             </p>
-            <h1 className="mt-4 text-4xl font-semibold leading-tight text-[var(--lumivale-ink)]">
+            <h1 className="mt-4 text-4xl font-semibold leading-tight text-white">
               Blogs
             </h1>
-            <p className="mt-4 text-base leading-8 text-[#526d7a]">
+            <p className="mt-4 text-base leading-8 text-white/74">
               Manage SEO-ready blog posts for the public landing site with a cleaner
               editorial workflow, faster filtering, and clearer publish controls.
             </p>
@@ -53,13 +53,13 @@ export default async function AdminBlogsPage({ searchParams }: AdminBlogsPagePro
           <div className="flex flex-wrap gap-3">
             <Link
               href={buildBlogsHref({ page: currentPage, query, status })}
-              className="inline-flex items-center gap-2 rounded-lg border border-[#bdd2dc] bg-white px-5 py-3 text-sm font-semibold text-[#31586a] transition hover:border-[#31586a]"
+              className="inline-flex items-center gap-2 rounded-lg border border-white/18 bg-white px-5 py-3 text-sm font-semibold text-[var(--lumivale-panel)] transition hover:border-white/40"
             >
               Refresh
             </Link>
             <Link
               href="/admin/blogs?mode=create"
-              className="inline-flex items-center gap-2 rounded-lg bg-[#31586a] px-5 py-3 text-sm font-semibold text-white shadow-[0_12px_28px_rgba(49,88,106,0.22)] transition hover:bg-[#264757]"
+              className="inline-flex items-center gap-2 rounded-lg border border-white/12 bg-[var(--lumivale-panel)] px-5 py-3 text-sm font-semibold text-white shadow-[0_12px_28px_rgba(1,8,7,0.28)] transition hover:bg-[var(--lumivale-admin-panel-soft)]"
             >
               <span aria-hidden="true">+</span>
               New Blog
@@ -67,7 +67,7 @@ export default async function AdminBlogsPage({ searchParams }: AdminBlogsPagePro
           </div>
         </div>
 
-        <div className="grid gap-4 border-t border-[#d8e9ef] bg-white/36 p-6 sm:grid-cols-2 sm:p-8 xl:grid-cols-4">
+        <div className="grid gap-4 border-t border-white/10 bg-white/6 p-6 sm:grid-cols-2 sm:p-8 xl:grid-cols-4">
           <MetricCard label="Matching posts" value={filteredPosts.length} note="Total results for current filters" />
           <MetricCard label="Published on page" value={publishedCount} note="Visible public-ready articles" />
           <MetricCard label="Drafts on page" value={draftCount} note="Posts still being prepared" />
@@ -79,11 +79,13 @@ export default async function AdminBlogsPage({ searchParams }: AdminBlogsPagePro
         </div>
       </section>
 
-      <div className="w-fit rounded-lg border border-[#cfe0e8] bg-white p-1 shadow-[0_16px_46px_rgba(49,88,106,0.08)]">
+      <div className="w-fit rounded-lg border border-[var(--lumivale-admin-border)] bg-white p-1 shadow-[0_16px_46px_rgba(5,43,32,0.08)]">
         <Link
           href={buildBlogsHref({ query, status: "all" })}
           className={`inline-flex rounded-lg px-4 py-2 text-sm font-semibold transition ${
-            mode === "list" ? "bg-[#eaf7fb] text-[#31586a]" : "text-[#526d7a]"
+            mode === "list"
+              ? "bg-[var(--lumivale-admin-chip)] text-[var(--lumivale-panel)]"
+              : "text-[var(--lumivale-admin-muted)]"
           }`}
         >
           View Blogs
@@ -91,7 +93,9 @@ export default async function AdminBlogsPage({ searchParams }: AdminBlogsPagePro
         <Link
           href="/admin/blogs?mode=create"
           className={`inline-flex rounded-lg px-4 py-2 text-sm font-semibold transition ${
-            mode === "create" ? "bg-[#eaf7fb] text-[#31586a]" : "text-[#526d7a] hover:text-[#31586a]"
+            mode === "create"
+              ? "bg-[var(--lumivale-admin-chip)] text-[var(--lumivale-panel)]"
+              : "text-[var(--lumivale-admin-muted)] hover:text-[var(--lumivale-panel)]"
           }`}
         >
           Create Blog
@@ -101,38 +105,38 @@ export default async function AdminBlogsPage({ searchParams }: AdminBlogsPagePro
       {mode === "create" ? (
         <CreateBlogPanel />
       ) : (
-      <section className="rounded-lg border border-[#cfe0e8] bg-white p-5 shadow-[0_22px_70px_rgba(49,88,106,0.08)] sm:p-7">
+      <section className="rounded-lg border border-[var(--lumivale-admin-border)] bg-white p-5 shadow-[0_22px_70px_rgba(5,43,32,0.08)] sm:p-7">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.34em] text-[#31586a]">
+            <p className="text-xs font-semibold uppercase tracking-[0.34em] text-[var(--lumivale-panel)]">
               Blog Library
             </p>
             <h2 className="mt-3 text-3xl font-semibold text-[var(--lumivale-ink)]">
               Browse And Manage Posts
             </h2>
-            <p className="mt-3 text-sm leading-7 text-[#526d7a]">
+            <p className="mt-3 text-sm leading-7 text-[var(--lumivale-admin-muted)]">
               Search by title or slug, narrow the list by status, and jump directly
               into editing without losing context.
             </p>
           </div>
-          <div className="rounded-lg border border-[#cfe0e8] bg-[#fbfdfe] px-5 py-4 text-sm">
-            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[#526d7a]">
+          <div className="rounded-lg border border-[var(--lumivale-admin-border)] bg-[var(--lumivale-admin-surface)] px-5 py-4 text-sm">
+            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--lumivale-admin-muted)]">
               Current view
             </p>
             <p className="mt-2 font-semibold text-[var(--lumivale-ink)]">
               Page {currentPage} of {totalPages}
             </p>
-            <p className="mt-1 text-xs text-[#526d7a]">{filteredPosts.length} total posts</p>
+            <p className="mt-1 text-xs text-[var(--lumivale-admin-muted)]">{filteredPosts.length} total posts</p>
           </div>
         </div>
 
         <form
           action="/admin/blogs"
-          className="mt-6 rounded-lg border border-[#cfe0e8] bg-[#fbfdfe] p-4"
+          className="mt-6 rounded-lg border border-[var(--lumivale-admin-border)] bg-[var(--lumivale-admin-surface)] p-4"
         >
           <label
             htmlFor="blog-search"
-            className="text-xs font-semibold uppercase tracking-[0.24em] text-[#526d7a]"
+            className="text-xs font-semibold uppercase tracking-[0.24em] text-[var(--lumivale-admin-muted)]"
           >
             Search
           </label>
@@ -144,12 +148,12 @@ export default async function AdminBlogsPage({ searchParams }: AdminBlogsPagePro
               type="search"
               defaultValue={query}
               placeholder="Search title or slug"
-              className="min-h-12 flex-1 rounded-lg border border-[#cfe0e8] bg-white px-4 text-sm outline-none transition focus:border-[#31586a]"
+              className="min-h-12 flex-1 rounded-lg border border-[var(--lumivale-admin-border)] bg-white px-4 text-sm outline-none transition focus:border-[var(--lumivale-panel)]"
             />
             {status !== "all" ? <input type="hidden" name="status" value={status} /> : null}
             <button
               type="submit"
-              className="min-h-12 rounded-lg bg-[#31586a] px-6 text-sm font-semibold text-white transition hover:bg-[#264757]"
+              className="min-h-12 rounded-lg bg-[var(--lumivale-panel)] px-6 text-sm font-semibold text-white transition hover:bg-[var(--lumivale-admin-panel-soft)]"
             >
               Search
             </button>
@@ -161,8 +165,8 @@ export default async function AdminBlogsPage({ searchParams }: AdminBlogsPagePro
                 href={buildBlogsHref({ query, status: option })}
                 className={`rounded-full border px-4 py-2 text-sm font-semibold transition ${
                   status === option
-                    ? "border-[#5db4d2] bg-[#eafaf2] text-[var(--lumivale-ink)]"
-                    : "border-[#cfe0e8] text-[var(--lumivale-ink)] hover:border-[#5db4d2]"
+                    ? "border-[var(--lumivale-panel)] bg-[var(--lumivale-admin-chip)] text-[var(--lumivale-panel)]"
+                    : "border-[var(--lumivale-admin-border)] text-[var(--lumivale-ink)] hover:border-[var(--lumivale-admin-border-strong)]"
                 }`}
               >
                 {option === "all" ? "All Posts" : capitalize(option)}
@@ -175,18 +179,18 @@ export default async function AdminBlogsPage({ searchParams }: AdminBlogsPagePro
           {pagePosts.length ? (
             pagePosts.map((post) => <BlogCard key={post.id} post={post} />)
           ) : (
-            <div className="rounded-lg border border-dashed border-[#cfe0e8] p-8 text-center lg:col-span-2">
+            <div className="rounded-lg border border-dashed border-[var(--lumivale-admin-border)] p-8 text-center lg:col-span-2">
               <p className="text-lg font-semibold text-[var(--lumivale-ink)]">
                 {posts.length ? "No matching posts." : "No blog posts yet."}
               </p>
-              <p className="mt-2 text-sm text-[#526d7a]">
+              <p className="mt-2 text-sm text-[var(--lumivale-admin-muted)]">
                 {posts.length
                   ? "Adjust search or status filters to see more posts."
                   : "Create the first post to start building the public blog library."}
               </p>
               <Link
                 href={posts.length ? "/admin/blogs" : "/admin/blogs?mode=create"}
-                className="mt-5 inline-flex rounded-lg bg-[#31586a] px-5 py-3 text-sm font-semibold text-white"
+                className="mt-5 inline-flex rounded-lg bg-[var(--lumivale-panel)] px-5 py-3 text-sm font-semibold text-white"
               >
                 {posts.length ? "Clear filters" : "New Blog"}
               </Link>
@@ -194,8 +198,8 @@ export default async function AdminBlogsPage({ searchParams }: AdminBlogsPagePro
           )}
         </div>
 
-        <div className="mt-6 flex flex-col gap-3 border-t border-[#cfe0e8] pt-5 sm:flex-row sm:items-center sm:justify-between">
-          <p className="text-sm text-[#526d7a]">
+        <div className="mt-6 flex flex-col gap-3 border-t border-[var(--lumivale-admin-border)] pt-5 sm:flex-row sm:items-center sm:justify-between">
+          <p className="text-sm text-[var(--lumivale-admin-muted)]">
             Showing page {currentPage} of {totalPages}
           </p>
           <div className="flex gap-2">
@@ -207,24 +211,24 @@ export default async function AdminBlogsPage({ searchParams }: AdminBlogsPagePro
                   status,
                   includePageOne: true,
                 })}
-                className="rounded-lg border border-[#cfe0e8] px-5 py-3 text-sm font-semibold text-[#31586a]"
+                className="rounded-lg border border-[var(--lumivale-admin-border)] px-5 py-3 text-sm font-semibold text-[var(--lumivale-panel)]"
               >
                 Previous
               </Link>
             ) : (
-              <span className="rounded-lg border border-[#e5edf1] px-5 py-3 text-sm font-semibold text-[#9aabb3]">
+              <span className="rounded-lg border border-[var(--lumivale-admin-border)] px-5 py-3 text-sm font-semibold text-[#92a49b]">
                 Previous
               </span>
             )}
             {currentPage < totalPages ? (
               <Link
                 href={buildBlogsHref({ page: currentPage + 1, query, status })}
-                className="rounded-lg border border-[#cfe0e8] px-5 py-3 text-sm font-semibold text-[#31586a]"
+                className="rounded-lg border border-[var(--lumivale-admin-border)] px-5 py-3 text-sm font-semibold text-[var(--lumivale-panel)]"
               >
                 Next
               </Link>
             ) : (
-              <span className="rounded-lg border border-[#e5edf1] px-5 py-3 text-sm font-semibold text-[#9aabb3]">
+              <span className="rounded-lg border border-[var(--lumivale-admin-border)] px-5 py-3 text-sm font-semibold text-[#92a49b]">
                 Next
               </span>
             )}
@@ -238,7 +242,7 @@ export default async function AdminBlogsPage({ searchParams }: AdminBlogsPagePro
 
 function BlogCard({ post }: { post: BlogPost }) {
   return (
-    <article className="overflow-hidden rounded-lg border border-[#cfe0e8] bg-white">
+    <article className="overflow-hidden rounded-lg border border-[var(--lumivale-admin-border)] bg-white">
       {post.coverImageId ? (
         // eslint-disable-next-line @next/next/no-img-element
         <img
@@ -247,28 +251,28 @@ function BlogCard({ post }: { post: BlogPost }) {
           className="aspect-[16/9] w-full object-cover"
         />
       ) : (
-        <div className="grid aspect-[16/9] place-items-center bg-[#eef9fc]">
-          <span className="rounded-full bg-white px-4 py-2 text-sm font-semibold text-[#31586a]">
+        <div className="grid aspect-[16/9] place-items-center bg-[var(--lumivale-admin-surface-strong)]">
+          <span className="rounded-full bg-white px-4 py-2 text-sm font-semibold text-[var(--lumivale-panel)]">
             {post.category}
           </span>
         </div>
       )}
       <div className="p-5">
         <div className="flex flex-wrap items-center justify-between gap-2">
-          <span className="rounded-full bg-[#eafaf2] px-3 py-1 text-xs font-semibold uppercase text-[var(--lumivale-ink)]">
+          <span className="rounded-full bg-[var(--lumivale-admin-chip)] px-3 py-1 text-xs font-semibold uppercase text-[var(--lumivale-panel)]">
             {post.status}
           </span>
-          <span className="text-xs text-[#526d7a]">{post.readTime}</span>
+          <span className="text-xs text-[var(--lumivale-admin-muted)]">{post.readTime}</span>
         </div>
         <h2 className="mt-4 text-xl font-semibold text-[var(--lumivale-ink)]">
           {post.title}
         </h2>
-        <p className="mt-2 text-xs font-semibold uppercase tracking-[0.16em] text-[#31586a]">
+        <p className="mt-2 text-xs font-semibold uppercase tracking-[0.16em] text-[var(--lumivale-panel)]">
           /blog/{post.slug}
         </p>
-        <p className="mt-3 text-sm leading-6 text-[#526d7a]">{post.excerpt}</p>
-        <div className="mt-5 rounded-lg border border-[#cfe0e8] bg-[#fbfdfe] p-4">
-          <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[#526d7a]">
+        <p className="mt-3 text-sm leading-6 text-[var(--lumivale-admin-muted)]">{post.excerpt}</p>
+        <div className="mt-5 rounded-lg border border-[var(--lumivale-admin-border)] bg-[var(--lumivale-admin-surface)] p-4">
+          <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--lumivale-admin-muted)]">
             Editorial notes
           </p>
           <p className="mt-2 text-sm text-[var(--lumivale-ink)]">
@@ -280,7 +284,7 @@ function BlogCard({ post }: { post: BlogPost }) {
         <div className="mt-5 flex flex-wrap gap-2">
           <Link
             href={`/admin/blogs/${post.id}/edit`}
-            className="rounded-lg border border-[#cfe0e8] px-4 py-2 text-sm font-semibold text-[#31586a]"
+            className="rounded-lg border border-[var(--lumivale-admin-border)] px-4 py-2 text-sm font-semibold text-[var(--lumivale-panel)]"
           >
             Edit
           </Link>
@@ -292,7 +296,7 @@ function BlogCard({ post }: { post: BlogPost }) {
             />
             <button
               type="submit"
-              className="rounded-lg border border-[#cfe0e8] px-4 py-2 text-sm font-semibold text-[#31586a]"
+              className="rounded-lg border border-[var(--lumivale-admin-border)] px-4 py-2 text-sm font-semibold text-[var(--lumivale-panel)]"
             >
               {post.status === "published" ? "Unpublish" : "Publish"}
             </button>
@@ -322,27 +326,27 @@ function MetricCard({
   value: number | string;
 }) {
   return (
-    <article className="rounded-lg border border-[#d8e9ef] bg-white/72 p-5">
-      <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#526d7a]">
+    <article className="rounded-lg border border-white/12 bg-white/6 p-5 backdrop-blur-sm">
+      <p className="text-xs font-semibold uppercase tracking-[0.24em] text-white/68">
         {label}
       </p>
-      <p className="mt-3 text-3xl font-semibold text-[var(--lumivale-ink)]">{value}</p>
-      <p className="mt-2 text-xs text-[#526d7a]">{note}</p>
+      <p className="mt-3 text-3xl font-semibold text-white">{value}</p>
+      <p className="mt-2 text-xs text-white/68">{note}</p>
     </article>
   );
 }
 
 function CreateBlogPanel() {
   return (
-    <section className="rounded-lg border border-[#cfe0e8] bg-white p-5 shadow-[0_22px_70px_rgba(49,88,106,0.08)] sm:p-7">
+    <section className="rounded-lg border border-[var(--lumivale-admin-border)] bg-white p-5 shadow-[0_22px_70px_rgba(5,43,32,0.08)] sm:p-7">
       <div>
-        <p className="text-xs font-semibold uppercase tracking-[0.34em] text-[#31586a]">
+        <p className="text-xs font-semibold uppercase tracking-[0.34em] text-[var(--lumivale-panel)]">
           Blog Editor
         </p>
         <h2 className="mt-3 text-3xl font-semibold text-[var(--lumivale-ink)]">
           Create Blog Post
         </h2>
-        <p className="mt-3 text-sm leading-7 text-[#526d7a]">
+        <p className="mt-3 text-sm leading-7 text-[var(--lumivale-admin-muted)]">
           Write the article, prepare the summary, and manage the public URL before
           publishing it to the website.
         </p>

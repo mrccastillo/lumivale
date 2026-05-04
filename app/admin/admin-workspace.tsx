@@ -13,6 +13,7 @@ import {
 const pageTitles: Record<string, string> = {
   "/admin/blogs": "Blogs",
   "/admin/testimonials": "Testimonials",
+  "/admin/faqs": "FAQs",
   "/admin/users": "Users",
 };
 

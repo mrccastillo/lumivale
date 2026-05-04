@@ -55,6 +55,9 @@ describe("admin blogs dashboard", () => {
       "href",
       "/admin/blogs?status=published",
     );
+    expect(screen.getByRole("link", { name: "New Blog" })).toHaveClass(
+      "bg-[var(--lumivale-panel)]",
+    );
   });
 
   test("filters posts by status and search query", async () => {
@@ -67,7 +70,7 @@ describe("admin blogs dashboard", () => {
     expect(screen.getByRole("heading", { name: "Growth Systems", level: 2 })).toBeInTheDocument();
     expect(screen.queryByRole("heading", { name: "Post 2", level: 2 })).not.toBeInTheDocument();
     expect(screen.getByDisplayValue("growth")).toBeInTheDocument();
-    expect(screen.getByText("Published")).toHaveClass("bg-[#eafaf2]");
+    expect(screen.getByText("Published")).toHaveClass("bg-[var(--lumivale-admin-chip)]");
   });
 
   test("paginates blog cards six per page", async () => {
@@ -99,9 +102,7 @@ describe("admin blogs dashboard", () => {
   test("shows the create blog form inside the blogs page", async () => {
     render(await AdminBlogsPage({ searchParams: Promise.resolve({ mode: "create" }) }));
 
-    expect(
-      screen.getByRole("heading", { name: "Create Blog Post", level: 2 }),
-    ).toBeInTheDocument();
+    expect(screen.getAllByRole("heading", { name: "Create Blog Post", level: 2 }).length).toBeGreaterThan(0);
     expect(
       screen.queryByRole("heading", { name: "Browse And Manage Posts", level: 2 }),
     ).not.toBeInTheDocument();
@@ -110,7 +111,7 @@ describe("admin blogs dashboard", () => {
       "/admin/blogs",
     );
     expect(screen.getByLabelText("Title")).toBeInTheDocument();
-    expect(screen.getByLabelText("Slug")).toBeInTheDocument();
+    expect(screen.getByLabelText("Blog Link Ending")).toBeInTheDocument();
     expect(screen.getByLabelText("Upload cover image")).toHaveAttribute(
       "accept",
       "image/png,image/jpeg,image/webp,image/gif",

@@ -1,9 +1,8 @@
 import { NextResponse } from "next/server";
 
-import { uploadTestimonialVideo } from "@/app/api/admin/testimonials/upload-video";
 import { requireAdminAccess } from "@/lib/admin-auth";
+import { createFaq, parseFaqFormData } from "@/lib/faqs";
 import { getMongoDb } from "@/lib/mongodb";
-import { createTestimonial, parseTestimonialFormData } from "@/lib/testimonials";
 
 function redirectTo(path: string) {
   const response = NextResponse.redirect(new URL(path, "http://localhost"), 303);
@@ -18,13 +17,13 @@ function buildCreateErrorHref(message: string) {
     mode: "create",
   });
 
-  return `/admin/testimonials?${params.toString()}`;
+  return `/admin/faqs?${params.toString()}`;
 }
 
 function getErrorMessage(error: unknown) {
   return error instanceof Error && error.message
     ? error.message
-    : "Could not create testimonial.";
+    : "Could not create FAQ.";
 }
 
 export async function POST(request: Request) {
@@ -33,19 +32,12 @@ export async function POST(request: Request) {
   const formData = await request.formData();
 
   try {
-    const input = parseTestimonialFormData(formData);
-    const videoFileId = await uploadTestimonialVideo(
-      db,
-      formData.get("videoFile") as File | null,
-    );
+    const input = parseFaqFormData(formData);
 
-    await createTestimonial(db, {
-      ...input,
-      videoFileId: videoFileId || input.videoFileId,
-    });
+    await createFaq(db, input);
   } catch (error) {
     return redirectTo(buildCreateErrorHref(getErrorMessage(error)));
   }
 
-  return redirectTo("/admin/testimonials");
+  return redirectTo("/admin/faqs");
 }

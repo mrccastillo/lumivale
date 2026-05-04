@@ -13,6 +13,13 @@
   --lumivale-paper: #ffffff;
   --lumivale-muted: #68708a;
   --lumivale-line: #e6e9f2;
+  --lumivale-admin-panel-soft: #0b3b2d;
+  --lumivale-admin-surface: #f3f7f4;
+  --lumivale-admin-surface-strong: #e5efe9;
+  --lumivale-admin-border: #cfddd5;
+  --lumivale-admin-border-strong: #b7cbbf;
+  --lumivale-admin-muted: #566960;
+  --lumivale-admin-chip: #dce9e2;
 }
 
 @theme inline {
@@ -41,4 +48,82 @@ body {
 ::selection {
   background: var(--lumivale-accent);
   color: white;
+}
+
+.lumivale-visual-editor h2 {
+  margin: 0 0 1rem;
+  font-size: 1.5rem;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.lumivale-visual-editor h3,
+.lumivale-visual-editor h4 {
+  margin: 1.25rem 0 0.75rem;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.lumivale-visual-editor p,
+.lumivale-visual-editor blockquote,
+.lumivale-visual-editor ul,
+.lumivale-visual-editor ol,
+.lumivale-visual-editor figure {
+  margin: 0 0 1rem;
+}
+
+.lumivale-visual-editor ul,
+.lumivale-visual-editor ol {
+  padding-left: 1.4rem;
+}
+
+.lumivale-visual-editor blockquote {
+  border-left: 3px solid var(--lumivale-accent);
+  color: var(--lumivale-muted);
+  padding-left: 1rem;
+}
+
+.lumivale-visual-editor img {
+  border: 1px solid var(--lumivale-line);
+  border-radius: 0.5rem;
+  display: block;
+  max-width: 100%;
+}
+
+@keyframes lumivale-marquee {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(-25%);
+  }
+}
+
+.lumivale-marquee-fade {
+  -webkit-mask-image: linear-gradient(
+    90deg,
+    transparent 0,
+    black 10%,
+    black 90%,
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    90deg,
+    transparent 0,
+    black 10%,
+    black 90%,
+    transparent 100%
+  );
+}
+
+.lumivale-marquee-track {
+  animation: lumivale-marquee 18s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lumivale-marquee-track {
+    animation: none;
+    transform: translateX(0);
+  }
 }

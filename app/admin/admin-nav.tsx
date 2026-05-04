@@ -7,6 +7,7 @@ import { useState } from "react";
 const adminLinks = [
   { href: "/admin/blogs", icon: BlogsIcon, label: "Blogs" },
   { href: "/admin/testimonials", icon: TestimonialsIcon, label: "Testimonials" },
+  { href: "/admin/faqs", icon: FaqsIcon, label: "FAQs" },
   { href: "/admin/users", icon: UsersIcon, label: "Users" },
 ];
 
@@ -208,6 +209,16 @@ function UsersIcon({ className }: IconProps) {
     <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className={className}>
       <circle cx="8" cy="5.5" r="2.25" />
       <path d="M4.5 12.5c.7-1.7 2-2.5 3.5-2.5s2.8.8 3.5 2.5" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+function FaqsIcon({ className }: IconProps) {
+  return (
+    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className={className}>
+      <path d="M6.25 6a1.75 1.75 0 1 1 3.14 1.05c-.52.67-1.39 1.12-1.39 2.2" strokeLinecap="round" />
+      <path d="M8 11.75h.01" strokeLinecap="round" />
+      <circle cx="8" cy="8" r="5.25" />
     </svg>
   );
 }

@@ -4,6 +4,7 @@ import { describe, expect, test, vi } from "vitest";
 import Home from "@/app/page";
 import { getAllCaseStudies } from "@/lib/case-studies";
 import { getMongoDb } from "@/lib/mongodb";
+import { getPublishedFaqs } from "@/lib/faqs";
 import { getAllServices } from "@/lib/services";
 import { CALENDLY_URL } from "@/lib/site-config";
 import { getPublishedTestimonials } from "@/lib/testimonials";
@@ -14,6 +15,47 @@ vi.mock("@/lib/mongodb", () => ({
 
 vi.mock("@/lib/testimonials", () => ({
   getPublishedTestimonials: vi.fn().mockResolvedValue([]),
+}));
+
+vi.mock("@/lib/faqs", () => ({
+  getPublishedFaqs: vi.fn().mockResolvedValue([]),
+  defaultFaqs: [
+    {
+      question: "Is this only for startups?",
+      answer:
+        "No. Lumivale is built for early teams, founders, and lean brands that need practical growth execution without agency overhead.",
+      sortOrder: 1,
+      status: "published",
+    },
+    {
+      question: "Do you handle the growth channels?",
+      answer:
+        "Yes. Lumivale supports targeted comments, UGC content, creator collaborations, LinkedIn outreach, and B2B email campaigns.",
+      sortOrder: 2,
+      status: "published",
+    },
+    {
+      question: "How does pricing work?",
+      answer:
+        "Packages are flat-rate so you know exactly what you are paying for before the work starts.",
+      sortOrder: 3,
+      status: "published",
+    },
+    {
+      question: "How soon can Lumivale start?",
+      answer:
+        "Most projects can begin after a short discovery call, once the channel focus, package, and first priorities are clear.",
+      sortOrder: 4,
+      status: "published",
+    },
+    {
+      question: "Can we choose only one channel?",
+      answer:
+        "Yes. You can start with one focused growth channel, then add more support once the activity and results are easier to repeat.",
+      sortOrder: 5,
+      status: "published",
+    },
+  ],
 }));
 
 describe("home page", () => {
@@ -100,13 +142,10 @@ describe("home page", () => {
     );
     expect(heroCta).not.toHaveClass("flex-col");
     expect(platformRow).toHaveClass(
-      "max-w-full",
-      "flex-nowrap",
-      "gap-x-4",
-      "text-sm",
-      "sm:max-w-none",
-      "sm:gap-x-12",
-      "sm:text-xl",
+      "w-full",
+      "max-w-4xl",
+      "overflow-hidden",
+      "lumivale-marquee-fade",
     );
     expect(platformRow).not.toHaveClass("flex-wrap", "gap-y-4", "text-base");
 
@@ -116,6 +155,37 @@ describe("home page", () => {
         name: `Read the full story: ${featuredStudy.title}`,
       }),
     ).toHaveAttribute("href", `/case-studies/${featuredStudy.slug}`);
+  });
+
+  test("renders the hero platform labels as an infinite marquee", async () => {
+    const { container } = render(await Home());
+    const hero = container.querySelector("#hero");
+    const platformRow = hero?.querySelector("[data-testid='platform-row']");
+    const marqueeTrack = hero?.querySelector("[data-testid='platform-track']");
+    const sequences = hero?.querySelectorAll("[data-testid='platform-sequence']");
+    const [primarySequence, ...duplicateSequences] = Array.from(sequences ?? []);
+
+    expect(platformRow).toHaveClass("overflow-hidden");
+    expect(marqueeTrack).toHaveClass("lumivale-marquee-track");
+    expect(sequences).toHaveLength(4);
+    expect(primarySequence).not.toHaveClass("min-w-full", "justify-center");
+    const primaryLabels = Array.from(
+      primarySequence?.querySelectorAll("[data-testid='platform-item']") ?? [],
+    ).map((item) => item.textContent);
+    expect(primaryLabels).toEqual(["Reddit", "Quora", "X", "TikTok", "LinkedIn"]);
+    expect(duplicateSequences.every((sequence) => sequence.getAttribute("aria-hidden") === "true")).toBe(true);
+  });
+
+  test("renders homepage sections inside motion wrappers", async () => {
+    const { container } = render(await Home());
+
+    expect(container.querySelector("[data-testid='hero-parallax']")).toBeInTheDocument();
+    expect(container.querySelector("[data-testid='proof-reveal']")).toBeInTheDocument();
+    expect(container.querySelector("[data-testid='services-group']")).toBeInTheDocument();
+    expect(container.querySelector("[data-testid='case-studies-group']")).toBeInTheDocument();
+    expect(container.querySelector("[data-testid='testimonials-reveal']")).toBeInTheDocument();
+    expect(container.querySelector("[data-testid='faqs-reveal']")).toBeInTheDocument();
+    expect(container.querySelector("[data-testid='conversion-reveal']")).toBeInTheDocument();
   });
 
   test("does not render the old website studio positioning", async () => {
@@ -238,6 +308,21 @@ describe("home page", () => {
     expect(testimonialSection?.querySelector("video")).toHaveAttribute("controls");
   });
 
+  test("renders six testimonial placeholders when no published testimonials are available", async () => {
+    const { container } = render(await Home());
+    const testimonialSection = container.querySelector("#testimonials");
+
+    expect(testimonialSection).toHaveTextContent(
+      "Lumivale keeps growth focused on the channels that can actually bring users, awareness, and website traffic.",
+    );
+    expect(testimonialSection).toHaveTextContent(
+      "The strongest early teams do not need more agency jargon. They need simple execution, clear packages, and consistent growth activity.",
+    );
+    expect(within(testimonialSection as HTMLElement).getAllByText("Video placeholder")).toHaveLength(3);
+    expect(within(testimonialSection as HTMLElement).getAllByText("Text placeholder")).toHaveLength(3);
+    expect(testimonialSection?.querySelectorAll("article")).toHaveLength(6);
+  });
+
   test("keeps the homepage available when MongoDB authentication fails", async () => {
     vi.mocked(getMongoDb).mockRejectedValueOnce(new Error("bad auth"));
 
@@ -246,6 +331,11 @@ describe("home page", () => {
     expect(container.querySelector("#testimonials")).toHaveTextContent(
       "Lumivale keeps growth focused on the channels that can actually bring users, awareness, and website traffic.",
     );
+    expect(
+      within(container.querySelector("#testimonials") as HTMLElement).getAllByText(
+        "Video placeholder",
+      ),
+    ).toHaveLength(3);
   });
 
   test("renders at least five collapsible FAQs", async () => {
@@ -282,5 +372,38 @@ describe("home page", () => {
     expect(
       within(faqSection as HTMLElement).getByText("Can we choose only one channel?"),
     ).toBeInTheDocument();
+  });
+
+  test("renders published FAQs from MongoDB", async () => {
+    vi.mocked(getPublishedFaqs).mockResolvedValueOnce([
+      {
+        id: "faq-1",
+        question: "What does Lumivale actually handle?",
+        answer: "Lumivale supports outreach, content, and awareness execution.",
+        sortOrder: 1,
+        status: "published",
+        createdAt: new Date("2026-05-03T08:00:00.000Z"),
+        updatedAt: new Date("2026-05-03T08:00:00.000Z"),
+      },
+      {
+        id: "faq-2",
+        question: "Can we start small?",
+        answer: "Yes. Start with one focused channel and expand later.",
+        sortOrder: 2,
+        status: "published",
+        createdAt: new Date("2026-05-03T08:01:00.000Z"),
+        updatedAt: new Date("2026-05-03T08:01:00.000Z"),
+      },
+    ]);
+
+    const { container } = render(await Home());
+    const faqSection = container.querySelector("#faqs");
+
+    expect(faqSection).toHaveTextContent("What does Lumivale actually handle?");
+    expect(faqSection).toHaveTextContent(
+      "Lumivale supports outreach, content, and awareness execution.",
+    );
+    expect(faqSection).toHaveTextContent("Can we start small?");
+    expect(faqSection).not.toHaveTextContent("How soon can Lumivale start?");
   });
 });

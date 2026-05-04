@@ -1,53 +1,43 @@
 import Link from "next/link";
 
-import { TestimonialForm } from "@/app/admin/testimonials/testimonial-form";
+import { FaqForm } from "@/app/admin/faqs/faq-form";
 import { requireAdminAccess } from "@/lib/admin-auth";
+import { type Faq, getAdminFaqs } from "@/lib/faqs";
 import { getMongoDb } from "@/lib/mongodb";
-import { type Testimonial, getAdminTestimonials } from "@/lib/testimonials";
 
 const PAGE_SIZE = 6;
 const STATUS_OPTIONS = ["all", "published", "draft"] as const;
-const TYPE_OPTIONS = ["all", "text", "video"] as const;
 
-type TestimonialStatusFilter = (typeof STATUS_OPTIONS)[number];
-type TestimonialTypeFilter = (typeof TYPE_OPTIONS)[number];
+type FaqStatusFilter = (typeof STATUS_OPTIONS)[number];
 
-type AdminTestimonialsPageProps = {
+type AdminFaqsPageProps = {
   searchParams?: Promise<Record<string, string | string[] | undefined>>
     | Record<string, string | string[] | undefined>;
 };
 
-export default async function AdminTestimonialsPage({
-  searchParams,
-}: AdminTestimonialsPageProps = {}) {
+export default async function AdminFaqsPage({ searchParams }: AdminFaqsPageProps = {}) {
   await requireAdminAccess();
   const db = await getMongoDb();
-  const testimonials = await getAdminTestimonials(db);
+  const faqs = await getAdminFaqs(db);
   const params = await searchParams;
   const query = firstValue(params?.q).trim();
   const status = parseStatus(firstValue(params?.status));
-  const type = parseType(firstValue(params?.type));
   const mode = parseMode(firstValue(params?.mode));
   const errorMessage = firstValue(params?.error).trim();
   const requestedPage = parsePage(firstValue(params?.page));
-  const filteredTestimonials = filterTestimonials(testimonials, { query, status, type });
-  const totalPages = Math.max(1, Math.ceil(filteredTestimonials.length / PAGE_SIZE));
+  const filteredFaqs = filterFaqs(faqs, { query, status });
+  const totalPages = Math.max(1, Math.ceil(filteredFaqs.length / PAGE_SIZE));
   const currentPage = Math.min(requestedPage, totalPages);
-  const pageTestimonials = filteredTestimonials.slice(
+  const pageFaqs = filteredFaqs.slice(
     (currentPage - 1) * PAGE_SIZE,
     currentPage * PAGE_SIZE,
   );
-  const publishedCount = pageTestimonials.filter(
-    (testimonial) => testimonial.status === "published",
-  ).length;
-  const draftCount = pageTestimonials.filter(
-    (testimonial) => testimonial.status === "draft",
-  ).length;
-  const baseHref = buildTestimonialsHref({
+  const publishedCount = pageFaqs.filter((faq) => faq.status === "published").length;
+  const draftCount = pageFaqs.filter((faq) => faq.status === "draft").length;
+  const baseHref = buildFaqsHref({
     page: currentPage,
     query,
     status,
-    type,
   });
 
   return (
@@ -58,51 +48,37 @@ export default async function AdminTestimonialsPage({
             <p className="text-xs font-semibold uppercase tracking-[0.34em] text-white/72">
               Content Management
             </p>
-            <h1 className="mt-4 text-4xl font-semibold leading-tight text-white">
-              Testimonials
-            </h1>
+            <h1 className="mt-4 text-4xl font-semibold leading-tight text-white">FAQs</h1>
             <p className="mt-4 text-base leading-8 text-white/74">
-              Manage text and video testimonials with a faster review workflow,
-              clearer filters, and a dedicated create modal for new entries.
+              Manage public questions and answers with clearer publishing controls,
+              search, and a faster create flow for the homepage FAQ section.
             </p>
           </div>
           <div className="flex flex-wrap gap-3">
             <Link
-              href={buildTestimonialsHref({ page: currentPage, query, status, type })}
+              href={buildFaqsHref({ page: currentPage, query, status })}
               className="inline-flex items-center gap-2 rounded-lg border border-white/18 bg-white px-5 py-3 text-sm font-semibold text-[var(--lumivale-panel)] transition hover:border-white/40"
             >
               Refresh
             </Link>
             <Link
-              href={buildTestimonialsHref({ query, status, type, mode: "create" })}
+              href="/admin/faqs?mode=create"
               className="inline-flex items-center gap-2 rounded-lg border border-white/12 bg-[var(--lumivale-panel)] px-5 py-3 text-sm font-semibold text-white shadow-[0_12px_28px_rgba(1,8,7,0.28)] transition hover:bg-[var(--lumivale-admin-panel-soft)]"
             >
               <span aria-hidden="true">+</span>
-              New testimonial
+              New FAQ
             </Link>
           </div>
         </div>
 
         <div className="grid gap-4 border-t border-white/10 bg-white/6 p-6 sm:grid-cols-2 sm:p-8 xl:grid-cols-4">
-          <MetricCard
-            label="Matching testimonials"
-            value={filteredTestimonials.length}
-            note="Total results for current filters"
-          />
-          <MetricCard
-            label="Published on page"
-            value={publishedCount}
-            note="Public-ready testimonials in view"
-          />
-          <MetricCard
-            label="Drafts on page"
-            value={draftCount}
-            note="Testimonials still being prepared"
-          />
+          <MetricCard label="Matching FAQs" value={filteredFaqs.length} note="Total results for current filters" />
+          <MetricCard label="Published on page" value={publishedCount} note="Visible public-ready answers in view" />
+          <MetricCard label="Drafts on page" value={draftCount} note="Questions still being prepared" />
           <MetricCard
             label="Current mode"
             value={mode === "create" ? "Create" : "Library"}
-            note={mode === "create" ? "Modal editor is open" : "Browsing testimonials"}
+            note={mode === "create" ? "Modal editor is open" : "Browsing FAQs"}
           />
         </div>
       </section>
@@ -111,14 +87,14 @@ export default async function AdminTestimonialsPage({
         <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.34em] text-[var(--lumivale-panel)]">
-              Testimonial Library
+              FAQ Library
             </p>
             <h2 className="mt-3 text-3xl font-semibold text-[var(--lumivale-ink)]">
-              Browse And Manage Testimonials
+              Browse And Manage FAQs
             </h2>
             <p className="mt-3 text-sm leading-7 text-[var(--lumivale-admin-muted)]">
-              Search by person, company, or quote, then narrow the library by
-              publication status and testimonial type.
+              Search by question or answer, narrow the list by status, and update
+              public guidance without leaving the admin workspace.
             </p>
           </div>
           <div className="rounded-lg border border-[var(--lumivale-admin-border)] bg-[var(--lumivale-admin-surface)] px-5 py-4 text-sm">
@@ -129,33 +105,32 @@ export default async function AdminTestimonialsPage({
               Page {currentPage} of {totalPages}
             </p>
             <p className="mt-1 text-xs text-[var(--lumivale-admin-muted)]">
-              {filteredTestimonials.length} total testimonials
+              {filteredFaqs.length} total FAQs
             </p>
           </div>
         </div>
 
         <form
-          action="/admin/testimonials"
+          action="/admin/faqs"
           className="mt-6 rounded-lg border border-[var(--lumivale-admin-border)] bg-[var(--lumivale-admin-surface)] p-4"
         >
           <label
-            htmlFor="testimonial-search"
+            htmlFor="faq-search"
             className="text-xs font-semibold uppercase tracking-[0.24em] text-[var(--lumivale-admin-muted)]"
           >
             Search
           </label>
           <div className="mt-3 flex flex-col gap-3 lg:flex-row lg:items-center">
             <input
-              id="testimonial-search"
-              aria-label="Search name, title, or quote"
+              id="faq-search"
+              aria-label="Search question or answer"
               name="q"
               type="search"
               defaultValue={query}
-              placeholder="Search name, title, or quote"
+              placeholder="Search question or answer"
               className="min-h-12 flex-1 rounded-lg border border-[var(--lumivale-admin-border)] bg-white px-4 text-sm outline-none transition focus:border-[var(--lumivale-panel)]"
             />
             {status !== "all" ? <input type="hidden" name="status" value={status} /> : null}
-            {type !== "all" ? <input type="hidden" name="type" value={type} /> : null}
             <button
               type="submit"
               className="min-h-12 rounded-lg bg-[var(--lumivale-panel)] px-6 text-sm font-semibold text-white transition hover:bg-[var(--lumivale-admin-panel-soft)]"
@@ -163,56 +138,41 @@ export default async function AdminTestimonialsPage({
               Search
             </button>
           </div>
-
           <div className="mt-4 flex flex-wrap gap-2">
             {STATUS_OPTIONS.map((option) => (
               <Link
                 key={option}
-                href={buildTestimonialsHref({ query, status: option, type })}
-                className={filterChipClassName(status === option)}
+                href={buildFaqsHref({ query, status: option })}
+                className={`rounded-full border px-4 py-2 text-sm font-semibold transition ${
+                  status === option
+                    ? "border-[var(--lumivale-panel)] bg-[var(--lumivale-admin-chip)] text-[var(--lumivale-panel)]"
+                    : "border-[var(--lumivale-admin-border)] text-[var(--lumivale-ink)] hover:border-[var(--lumivale-admin-border-strong)]"
+                }`}
               >
                 {option === "all" ? "All Statuses" : capitalize(option)}
-              </Link>
-            ))}
-          </div>
-
-          <div className="mt-3 flex flex-wrap gap-2">
-            {TYPE_OPTIONS.map((option) => (
-              <Link
-                key={option}
-                href={buildTestimonialsHref({ query, status, type: option })}
-                className={filterChipClassName(type === option)}
-              >
-                {option === "all" ? "All Types" : capitalize(option)}
               </Link>
             ))}
           </div>
         </form>
 
         <div className="mt-6 grid gap-5 lg:grid-cols-2">
-          {pageTestimonials.length ? (
-            pageTestimonials.map((testimonial) => (
-              <TestimonialCard key={testimonial.id} testimonial={testimonial} />
-            ))
+          {pageFaqs.length ? (
+            pageFaqs.map((faq) => <FaqCard key={faq.id} faq={faq} />)
           ) : (
             <div className="rounded-lg border border-dashed border-[var(--lumivale-admin-border)] p-8 text-center lg:col-span-2">
               <p className="text-lg font-semibold text-[var(--lumivale-ink)]">
-                {testimonials.length ? "No matching testimonials." : "No testimonials yet."}
+                {faqs.length ? "No matching FAQs." : "No FAQs yet."}
               </p>
               <p className="mt-2 text-sm text-[var(--lumivale-admin-muted)]">
-                {testimonials.length
-                  ? "Adjust search or filter controls to see more testimonials."
-                  : "Create the first testimonial to start building the library."}
+                {faqs.length
+                  ? "Adjust search or status filters to see more FAQs."
+                  : "Create the first FAQ to start filling the public questions section."}
               </p>
               <Link
-                href={
-                  testimonials.length
-                    ? "/admin/testimonials"
-                    : "/admin/testimonials?mode=create"
-                }
+                href={faqs.length ? "/admin/faqs" : "/admin/faqs?mode=create"}
                 className="mt-5 inline-flex rounded-lg bg-[var(--lumivale-panel)] px-5 py-3 text-sm font-semibold text-white"
               >
-                {testimonials.length ? "Clear filters" : "New testimonial"}
+                {faqs.length ? "Clear filters" : "New FAQ"}
               </Link>
             </div>
           )}
@@ -225,11 +185,10 @@ export default async function AdminTestimonialsPage({
           <div className="flex gap-2">
             {currentPage > 1 ? (
               <Link
-                href={buildTestimonialsHref({
+                href={buildFaqsHref({
                   page: currentPage - 1,
                   query,
                   status,
-                  type,
                   includePageOne: true,
                 })}
                 className="rounded-lg border border-[var(--lumivale-admin-border)] px-5 py-3 text-sm font-semibold text-[var(--lumivale-panel)]"
@@ -243,7 +202,7 @@ export default async function AdminTestimonialsPage({
             )}
             {currentPage < totalPages ? (
               <Link
-                href={buildTestimonialsHref({ page: currentPage + 1, query, status, type })}
+                href={buildFaqsHref({ page: currentPage + 1, query, status })}
                 className="rounded-lg border border-[var(--lumivale-admin-border)] px-5 py-3 text-sm font-semibold text-[var(--lumivale-panel)]"
               >
                 Next
@@ -258,13 +217,13 @@ export default async function AdminTestimonialsPage({
       </section>
 
       {mode === "create" ? (
-        <CreateTestimonialModal cancelHref={baseHref} errorMessage={errorMessage} />
+        <CreateFaqModal cancelHref={baseHref} errorMessage={errorMessage} />
       ) : null}
     </section>
   );
 }
 
-function CreateTestimonialModal({
+function CreateFaqModal({
   cancelHref,
   errorMessage,
 }: {
@@ -276,28 +235,27 @@ function CreateTestimonialModal({
       <div
         role="dialog"
         aria-modal="true"
-        aria-labelledby="create-testimonial-title"
+        aria-labelledby="create-faq-title"
         className="max-h-[calc(100vh-2rem)] w-full max-w-4xl overflow-y-auto rounded-[28px] border border-[var(--lumivale-admin-border)] bg-[var(--lumivale-admin-surface)] p-5 shadow-[0_32px_90px_rgba(1,8,7,0.3)] sm:p-7"
       >
         <div className="flex items-start justify-between gap-4">
           <div>
             <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-[var(--lumivale-admin-muted)]">
-              Testimonial Editor
+              FAQ Editor
             </p>
             <h2
-              id="create-testimonial-title"
+              id="create-faq-title"
               className="mt-2 text-3xl font-semibold text-[var(--lumivale-ink)]"
             >
-              Create Testimonial
+              Create FAQ
             </h2>
             <p className="mt-3 max-w-2xl text-sm leading-7 text-[var(--lumivale-muted)]">
-              Add a text or video testimonial without leaving the management page.
-              Video testimonials still include a quote for list previews and context.
+              Add a new public question and answer without leaving the FAQ management page.
             </p>
           </div>
           <a
             href={cancelHref}
-            aria-label="Close create testimonial modal"
+            aria-label="Close create FAQ modal"
             className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-[var(--lumivale-admin-border)] bg-white text-lg text-[var(--lumivale-panel)] transition hover:border-[var(--lumivale-panel)]"
           >
             x
@@ -305,10 +263,10 @@ function CreateTestimonialModal({
         </div>
 
         <div className="mt-6">
-          <TestimonialForm
+          <FaqForm
             cancelHref={cancelHref}
             errorMessage={errorMessage}
-            submitLabel="Create testimonial"
+            submitLabel="Create FAQ"
           />
         </div>
       </div>
@@ -316,62 +274,56 @@ function CreateTestimonialModal({
   );
 }
 
-function TestimonialCard({ testimonial }: { testimonial: Testimonial }) {
+function FaqCard({ faq }: { faq: Faq }) {
   return (
     <article className="overflow-hidden rounded-lg border border-[var(--lumivale-admin-border)] bg-white">
       <div className="p-5">
         <div className="flex flex-wrap items-center gap-2">
           <span className="rounded-full bg-[var(--lumivale-admin-chip)] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--lumivale-panel)]">
-            {testimonial.type}
-          </span>
-          <span className="rounded-full bg-[#fff8ec] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-[#a96700]">
-            {testimonial.status}
+            {faq.status}
           </span>
           <span className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--lumivale-admin-muted)]">
-            Sort {testimonial.sortOrder}
+            Sort {faq.sortOrder}
           </span>
         </div>
 
-        <h2 className="mt-4 text-xl font-semibold text-[var(--lumivale-ink)]">
-          {testimonial.personName}
-        </h2>
-        <p className="mt-2 text-sm text-[var(--lumivale-admin-muted)]">
-          {testimonial.personTitle || "No title or company added yet."}
+        <h2 className="mt-4 text-xl font-semibold text-[var(--lumivale-ink)]">{faq.question}</h2>
+        <p className="mt-3 text-sm leading-7 text-[var(--lumivale-admin-muted)]">
+          {faq.answer}
         </p>
-        <p className="mt-4 text-sm leading-7 text-[var(--lumivale-ink)]">{testimonial.quote}</p>
 
         <div className="mt-5 rounded-lg border border-[var(--lumivale-admin-border)] bg-[var(--lumivale-admin-surface)] p-4">
           <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--lumivale-admin-muted)]">
-            Review notes
+            Publishing notes
           </p>
           <p className="mt-2 text-sm text-[var(--lumivale-ink)]">
-            {testimonial.type === "video"
-              ? "Video testimonial with a quote preview for the dashboard."
-              : "Text testimonial ready for review and publishing."}
+            {faq.status === "published"
+              ? "Visible on the public FAQ section."
+              : "Draft answer. Publish when the copy is ready for visitors."}
           </p>
         </div>
 
         <div className="mt-5 flex flex-wrap gap-2">
           <Link
-            href={`/admin/testimonials/${testimonial.id}/edit`}
+            href={`/admin/faqs/${faq.id}/edit`}
             className="rounded-lg border border-[var(--lumivale-admin-border)] px-4 py-2 text-sm font-semibold text-[var(--lumivale-panel)]"
           >
             Edit
           </Link>
-          <form action={`/api/admin/testimonials/${testimonial.id}`} method="post">
+          <form action={`/api/admin/faqs/${faq.id}`} method="post">
             <input
               type="hidden"
               name="action"
-              value={testimonial.status === "published" ? "draft" : "publish"}
+              value={faq.status === "published" ? "draft" : "publish"}
             />
             <button
               type="submit"
               className="rounded-lg border border-[var(--lumivale-admin-border)] px-4 py-2 text-sm font-semibold text-[var(--lumivale-panel)]"
             >
-              {testimonial.status === "published" ? "Unpublish" : "Publish"}
+              {faq.status === "published" ? "Unpublish" : "Publish"}
             </button>
           </form>
-          <form action={`/api/admin/testimonials/${testimonial.id}`} method="post">
+          <form action={`/api/admin/faqs/${faq.id}`} method="post">
             <input type="hidden" name="action" value="delete" />
             <button
               type="submit"
@@ -406,47 +358,35 @@ function MetricCard({
   );
 }
 
-function filterTestimonials(
-  testimonials: Testimonial[],
-  {
-    query,
-    status,
-    type,
-  }: {
-    query: string;
-    status: TestimonialStatusFilter;
-    type: TestimonialTypeFilter;
-  },
+function filterFaqs(
+  faqs: Faq[],
+  { query, status }: { query: string; status: FaqStatusFilter },
 ) {
   const normalizedQuery = query.toLowerCase();
 
-  return testimonials.filter((testimonial) => {
-    const matchesStatus = status === "all" || testimonial.status === status;
-    const matchesType = type === "all" || testimonial.type === type;
+  return faqs.filter((faq) => {
+    const matchesStatus = status === "all" || faq.status === status;
     const matchesQuery =
       !normalizedQuery ||
-      testimonial.personName.toLowerCase().includes(normalizedQuery) ||
-      testimonial.personTitle.toLowerCase().includes(normalizedQuery) ||
-      testimonial.quote.toLowerCase().includes(normalizedQuery);
+      faq.question.toLowerCase().includes(normalizedQuery) ||
+      faq.answer.toLowerCase().includes(normalizedQuery);
 
-    return matchesStatus && matchesType && matchesQuery;
+    return matchesStatus && matchesQuery;
   });
 }
 
-function buildTestimonialsHref({
+function buildFaqsHref({
   includePageOne = false,
   mode,
   page = 1,
   query = "",
   status = "all",
-  type = "all",
 }: {
   includePageOne?: boolean;
   mode?: "create";
   page?: number;
   query?: string;
-  status?: TestimonialStatusFilter;
-  type?: TestimonialTypeFilter;
+  status?: FaqStatusFilter;
 }) {
   const params = new URLSearchParams();
 
@@ -456,10 +396,6 @@ function buildTestimonialsHref({
 
   if (status !== "all") {
     params.set("status", status);
-  }
-
-  if (type !== "all") {
-    params.set("type", type);
   }
 
   if (page > 1 || includePageOne) {
@@ -472,15 +408,7 @@ function buildTestimonialsHref({
 
   const queryString = params.toString();
 
-  return queryString ? `/admin/testimonials?${queryString}` : "/admin/testimonials";
-}
-
-function filterChipClassName(isActive: boolean) {
-  return `rounded-full border px-4 py-2 text-sm font-semibold transition ${
-    isActive
-      ? "border-[var(--lumivale-panel)] bg-[var(--lumivale-admin-chip)] text-[var(--lumivale-panel)]"
-      : "border-[var(--lumivale-admin-border)] text-[var(--lumivale-ink)] hover:border-[var(--lumivale-admin-border-strong)]"
-  }`;
+  return queryString ? `/admin/faqs?${queryString}` : "/admin/faqs";
 }
 
 function firstValue(value: string | string[] | undefined) {
@@ -493,15 +421,9 @@ function parsePage(value: string) {
   return Number.isInteger(page) && page > 0 ? page : 1;
 }
 
-function parseStatus(value: string): TestimonialStatusFilter {
-  return STATUS_OPTIONS.includes(value as TestimonialStatusFilter)
-    ? (value as TestimonialStatusFilter)
-    : "all";
-}
-
-function parseType(value: string): TestimonialTypeFilter {
-  return TYPE_OPTIONS.includes(value as TestimonialTypeFilter)
-    ? (value as TestimonialTypeFilter)
+function parseStatus(value: string): FaqStatusFilter {
+  return STATUS_OPTIONS.includes(value as FaqStatusFilter)
+    ? (value as FaqStatusFilter)
     : "all";
 }
 

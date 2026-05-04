@@ -2,8 +2,8 @@ import { render, screen } from "@testing-library/react";
 import { describe, expect, test, vi } from "vitest";
 
 import AdminLoginPage from "@/app/admin/login/page";
+import AdminFaqsPage from "@/app/admin/faqs/page";
 import AdminTestimonialsPage from "@/app/admin/testimonials/page";
-import NewTestimonialPage from "@/app/admin/testimonials/new/page";
 import AdminUsersPage from "@/app/admin/users/page";
 
 vi.mock("@/lib/admin-auth", () => ({
@@ -35,6 +35,20 @@ vi.mock("@/lib/testimonials", () => ({
   ]),
 }));
 
+vi.mock("@/lib/faqs", () => ({
+  getAdminFaqs: vi.fn().mockResolvedValue([
+    {
+      id: "faq-1",
+      question: "How soon can Lumivale start?",
+      answer: "Most projects can begin after a short discovery call.",
+      sortOrder: 1,
+      status: "published",
+      createdAt: new Date("2026-05-03T08:00:00.000Z"),
+      updatedAt: new Date("2026-05-03T08:00:00.000Z"),
+    },
+  ]),
+}));
+
 vi.mock("@/lib/admin-users", () => ({
   getAdminUsers: vi.fn().mockResolvedValue([
     {
@@ -59,44 +73,45 @@ describe("admin pages", () => {
   });
 
   test("renders the admin testimonials list", async () => {
-    render(await AdminTestimonialsPage());
+    render(await AdminTestimonialsPage({ searchParams: Promise.resolve({}) }));
 
     expect(
       screen.getByRole("heading", { name: "Testimonials", level: 1 }),
     ).toBeInTheDocument();
+    expect(screen.getByText("Content Management")).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "New testimonial" })).toHaveAttribute(
       "href",
-      "/admin/testimonials/new",
+      "/admin/testimonials?mode=create",
     );
     expect(screen.getByText("Maya Lee")).toBeInTheDocument();
-    expect(screen.getByText("text · published · sort 1")).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Edit" })).toHaveAttribute(
       "href",
       "/admin/testimonials/testimonial-1/edit",
     );
   });
 
-  test("renders the new testimonial form with text and video controls", async () => {
-    render(await NewTestimonialPage());
+  test("renders the admin FAQ list", async () => {
+    render(await AdminFaqsPage({ searchParams: Promise.resolve({}) }));
 
-    expect(
-      screen.getByRole("heading", { name: "Create Testimonial", level: 1 }),
-    ).toBeInTheDocument();
-    expect(screen.getByLabelText("Name")).toBeInTheDocument();
-    expect(screen.getByLabelText("Title or company")).toBeInTheDocument();
-    expect(screen.getByLabelText("Quote")).toBeInTheDocument();
-    expect(screen.getByLabelText("Type")).toBeInTheDocument();
-    expect(screen.getByLabelText("Upload video")).toHaveAttribute(
-      "accept",
-      "video/mp4,video/webm,video/quicktime",
+    expect(screen.getByRole("heading", { name: "FAQs", level: 1 })).toBeInTheDocument();
+    expect(screen.getByText("Content Management")).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "New FAQ" })).toHaveAttribute(
+      "href",
+      "/admin/faqs?mode=create",
+    );
+    expect(screen.getByText("How soon can Lumivale start?")).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Edit" })).toHaveAttribute(
+      "href",
+      "/admin/faqs/faq-1/edit",
     );
   });
 
   test("renders the admin users page and creation form", async () => {
-    render(await AdminUsersPage());
+    render(await AdminUsersPage({ searchParams: Promise.resolve({}) }));
 
     expect(screen.getByRole("heading", { name: "Users", level: 1 })).toBeInTheDocument();
-    expect(screen.getByText("admin@example.com")).toBeInTheDocument();
+    expect(screen.getByText("Admin Directory")).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "admin@example.com", level: 3 })).toBeInTheDocument();
     expect(screen.getByLabelText("Email")).toBeInTheDocument();
     expect(screen.getByLabelText("Initial password")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Create admin" })).toBeInTheDocument();
