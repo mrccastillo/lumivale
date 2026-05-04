@@ -58,13 +58,16 @@ describe("admin shell", () => {
   test("renders a collapsible left sidebar admin navigation", () => {
     pathnameMock.mockReturnValue("/admin/blogs");
 
-    render(<AdminNav />);
+    render(<AdminNav isDesktopExpanded={true} onDesktopToggle={() => {}} />);
 
     expect(screen.getByRole("navigation", { name: "Admin navigation" })).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "Blogs" })).toHaveAttribute(
+    const blogsLink = screen.getByRole("link", { name: "Blogs" });
+
+    expect(blogsLink).toHaveAttribute(
       "href",
       "/admin/blogs",
     );
+    expect(blogsLink.querySelector("svg")).not.toBeNull();
     expect(screen.getByRole("link", { name: "Testimonials" })).toHaveAttribute(
       "href",
       "/admin/testimonials",
@@ -82,13 +85,6 @@ describe("admin shell", () => {
       "top-0",
       "h-screen",
     );
-
-    fireEvent.click(screen.getByRole("button", { name: "Collapse navigation" }));
-
-    expect(screen.getByRole("button", { name: "Expand navigation" })).toHaveAttribute(
-      "aria-expanded",
-      "false",
-    );
   });
 
   test("wraps authenticated admin pages with sidebar and compact header", () => {
@@ -103,6 +99,34 @@ describe("admin shell", () => {
     expect(screen.getByRole("navigation", { name: "Admin navigation" })).toBeInTheDocument();
     expect(screen.getByRole("banner", { name: "Admin header" })).toBeInTheDocument();
     expect(screen.getByText("Blog dashboard")).toBeInTheDocument();
+  });
+
+  test("hides the desktop logo block and reduces the workspace offset when collapsed", () => {
+    pathnameMock.mockReturnValue("/admin/blogs");
+
+    render(
+      <AdminWorkspace>
+        <p>Blog dashboard</p>
+      </AdminWorkspace>,
+    );
+
+    const shell = screen.getByTestId("admin-workspace-shell");
+
+    expect(shell).toHaveClass("md:pl-[17.5rem]");
+    expect(screen.getByText("Lumivale")).toBeInTheDocument();
+    expect(screen.getByText("Admin Portal")).toBeInTheDocument();
+    expect(screen.getAllByRole("link")).toHaveLength(4);
+
+    fireEvent.click(screen.getByRole("button", { name: "Collapse navigation" }));
+
+    expect(screen.getByRole("button", { name: "Expand navigation" })).toHaveAttribute(
+      "aria-expanded",
+      "false",
+    );
+    expect(shell).toHaveClass("md:pl-[5.5rem]");
+    expect(screen.queryByText("Lumivale")).not.toBeInTheDocument();
+    expect(screen.queryByText("Admin Portal")).not.toBeInTheDocument();
+    expect(screen.getAllByRole("link")).toHaveLength(3);
   });
 
   test("does not render sidebar or compact header on admin login", () => {

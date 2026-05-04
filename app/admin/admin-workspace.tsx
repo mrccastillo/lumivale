@@ -2,8 +2,13 @@
 
 import type { ReactNode } from "react";
 import { usePathname } from "next/navigation";
+import { useState } from "react";
 
-import { AdminNav } from "@/app/admin/admin-nav";
+import {
+  ADMIN_NAV_COLLAPSED_OFFSET_CLASS,
+  ADMIN_NAV_EXPANDED_OFFSET_CLASS,
+  AdminNav,
+} from "@/app/admin/admin-nav";
 
 const pageTitles: Record<string, string> = {
   "/admin/blogs": "Blogs",
@@ -13,16 +18,26 @@ const pageTitles: Record<string, string> = {
 
 export function AdminWorkspace({ children }: { children: ReactNode }) {
   const pathname = usePathname() || "/admin/blogs";
+  const [isDesktopExpanded, setIsDesktopExpanded] = useState(true);
 
   if (pathname === "/admin/login") {
     return <>{children}</>;
   }
 
   const title = getPageTitle(pathname);
+  const shellOffsetClass = isDesktopExpanded
+    ? ADMIN_NAV_EXPANDED_OFFSET_CLASS
+    : ADMIN_NAV_COLLAPSED_OFFSET_CLASS;
 
   return (
-    <div className="min-h-screen bg-[#f7f8fb] text-[var(--lumivale-ink)] md:pl-[17.5rem]">
-      <AdminNav />
+    <div
+      data-testid="admin-workspace-shell"
+      className={`min-h-screen bg-[#f7f8fb] text-[var(--lumivale-ink)] ${shellOffsetClass}`}
+    >
+      <AdminNav
+        isDesktopExpanded={isDesktopExpanded}
+        onDesktopToggle={() => setIsDesktopExpanded((expanded) => !expanded)}
+      />
       <header
         aria-label="Admin header"
         className="sticky top-0 z-30 border-b border-[var(--lumivale-line)] bg-white/92 px-4 py-3 backdrop-blur-xl sm:px-6 md:px-8"
