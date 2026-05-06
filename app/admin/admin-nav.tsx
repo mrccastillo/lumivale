@@ -9,6 +9,7 @@ const adminLinks = [
   { href: "/admin/testimonials", icon: TestimonialsIcon, label: "Testimonials" },
   { href: "/admin/faqs", icon: FaqsIcon, label: "FAQs" },
   { href: "/admin/users", icon: UsersIcon, label: "Users" },
+  { href: "/admin/trusted-clients", icon: TrustedClientsIcon, label: "Trusted Clients" },
 ];
 
 export const ADMIN_NAV_EXPANDED_OFFSET_CLASS = "md:pl-[17.5rem]";
@@ -209,6 +210,15 @@ function UsersIcon({ className }: IconProps) {
     <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className={className}>
       <circle cx="8" cy="5.5" r="2.25" />
       <path d="M4.5 12.5c.7-1.7 2-2.5 3.5-2.5s2.8.8 3.5 2.5" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+function TrustedClientsIcon({ className }: IconProps) {
+  return (
+    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className={className}>
+      <rect x="3" y="3.25" width="10" height="9.5" rx="2" />
+      <path d="M5.25 6.25h5.5M5.25 8.5h5.5M5.25 10.75h3.5" strokeLinecap="round" />
     </svg>
   );
 }
