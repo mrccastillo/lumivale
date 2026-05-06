@@ -267,50 +267,80 @@ describe("home page", () => {
   test("renders published text and video testimonials from MongoDB", async () => {
     vi.mocked(getPublishedTestimonials).mockResolvedValueOnce([
       {
-        id: "testimonial-1",
-        personName: "Maya Lee",
-        personTitle: "Founder, Northstar",
-        quote: "Lumivale made growth activity simpler to repeat.",
+        id: "video-1",
+        personName: "Jon Ramos",
+        personTitle: "CEO, Signal Labs",
+        quote: "The execution support helped us move faster.",
         sortOrder: 1,
         status: "published",
-        type: "text",
-        videoFileId: "",
+        type: "video",
+        videoFileId: "video-1",
         createdAt: new Date("2026-05-03T08:00:00.000Z"),
         updatedAt: new Date("2026-05-03T08:00:00.000Z"),
       },
       {
-        id: "testimonial-2",
-        personName: "Jon Ramos",
-        personTitle: "CEO, Signal Labs",
-        quote: "The execution support helped us move faster.",
+        id: "video-2",
+        personName: "Mina Park",
+        personTitle: "Founder, Northstar",
+        quote: "Their video execution helped our launch reach the right audience.",
         sortOrder: 2,
         status: "published",
         type: "video",
-        videoFileId: "video-1",
+        videoFileId: "video-2",
         createdAt: new Date("2026-05-03T08:01:00.000Z"),
         updatedAt: new Date("2026-05-03T08:01:00.000Z"),
+      },
+      {
+        id: "text-1",
+        personName: "Maya Lee",
+        personTitle: "Founder, Northstar",
+        quote: "Lumivale made growth activity simpler to repeat.",
+        sortOrder: 3,
+        status: "published",
+        type: "text",
+        videoFileId: "",
+        createdAt: new Date("2026-05-03T08:02:00.000Z"),
+        updatedAt: new Date("2026-05-03T08:02:00.000Z"),
+      },
+      {
+        id: "text-2",
+        personName: "Evan Cole",
+        personTitle: "Growth Lead, Signal Labs",
+        quote: "The process stayed clear and practical from week one.",
+        sortOrder: 4,
+        status: "published",
+        type: "text",
+        videoFileId: "",
+        createdAt: new Date("2026-05-03T08:03:00.000Z"),
+        updatedAt: new Date("2026-05-03T08:03:00.000Z"),
       },
     ]);
 
     const { container } = render(await Home());
     const testimonialSection = container.querySelector("#testimonials");
+    const videoGrid = testimonialSection?.querySelector("[data-testid='testimonials-video-grid']");
+    const textGrid = testimonialSection?.querySelector("[data-testid='testimonials-text-grid']");
 
-    expect(testimonialSection).toHaveTextContent("Maya Lee");
-    expect(testimonialSection).toHaveTextContent("Founder, Northstar");
-    expect(testimonialSection).toHaveTextContent(
-      "Lumivale made growth activity simpler to repeat.",
-    );
-    expect(testimonialSection).toHaveTextContent("Jon Ramos");
-    expect(testimonialSection?.querySelector("video")).toHaveAttribute(
+    expect(videoGrid).toHaveTextContent("Jon Ramos");
+    expect(videoGrid).toHaveTextContent("Mina Park");
+    expect(textGrid).toHaveTextContent("Maya Lee");
+    expect(textGrid).toHaveTextContent("Evan Cole");
+    expect(videoGrid?.querySelectorAll("[data-testid='homepage-video-testimonial']")).toHaveLength(4);
+    expect(textGrid?.querySelectorAll("[data-testid='homepage-text-testimonial']")).toHaveLength(6);
+    expect(videoGrid).toHaveTextContent("Video placeholder");
+    expect(textGrid).toHaveTextContent("Text placeholder");
+    expect(videoGrid?.querySelector("video")).toHaveAttribute(
       "src",
       "/api/testimonial-videos/video-1",
     );
-    expect(testimonialSection?.querySelector("video")).toHaveAttribute("controls");
+    expect(videoGrid?.querySelector("video")).toHaveAttribute("controls");
   });
 
-  test("renders six testimonial placeholders when no published testimonials are available", async () => {
+  test("renders four video and six text placeholders when no published testimonials are available", async () => {
     const { container } = render(await Home());
     const testimonialSection = container.querySelector("#testimonials");
+    const videoGrid = testimonialSection?.querySelector("[data-testid='testimonials-video-grid']");
+    const textGrid = testimonialSection?.querySelector("[data-testid='testimonials-text-grid']");
 
     expect(testimonialSection).toHaveTextContent(
       "Lumivale keeps growth focused on the channels that can actually bring users, awareness, and website traffic.",
@@ -318,24 +348,24 @@ describe("home page", () => {
     expect(testimonialSection).toHaveTextContent(
       "The strongest early teams do not need more agency jargon. They need simple execution, clear packages, and consistent growth activity.",
     );
-    expect(within(testimonialSection as HTMLElement).getAllByText("Video placeholder")).toHaveLength(3);
-    expect(within(testimonialSection as HTMLElement).getAllByText("Text placeholder")).toHaveLength(3);
-    expect(testimonialSection?.querySelectorAll("article")).toHaveLength(6);
+    expect(within(videoGrid as HTMLElement).getAllByText("Video placeholder")).toHaveLength(4);
+    expect(within(textGrid as HTMLElement).getAllByText("Text placeholder")).toHaveLength(6);
+    expect(videoGrid?.querySelectorAll("[data-testid='homepage-video-testimonial']")).toHaveLength(4);
+    expect(textGrid?.querySelectorAll("[data-testid='homepage-text-testimonial']")).toHaveLength(6);
   });
 
   test("keeps the homepage available when MongoDB authentication fails", async () => {
     vi.mocked(getMongoDb).mockRejectedValueOnce(new Error("bad auth"));
 
     const { container } = render(await Home());
+    const videoGrid = container.querySelector("[data-testid='testimonials-video-grid']");
+    const textGrid = container.querySelector("[data-testid='testimonials-text-grid']");
 
     expect(container.querySelector("#testimonials")).toHaveTextContent(
       "Lumivale keeps growth focused on the channels that can actually bring users, awareness, and website traffic.",
     );
-    expect(
-      within(container.querySelector("#testimonials") as HTMLElement).getAllByText(
-        "Video placeholder",
-      ),
-    ).toHaveLength(3);
+    expect(within(videoGrid as HTMLElement).getAllByText("Video placeholder")).toHaveLength(4);
+    expect(within(textGrid as HTMLElement).getAllByText("Text placeholder")).toHaveLength(6);
   });
 
   test("renders at least five collapsible FAQs", async () => {
