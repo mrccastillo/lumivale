@@ -1,21 +1,32 @@
 import { afterEach, describe, expect, test, vi } from "vitest";
 
+const getMongoDbMock = vi.hoisted(() => vi.fn().mockResolvedValue("test-db"));
+const hasTrustedClientApprovalMock = vi.hoisted(() => vi.fn());
 const sendTrustedClientMagicLinkMock = vi.hoisted(() => vi.fn());
+
+vi.mock("@/lib/mongodb", () => ({
+  getMongoDb: getMongoDbMock,
+}));
+
+vi.mock("@/lib/trusted-clients", () => ({
+  hasTrustedClientApproval: hasTrustedClientApprovalMock,
+}));
 
 vi.mock("@/lib/trusted-client-email", () => ({
   sendTrustedClientMagicLink: sendTrustedClientMagicLinkMock,
 }));
 
 afterEach(() => {
-  delete process.env.TRUSTED_CLIENT_EMAILS;
   delete process.env.TRUSTED_CLIENT_MAGIC_LINK_SECRET;
+  getMongoDbMock.mockClear();
+  hasTrustedClientApprovalMock.mockReset();
   sendTrustedClientMagicLinkMock.mockReset();
 });
 
 describe("client access request route", () => {
-  test("sends a magic link for an allowed email", async () => {
-    process.env.TRUSTED_CLIENT_EMAILS = "client@example.com";
+  test("sends a magic link for an approved email", async () => {
     process.env.TRUSTED_CLIENT_MAGIC_LINK_SECRET = "super-secret";
+    hasTrustedClientApprovalMock.mockResolvedValue(true);
     sendTrustedClientMagicLinkMock.mockResolvedValue({ mode: "email" });
 
     const { POST } = await import("@/app/client-access/request/route");
@@ -31,6 +42,7 @@ describe("client access request route", () => {
 
     expect(response.status).toBe(303);
     expect(response.headers.get("location")).toBe("/client-access?sent=1");
+    expect(hasTrustedClientApprovalMock).toHaveBeenCalledWith("test-db", "client@example.com");
     expect(sendTrustedClientMagicLinkMock).toHaveBeenCalledTimes(1);
     expect(sendTrustedClientMagicLinkMock.mock.calls[0]?.[0]).toMatchObject({
       email: "client@example.com",
@@ -40,9 +52,9 @@ describe("client access request route", () => {
     );
   });
 
-  test("does not send a magic link for an email outside the allowlist", async () => {
-    process.env.TRUSTED_CLIENT_EMAILS = "client@example.com";
+  test("does not send a magic link for an unapproved email", async () => {
     process.env.TRUSTED_CLIENT_MAGIC_LINK_SECRET = "super-secret";
+    hasTrustedClientApprovalMock.mockResolvedValue(false);
 
     const { POST } = await import("@/app/client-access/request/route");
     const formData = new FormData();
@@ -61,8 +73,8 @@ describe("client access request route", () => {
   });
 
   test("shows a preview link in development when email transport is not configured", async () => {
-    process.env.TRUSTED_CLIENT_EMAILS = "client@example.com";
     process.env.TRUSTED_CLIENT_MAGIC_LINK_SECRET = "super-secret";
+    hasTrustedClientApprovalMock.mockResolvedValue(true);
     sendTrustedClientMagicLinkMock.mockResolvedValue({
       mode: "preview",
       previewUrl: "http://localhost/client-access/verify?token=preview-token",
