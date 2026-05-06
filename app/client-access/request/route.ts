@@ -1,9 +1,10 @@
 import { NextResponse } from "next/server";
 
+import { getMongoDb } from "@/lib/mongodb";
+import { hasTrustedClientApproval } from "@/lib/trusted-clients";
 import { sendTrustedClientMagicLink } from "@/lib/trusted-client-email";
 import {
   createMagicLinkToken,
-  isTrustedClientEmail,
   normalizeTrustedClientEmail,
 } from "@/lib/trusted-client";
 
@@ -15,10 +16,11 @@ function redirectToClientAccess(path: string) {
 }
 
 export async function POST(request: Request) {
+  const db = await getMongoDb();
   const formData = await request.formData();
   const email = normalizeTrustedClientEmail(String(formData.get("email") ?? ""));
 
-  if (!email || !isTrustedClientEmail(email)) {
+  if (!email || !(await hasTrustedClientApproval(db, email))) {
     return redirectToClientAccess("/client-access?sent=1");
   }
 

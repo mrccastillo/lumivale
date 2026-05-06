@@ -72,19 +72,6 @@ export function normalizeTrustedClientEmail(email: string) {
   return email.trim().toLowerCase();
 }
 
-export function getTrustedClientEmails() {
-  const rawEmails = process.env.TRUSTED_CLIENT_EMAILS ?? "";
-
-  return rawEmails
-    .split(",")
-    .map((email) => normalizeTrustedClientEmail(email))
-    .filter(Boolean);
-}
-
-export function isTrustedClientEmail(email: string) {
-  return getTrustedClientEmails().includes(normalizeTrustedClientEmail(email));
-}
-
 export function createMagicLinkToken(email: string) {
   return createSignedToken({
     email: normalizeTrustedClientEmail(email),
