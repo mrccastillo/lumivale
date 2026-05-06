@@ -39,7 +39,10 @@ type HomepageTestimonialCardData = Pick<
   placeholder?: boolean;
 };
 
-const testimonialPlaceholders: HomepageTestimonialCardData[] = [
+const HOMEPAGE_VIDEO_TESTIMONIAL_SLOTS = 4;
+const HOMEPAGE_TEXT_TESTIMONIAL_SLOTS = 6;
+
+const videoTestimonialPlaceholders: HomepageTestimonialCardData[] = [
   {
     id: "placeholder-video-1",
     personName: "Founder placeholder",
@@ -47,16 +50,6 @@ const testimonialPlaceholders: HomepageTestimonialCardData[] = [
     quote:
       "Short video feedback about how Lumivale helped simplify execution and keep weekly growth activity moving.",
     type: "video",
-    videoFileId: "",
-    placeholder: true,
-  },
-  {
-    id: "placeholder-text-1",
-    personName: "Marketing lead placeholder",
-    personTitle: "Consumer startup",
-    quote:
-      "Text testimonial placeholder for clear channel strategy, faster shipping, and more confidence in what to focus on next.",
-    type: "text",
     videoFileId: "",
     placeholder: true,
   },
@@ -71,16 +64,6 @@ const testimonialPlaceholders: HomepageTestimonialCardData[] = [
     placeholder: true,
   },
   {
-    id: "placeholder-text-2",
-    personName: "CEO placeholder",
-    personTitle: "Early-stage brand",
-    quote:
-      "Text testimonial placeholder focused on practical support, straightforward deliverables, and steady momentum across channels.",
-    type: "text",
-    videoFileId: "",
-    placeholder: true,
-  },
-  {
     id: "placeholder-video-3",
     personName: "Revenue lead placeholder",
     personTitle: "Growth-focused startup",
@@ -91,11 +74,74 @@ const testimonialPlaceholders: HomepageTestimonialCardData[] = [
     placeholder: true,
   },
   {
+    id: "placeholder-video-4",
+    personName: "Product lead placeholder",
+    personTitle: "Fast-moving launch team",
+    quote:
+      "Video placeholder about clearer offers, steadier publishing, and growth activity that keeps momentum visible.",
+    type: "video",
+    videoFileId: "",
+    placeholder: true,
+  },
+];
+
+const textTestimonialPlaceholders: HomepageTestimonialCardData[] = [
+  {
+    id: "placeholder-text-1",
+    personName: "Marketing lead placeholder",
+    personTitle: "Consumer startup",
+    quote:
+      "Text testimonial placeholder for clear channel strategy, faster shipping, and more confidence in what to focus on next.",
+    type: "text",
+    videoFileId: "",
+    placeholder: true,
+  },
+  {
+    id: "placeholder-text-2",
+    personName: "CEO placeholder",
+    personTitle: "Early-stage brand",
+    quote:
+      "Text testimonial placeholder focused on practical support, straightforward deliverables, and steady momentum across channels.",
+    type: "text",
+    videoFileId: "",
+    placeholder: true,
+  },
+  {
     id: "placeholder-text-3",
     personName: "Team lead placeholder",
     personTitle: "Service business",
     quote:
       "Text feedback placeholder about keeping priorities clear, reporting simple, and progress visible every week.",
+    type: "text",
+    videoFileId: "",
+    placeholder: true,
+  },
+  {
+    id: "placeholder-text-4",
+    personName: "Operator placeholder",
+    personTitle: "Scaling media team",
+    quote:
+      "Text placeholder about smoother reviews, stronger content direction, and more confidence in what ships next.",
+    type: "text",
+    videoFileId: "",
+    placeholder: true,
+  },
+  {
+    id: "placeholder-text-5",
+    personName: "Founder placeholder",
+    personTitle: "B2B software company",
+    quote:
+      "Text placeholder focused on practical support, lighter oversight, and output that feels consistent week to week.",
+    type: "text",
+    videoFileId: "",
+    placeholder: true,
+  },
+  {
+    id: "placeholder-text-6",
+    personName: "Growth lead placeholder",
+    personTitle: "Lean acquisition team",
+    quote:
+      "Text placeholder about better execution quality, more useful reporting, and stronger channel follow-through.",
     type: "text",
     videoFileId: "",
     placeholder: true,
@@ -169,7 +215,7 @@ export default async function Home() {
   const caseStudies = getAllCaseStudies();
   const services = getAllServices();
   const [testimonials, faqs] = await Promise.all([getHomeTestimonials(), getHomeFaqs()]);
-  const testimonialCards = testimonials.length ? testimonials : testimonialPlaceholders;
+  const { textTestimonials, videoTestimonials } = getHomepageTestimonialSlots(testimonials);
 
   return (
     <div className="bg-[#f7f8fb] text-[var(--lumivale-ink)]">
@@ -355,10 +401,24 @@ export default async function Home() {
             </p>
           </div>
 
-          <div className="mt-10 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
-            {testimonialCards.map((testimonial) => (
-              <HomepageTestimonialCard key={testimonial.id} testimonial={testimonial} />
-            ))}
+          <div className="mt-10">
+            <div
+              data-testid="testimonials-video-grid"
+              className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4"
+            >
+              {videoTestimonials.map((testimonial) => (
+                <HomepageTestimonialCard key={testimonial.id} testimonial={testimonial} />
+              ))}
+            </div>
+
+            <div
+              data-testid="testimonials-text-grid"
+              className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-3"
+            >
+              {textTestimonials.map((testimonial) => (
+                <HomepageTestimonialCard key={testimonial.id} testimonial={testimonial} />
+              ))}
+            </div>
           </div>
         </Reveal>
       </section>
@@ -429,70 +489,126 @@ function HomepageTestimonialCard({
 }: {
   testimonial: HomepageTestimonialCardData;
 }) {
-  const isVideo = testimonial.type === "video";
-  const badgeLabel = testimonial.placeholder
-    ? isVideo
-      ? "Video placeholder"
-      : "Text placeholder"
-    : isVideo
-      ? "Video testimonial"
-      : "Text testimonial";
+  return testimonial.type === "video"
+    ? <HomepageVideoTestimonialCard testimonial={testimonial} />
+    : <HomepageTextTestimonialCard testimonial={testimonial} />;
+}
+
+function HomepageVideoTestimonialCard({
+  testimonial,
+}: {
+  testimonial: HomepageTestimonialCardData;
+}) {
+  const badgeLabel = testimonial.placeholder ? "Video placeholder" : "Video testimonial";
 
   return (
-    <article className="flex min-h-[320px] flex-col rounded-[26px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.07),rgba(255,255,255,0.03))] p-5 text-left shadow-[0_24px_70px_rgba(0,0,0,0.22)] backdrop-blur-sm sm:p-6">
-      <div className="flex items-center justify-between gap-3">
-        <span className="inline-flex rounded-full border border-[var(--lumivale-accent)]/30 bg-[var(--lumivale-accent)]/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--lumivale-accent-soft)]">
-          {badgeLabel}
-        </span>
-        {testimonial.placeholder ? (
-          <span className="text-[11px] font-semibold uppercase tracking-[0.18em] text-white/42">
-            Sample
-          </span>
-        ) : null}
-      </div>
-
-      {isVideo ? (
-        testimonial.videoFileId ? (
+    <article
+      data-testid="homepage-video-testimonial"
+      className="flex min-h-[420px] flex-col overflow-hidden rounded-[24px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.08),rgba(255,255,255,0.03))] p-3 text-left shadow-[0_26px_72px_rgba(0,0,0,0.24)] backdrop-blur-sm"
+    >
+      <div className="relative overflow-hidden rounded-[20px] border border-white/8 bg-[#091310]">
+        {testimonial.videoFileId ? (
           <video
             controls
             preload="metadata"
             src={`/api/testimonial-videos/${testimonial.videoFileId}`}
-            className="mt-5 aspect-video w-full rounded-[20px] bg-black object-cover"
+            className="aspect-[9/13] w-full bg-black object-cover"
           />
         ) : (
-          <div className="mt-5 grid aspect-video w-full place-items-center rounded-[20px] border border-white/10 bg-[linear-gradient(135deg,rgba(20,201,131,0.16),rgba(255,255,255,0.04))]">
-            <div className="flex flex-col items-center gap-3 text-center">
-              <span className="grid size-14 place-items-center rounded-full border border-white/14 bg-black/20 text-lg text-white">
-                ▶
+          <div className="grid aspect-[9/13] w-full place-items-center bg-[linear-gradient(145deg,rgba(20,201,131,0.18),rgba(69,215,180,0.08)_38%,rgba(255,255,255,0.03))] p-6">
+            <div className="text-center">
+              <span className="inline-flex rounded-full border border-white/14 bg-black/20 px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.24em] text-white/80">
+                Play
               </span>
-              <div>
-                <p className="text-sm font-semibold text-white">Preview frame</p>
-                <p className="mt-1 text-xs text-[#b9d9c8]">Drop in a founder clip, operator recap, or client reaction.</p>
-              </div>
+              <p className="mt-4 text-sm font-semibold text-white">Preview frame</p>
+              <p className="mt-2 text-xs leading-6 text-[#b9d9c8]">
+                Drop in a client clip, founder reaction, or operator recap here.
+              </p>
             </div>
           </div>
-        )
-      ) : (
-        <div className="mt-5 flex items-start gap-3 rounded-[20px] border border-white/8 bg-white/[0.03] p-4">
-          <span className="text-3xl leading-none text-[var(--lumivale-accent-soft)]">“</span>
-          <p className="text-sm leading-7 text-[#c7e7d7]">
-            Written proof keeps the section useful even before video clips are added.
-          </p>
-        </div>
-      )}
+        )}
 
-      <blockquote className="mt-5 flex-1 text-lg font-semibold leading-8 text-white sm:text-[1.35rem]">
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 bg-[linear-gradient(180deg,transparent,rgba(1,8,7,0.88))] p-4">
+          <span className="inline-flex rounded-full border border-white/12 bg-white/10 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.22em] text-[var(--lumivale-accent-soft)]">
+            {badgeLabel}
+          </span>
+          <p className="mt-3 text-base font-semibold text-white">{testimonial.personName}</p>
+          {testimonial.personTitle ? (
+            <p className="mt-1 text-xs leading-5 text-[#b9d9c8]">{testimonial.personTitle}</p>
+          ) : null}
+        </div>
+      </div>
+
+      <blockquote className="mt-4 flex-1 px-1 text-base font-semibold leading-7 text-white">
+        {testimonial.quote}
+      </blockquote>
+    </article>
+  );
+}
+
+function HomepageTextTestimonialCard({
+  testimonial,
+}: {
+  testimonial: HomepageTestimonialCardData;
+}) {
+  const badgeLabel = testimonial.placeholder ? "Text placeholder" : "Text testimonial";
+
+  return (
+    <article
+      data-testid="homepage-text-testimonial"
+      className="rounded-[20px] border border-white/8 bg-white/[0.04] p-5 text-left shadow-[0_18px_44px_rgba(0,0,0,0.18)] backdrop-blur-sm"
+    >
+      <div className="flex items-start justify-between gap-4">
+        <span className="inline-flex rounded-full border border-white/10 bg-white/[0.05] px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-[var(--lumivale-accent-soft)]">
+          {badgeLabel}
+        </span>
+        <span className="text-3xl leading-none text-[var(--lumivale-accent-soft)]">"</span>
+      </div>
+
+      <blockquote className="mt-4 text-sm leading-7 text-[#d7eee1]">
         {testimonial.quote}
       </blockquote>
 
-      <div className="mt-6 border-t border-white/10 pt-4">
-        <p className="font-semibold text-white">{testimonial.personName}</p>
+      <div className="mt-5 border-t border-white/8 pt-4">
+        <p className="text-sm font-semibold text-white">{testimonial.personName}</p>
         {testimonial.personTitle ? (
-          <p className="mt-1 text-sm text-[#b9d9c8]">{testimonial.personTitle}</p>
+          <p className="mt-1 text-xs leading-5 text-[#9cc7b2]">{testimonial.personTitle}</p>
         ) : null}
       </div>
     </article>
   );
+}
+
+function getHomepageTestimonialSlots(testimonials: HomepageTestimonialCardData[]) {
+  const videoTestimonials = testimonials.filter((testimonial) => testimonial.type === "video");
+  const textTestimonials = testimonials.filter((testimonial) => testimonial.type === "text");
+
+  return {
+    videoTestimonials: fillHomepageTestimonialSlots(
+      videoTestimonials,
+      videoTestimonialPlaceholders,
+      HOMEPAGE_VIDEO_TESTIMONIAL_SLOTS,
+    ),
+    textTestimonials: fillHomepageTestimonialSlots(
+      textTestimonials,
+      textTestimonialPlaceholders,
+      HOMEPAGE_TEXT_TESTIMONIAL_SLOTS,
+    ),
+  };
+}
+
+function fillHomepageTestimonialSlots(
+  testimonials: HomepageTestimonialCardData[],
+  placeholders: HomepageTestimonialCardData[],
+  count: number,
+) {
+  const filled = [...testimonials.slice(0, count)];
+
+  if (filled.length < count) {
+    filled.push(...placeholders.slice(0, count - filled.length));
+  }
+
+  return filled;
 }
 
 async function getHomeTestimonials() {
@@ -519,3 +635,4 @@ async function getHomeFaqs() {
     return defaultFaqs;
   }
 }
+
