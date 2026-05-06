@@ -562,7 +562,7 @@ function HomepageTextTestimonialCard({
         <span className="inline-flex rounded-full border border-white/10 bg-white/[0.05] px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-[var(--lumivale-accent-soft)]">
           {badgeLabel}
         </span>
-        <span className="text-3xl leading-none text-[var(--lumivale-accent-soft)]">"</span>
+        <span className="text-3xl leading-none text-[var(--lumivale-accent-soft)]">&quot;</span>
       </div>
 
       <blockquote className="mt-4 text-sm leading-7 text-[#d7eee1]">
