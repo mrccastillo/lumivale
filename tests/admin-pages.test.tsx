@@ -4,6 +4,7 @@ import { describe, expect, test, vi } from "vitest";
 import AdminLoginPage from "@/app/admin/login/page";
 import AdminFaqsPage from "@/app/admin/faqs/page";
 import AdminTestimonialsPage from "@/app/admin/testimonials/page";
+import AdminTrustedClientsPage from "@/app/admin/trusted-clients/page";
 import AdminUsersPage from "@/app/admin/users/page";
 
 vi.mock("@/lib/admin-auth", () => ({
@@ -56,6 +57,17 @@ vi.mock("@/lib/admin-users", () => ({
       email: "admin@example.com",
       createdAt: new Date("2026-05-03T08:00:00.000Z"),
       updatedAt: new Date("2026-05-03T08:00:00.000Z"),
+    },
+  ]),
+}));
+
+vi.mock("@/lib/trusted-clients", () => ({
+  getTrustedClients: vi.fn().mockResolvedValue([
+    {
+      id: "trusted-1",
+      email: "client@example.com",
+      createdAt: new Date("2026-05-06T08:00:00.000Z"),
+      updatedAt: new Date("2026-05-06T08:00:00.000Z"),
     },
   ]),
 }));
@@ -115,5 +127,15 @@ describe("admin pages", () => {
     expect(screen.getByLabelText("Email")).toBeInTheDocument();
     expect(screen.getByLabelText("Initial password")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Create admin" })).toBeInTheDocument();
+  });
+
+  test("renders the admin trusted clients page and creation form", async () => {
+    render(await AdminTrustedClientsPage({ searchParams: Promise.resolve({}) }));
+
+    expect(screen.getByRole("heading", { name: "Trusted Clients", level: 1 })).toBeInTheDocument();
+    expect(screen.getByText("Pricing Access")).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "client@example.com", level: 3 })).toBeInTheDocument();
+    expect(screen.getByLabelText("Email")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Add trusted client" })).toBeInTheDocument();
   });
 });
