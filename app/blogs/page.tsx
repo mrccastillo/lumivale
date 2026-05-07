@@ -3,8 +3,33 @@ import Link from "next/link";
 import { getPublicBlogPosts } from "@/lib/blogs";
 import { getMongoDb } from "@/lib/mongodb";
 
+const placeholderPosts = [
+  {
+    category: "Comment Campaigns",
+    excerpt:
+      "Placeholder article on turning active conversations into steady traffic and awareness.",
+    readTime: "4 min read",
+    title: "How comment campaigns can create warmer inbound attention.",
+  },
+  {
+    category: "UGC Content",
+    excerpt:
+      "Placeholder article on creator-style short-form content systems for lean distribution.",
+    readTime: "6 min read",
+    title: "What a practical UGC publishing cadence looks like for early teams.",
+  },
+  {
+    category: "Outreach",
+    excerpt:
+      "Placeholder article on simple outbound systems across LinkedIn and email motions.",
+    readTime: "5 min read",
+    title: "Keeping outreach simple without losing consistency or intent.",
+  },
+] as const;
+
 export default async function BlogsPage() {
   const posts = await getBlogsPagePosts();
+  const hasPosts = posts.length > 0;
 
   return (
     <div className="bg-[#f7f8fb] text-[var(--lumivale-ink)]">
@@ -36,7 +61,7 @@ export default async function BlogsPage() {
           </div>
 
           <div className="mt-7 grid gap-4 lg:grid-cols-3">
-            {posts.length ? posts.map((post) => (
+            {hasPosts ? posts.map((post) => (
               <Link
                 key={post.title}
                 href={`/blogs/${post.slug}`}
@@ -77,9 +102,38 @@ export default async function BlogsPage() {
                 </article>
               </Link>
             )) : (
-              <p className="rounded-lg border border-[var(--lumivale-line)] bg-white p-6 text-sm text-[var(--lumivale-muted)]">
-                Blog posts are temporarily unavailable. Please check back soon.
-              </p>
+              placeholderPosts.map((post) => (
+                <article
+                  key={post.title}
+                  className="flex min-h-[320px] flex-col overflow-hidden rounded-lg border border-[var(--lumivale-line)] bg-white shadow-[0_20px_60px_rgba(42,47,82,0.06)]"
+                >
+                  <div
+                    aria-label={`${post.category} placeholder image`}
+                    className="grid aspect-[16/9] place-items-center bg-[linear-gradient(135deg,#eafaf2_0%,#f7f8fb_52%,#ffffff_100%)]"
+                  >
+                    <span className="rounded-full bg-white/80 px-4 py-2 text-sm font-semibold text-[var(--lumivale-accent)] shadow-[0_10px_30px_rgba(42,47,82,0.08)]">
+                      Placeholder
+                    </span>
+                  </div>
+                  <div className="flex flex-1 flex-col p-4 sm:p-5">
+                    <div className="flex items-center justify-between gap-4 text-xs sm:text-sm">
+                      <span className="rounded-full bg-[#eef8f2] px-3 py-1 font-semibold text-[var(--lumivale-ink)]">
+                        {post.category}
+                      </span>
+                      <span className="text-[var(--lumivale-muted)]">{post.readTime}</span>
+                    </div>
+                    <h2 className="mt-5 text-[1.05rem] font-semibold leading-tight sm:text-[1.12rem]">
+                      {post.title}
+                    </h2>
+                    <p className="mt-3 text-sm leading-7 text-[var(--lumivale-muted)]">
+                      {post.excerpt}
+                    </p>
+                    <p className="mt-auto pt-5 text-sm font-semibold text-[var(--lumivale-muted)]">
+                      Article placeholder
+                    </p>
+                  </div>
+                </article>
+              ))
             )}
           </div>
         </div>

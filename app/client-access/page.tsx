@@ -14,7 +14,7 @@ export default async function ClientAccessPage({
   const hasInvalidLinkError = params.error === "invalid-link";
 
   return (
-    <section className="mx-auto flex w-full max-w-4xl flex-col gap-6 px-6 py-[54px]">
+    <section className="mx-auto flex w-full max-w-4xl flex-col gap-6 px-6 pb-[54px] pt-32">
       <h1 className="text-3xl font-medium text-stone-900">Client Access</h1>
       <p className="max-w-2xl text-stone-600">
         Enter your approved email address and we&apos;ll send a pricing access link.

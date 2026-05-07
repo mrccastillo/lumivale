@@ -12,8 +12,9 @@ export default function CaseStudiesPage() {
             Measured Growth, Built with Lumivale
           </h1>
           <p className="mx-auto mt-5 max-w-2xl leading-7 text-[var(--lumivale-muted)]">
-            Each card shows practical growth activity across awareness, content, and
-            outbound channels.
+            Explore our success stories across awareness, content, and outbound
+            strategies with real client outcomes backed by consistent and measurable
+            growth.
           </p>
         </div>
 

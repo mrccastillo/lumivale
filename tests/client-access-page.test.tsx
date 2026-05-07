@@ -5,7 +5,7 @@ import ClientAccessPage from "@/app/client-access/page";
 
 describe("client access page", () => {
   test("renders the email request form", async () => {
-    render(await ClientAccessPage({ searchParams: Promise.resolve({}) }));
+    const { container } = render(await ClientAccessPage({ searchParams: Promise.resolve({}) }));
 
     expect(
       screen.getByRole("heading", { name: "Client Access", level: 1 }),
@@ -14,6 +14,8 @@ describe("client access page", () => {
     expect(
       screen.getByRole("button", { name: "Send magic link" }),
     ).toBeInTheDocument();
+    expect(container.querySelector("section")).toHaveClass("pt-32", "pb-[54px]");
+    expect(container.querySelector("section")).not.toHaveClass("py-[54px]");
   });
 
   test("shows the development preview link when present", async () => {

@@ -16,7 +16,7 @@ describe("case studies page", () => {
     ).toBeInTheDocument();
     expect(
       screen.getByText(
-        "Each card shows practical growth activity across awareness, content, and outbound channels.",
+        "Explore our success stories across awareness, content, and outbound strategies with real client outcomes backed by consistent and measurable growth.",
       ),
     ).toBeInTheDocument();
     expect(container.querySelectorAll("article")).toHaveLength(3);

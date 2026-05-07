@@ -239,6 +239,16 @@ describe("site navbar", () => {
     );
   });
 
+  test("keeps pricing active on nested private pricing routes", async () => {
+    hasTrustedClientAccessMock.mockResolvedValue(true);
+    pathnameMock.mockReturnValue("/pricing/comment-campaign");
+    const { SiteNavbar } = await import("@/components/site-navbar");
+
+    render(await SiteNavbar());
+
+    expect(screen.getByRole("link", { name: "Pricing" })).toHaveClass("text-white");
+  });
+
   test("updates navbar surface immediately after route changes without requiring scroll", async () => {
     hasTrustedClientAccessMock.mockResolvedValue(false);
     pathnameMock.mockReturnValue("/");

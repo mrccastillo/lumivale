@@ -78,8 +78,25 @@ describe("blogs page", () => {
     const { container } = render(await BlogsPage());
 
     expect(screen.getByRole("heading", { name: "Blogs", level: 1 })).toBeInTheDocument();
-    expect(container).toHaveTextContent(
-      "Blog posts are temporarily unavailable. Please check back soon.",
-    );
+    expect(screen.getAllByText("Placeholder")).toHaveLength(3);
+    expect(
+      screen.getByRole("heading", {
+        name: "How comment campaigns can create warmer inbound attention.",
+        level: 2,
+      }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", {
+        name: "What a practical UGC publishing cadence looks like for early teams.",
+        level: 2,
+      }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", {
+        name: "Keeping outreach simple without losing consistency or intent.",
+        level: 2,
+      }),
+    ).toBeInTheDocument();
+    expect(container).toHaveTextContent("Article placeholder");
   });
 });

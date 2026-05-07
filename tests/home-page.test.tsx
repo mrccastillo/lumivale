@@ -1,4 +1,4 @@
-import { render, screen, within } from "@testing-library/react";
+import { fireEvent, render, screen, within } from "@testing-library/react";
 import { describe, expect, test, vi } from "vitest";
 
 import Home from "@/app/page";
@@ -114,7 +114,6 @@ describe("home page", () => {
         "Lumivale helps early-stage teams find the channels that actually bring customers, then turns those channels into clear, repeatable growth actions.",
       ),
     ).toBeInTheDocument();
-    expect(screen.getByText("Light up your growth")).toBeInTheDocument();
     expect(screen.getByText("We keep it Simple.")).toBeInTheDocument();
     expect(screen.getByText("Make it Affordable.")).toBeInTheDocument();
     expect(screen.getByText("Ensure Excellence.")).toBeInTheDocument();
@@ -184,6 +183,7 @@ describe("home page", () => {
     expect(container.querySelector("[data-testid='services-group']")).toBeInTheDocument();
     expect(container.querySelector("[data-testid='case-studies-group']")).toBeInTheDocument();
     expect(container.querySelector("[data-testid='testimonials-reveal']")).toBeInTheDocument();
+    expect(container.querySelector("[data-testid='testimonials-spotlight']")).toBeInTheDocument();
     expect(container.querySelector("[data-testid='faqs-reveal']")).toBeInTheDocument();
     expect(container.querySelector("[data-testid='conversion-reveal']")).toBeInTheDocument();
   });
@@ -213,6 +213,13 @@ describe("home page", () => {
 
     const serviceQueries = within(serviceSection as HTMLElement);
 
+    expect(
+      serviceQueries.getByRole("heading", { level: 2, name: "How We Can Help" }),
+    ).toBeInTheDocument();
+    expect(serviceSection).toHaveTextContent(
+      "Stop the guesswork and choose from one of our proven channels to unlock targeted growth that turns attention into revenue.",
+    );
+
     for (const service of getAllServices()) {
       expect(
         serviceQueries.getByRole("link", { name: service.title }),
@@ -241,7 +248,7 @@ describe("home page", () => {
 
     expect(caseStudySection).toHaveTextContent("Measured Growth, Built with Lumivale");
     expect(caseStudySection).toHaveTextContent(
-      "Each card shows practical growth activity across awareness, content, and outbound channels.",
+      "Explore our success stories across awareness, content, and outbound strategies with real client outcomes backed by consistent and measurable growth.",
     );
     expect(caseStudySection?.querySelectorAll("article")).toHaveLength(3);
 
@@ -264,7 +271,7 @@ describe("home page", () => {
     ).not.toBeInTheDocument();
   });
 
-  test("renders published text and video testimonials from MongoDB", async () => {
+  test("renders published text testimonials from MongoDB and skips the video row", async () => {
     vi.mocked(getPublishedTestimonials).mockResolvedValueOnce([
       {
         id: "video-1",
@@ -318,36 +325,26 @@ describe("home page", () => {
 
     const { container } = render(await Home());
     const testimonialSection = container.querySelector("#testimonials");
-    const videoGrid = testimonialSection?.querySelector("[data-testid='testimonials-video-grid']");
     const textGrid = testimonialSection?.querySelector("[data-testid='testimonials-text-grid']");
 
-    expect(videoGrid).toHaveTextContent("Jon Ramos");
-    expect(videoGrid).toHaveTextContent("Mina Park");
+    expect(testimonialSection).toHaveTextContent("Hear it from our clients");
     expect(textGrid).toHaveTextContent("Maya Lee");
     expect(textGrid).toHaveTextContent("Evan Cole");
-    expect(videoGrid?.querySelectorAll("[data-testid='homepage-video-testimonial']")).toHaveLength(4);
-    expect(textGrid?.querySelectorAll("[data-testid='homepage-text-testimonial']")).toHaveLength(6);
-    expect(videoGrid).toHaveTextContent("Video placeholder");
-    expect(textGrid).toHaveTextContent("Text placeholder");
-    expect(videoGrid?.querySelector("video")).toHaveAttribute(
-      "src",
-      "/api/testimonial-videos/video-1",
-    );
-    expect(videoGrid?.querySelector("video")).toHaveAttribute("controls");
+    expect(textGrid).toHaveTextContent("Placeholder");
+    expect(textGrid?.querySelectorAll("[data-testid='homepage-text-testimonial']")).toHaveLength(4);
+    expect(testimonialSection).not.toHaveTextContent("Jon Ramos");
+    expect(testimonialSection).not.toHaveTextContent("Mina Park");
+    expect(testimonialSection?.querySelector("video")).not.toBeInTheDocument();
+    expect(container.querySelector("[data-testid='testimonials-video-grid']")).not.toBeInTheDocument();
   });
 
-  test("renders four video and six text placeholders when no published testimonials are available", async () => {
+  test("renders legacy video and text placeholders when no published testimonials are available", async () => {
     const { container } = render(await Home());
     const testimonialSection = container.querySelector("#testimonials");
     const videoGrid = testimonialSection?.querySelector("[data-testid='testimonials-video-grid']");
     const textGrid = testimonialSection?.querySelector("[data-testid='testimonials-text-grid']");
 
-    expect(testimonialSection).toHaveTextContent(
-      "Lumivale keeps growth focused on the channels that can actually bring users, awareness, and website traffic.",
-    );
-    expect(testimonialSection).toHaveTextContent(
-      "The strongest early teams do not need more agency jargon. They need simple execution, clear packages, and consistent growth activity.",
-    );
+    expect(testimonialSection).toHaveTextContent("Hear it from our clients");
     expect(within(videoGrid as HTMLElement).getAllByText("Video placeholder")).toHaveLength(4);
     expect(within(textGrid as HTMLElement).getAllByText("Text placeholder")).toHaveLength(6);
     expect(videoGrid?.querySelectorAll("[data-testid='homepage-video-testimonial']")).toHaveLength(4);
@@ -361,11 +358,90 @@ describe("home page", () => {
     const videoGrid = container.querySelector("[data-testid='testimonials-video-grid']");
     const textGrid = container.querySelector("[data-testid='testimonials-text-grid']");
 
-    expect(container.querySelector("#testimonials")).toHaveTextContent(
-      "Lumivale keeps growth focused on the channels that can actually bring users, awareness, and website traffic.",
-    );
+    expect(container.querySelector("#testimonials")).toHaveTextContent("Hear it from our clients");
     expect(within(videoGrid as HTMLElement).getAllByText("Video placeholder")).toHaveLength(4);
     expect(within(textGrid as HTMLElement).getAllByText("Text placeholder")).toHaveLength(6);
+  });
+
+  test("paginates homepage text testimonials four per page with wraparound arrows", async () => {
+    vi.mocked(getPublishedTestimonials).mockResolvedValueOnce([
+      {
+        id: "text-1",
+        personName: "Maya Lee",
+        personTitle: "Founder, Northstar",
+        quote: "Lumivale made growth activity simpler to repeat.",
+        sortOrder: 1,
+        status: "published",
+        type: "text",
+        videoFileId: "",
+        createdAt: new Date("2026-05-03T08:00:00.000Z"),
+        updatedAt: new Date("2026-05-03T08:00:00.000Z"),
+      },
+      {
+        id: "text-2",
+        personName: "Evan Cole",
+        personTitle: "Growth Lead, Signal Labs",
+        quote: "The process stayed clear and practical from week one.",
+        sortOrder: 2,
+        status: "published",
+        type: "text",
+        videoFileId: "",
+        createdAt: new Date("2026-05-03T08:01:00.000Z"),
+        updatedAt: new Date("2026-05-03T08:01:00.000Z"),
+      },
+      {
+        id: "text-3",
+        personName: "Talia West",
+        personTitle: "Founder, Arcrow",
+        quote: "Execution got simpler fast.",
+        sortOrder: 3,
+        status: "published",
+        type: "text",
+        videoFileId: "",
+        createdAt: new Date("2026-05-03T08:02:00.000Z"),
+        updatedAt: new Date("2026-05-03T08:02:00.000Z"),
+      },
+      {
+        id: "text-4",
+        personName: "Noah Price",
+        personTitle: "Growth, Halcyon",
+        quote: "We had a clearer playbook in days.",
+        sortOrder: 4,
+        status: "published",
+        type: "text",
+        videoFileId: "",
+        createdAt: new Date("2026-05-03T08:03:00.000Z"),
+        updatedAt: new Date("2026-05-03T08:03:00.000Z"),
+      },
+      {
+        id: "text-5",
+        personName: "Iris Kent",
+        personTitle: "CEO, Meridian",
+        quote: "The channel focus finally felt obvious.",
+        sortOrder: 5,
+        status: "published",
+        type: "text",
+        videoFileId: "",
+        createdAt: new Date("2026-05-03T08:04:00.000Z"),
+        updatedAt: new Date("2026-05-03T08:04:00.000Z"),
+      },
+    ]);
+
+    render(await Home());
+
+    expect(screen.getByText("Page 1 of 2")).toBeInTheDocument();
+    expect(screen.getByText("Maya Lee")).toBeInTheDocument();
+    expect(screen.queryByText("Iris Kent")).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("button", { name: "Next testimonials" }));
+
+    expect(screen.getByText("Page 2 of 2")).toBeInTheDocument();
+    expect(screen.getByText("Iris Kent")).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("button", { name: "Next testimonials" }));
+
+    expect(screen.getByText("Page 1 of 2")).toBeInTheDocument();
+    expect(screen.getByText("Maya Lee")).toBeInTheDocument();
   });
 
   test("renders at least five collapsible FAQs", async () => {

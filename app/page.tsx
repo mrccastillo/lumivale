@@ -1,9 +1,13 @@
 import Link from "next/link";
 
 import { CaseStudyCards } from "@/components/case-study-cards";
+import { HeroGlowBlob } from "@/components/hero-glow-blob";
+import { HomepageTestimonialsCarousel } from "@/components/homepage-testimonials-carousel";
+import { HomepageVideoTestimonialCard } from "@/components/homepage-video-testimonial-card";
 import { MotionGroup, MotionItem } from "@/components/motion-group";
 import { Parallax } from "@/components/parallax";
 import { Reveal } from "@/components/reveal";
+import { TestimonialsSpotlight } from "@/components/testimonials-spotlight";
 import { getAllCaseStudies } from "@/lib/case-studies";
 import { defaultFaqs, getPublishedFaqs } from "@/lib/faqs";
 import { getMongoDb } from "@/lib/mongodb";
@@ -32,24 +36,29 @@ const metrics = [
   },
 ];
 
-type HomepageTestimonialCardData = Pick<
+type HomepageTextTestimonialData = Pick<
   Testimonial,
-  "id" | "personName" | "personTitle" | "quote" | "type" | "videoFileId"
+  "id" | "personName" | "personTitle" | "quote"
 > & {
   placeholder?: boolean;
 };
 
-const HOMEPAGE_VIDEO_TESTIMONIAL_SLOTS = 4;
-const HOMEPAGE_TEXT_TESTIMONIAL_SLOTS = 6;
+type HomepageVideoTestimonialData = Pick<
+  Testimonial,
+  "id" | "personName" | "personTitle" | "quote" | "videoFileId"
+> & {
+  placeholder?: boolean;
+};
 
-const videoTestimonialPlaceholders: HomepageTestimonialCardData[] = [
+const HOMEPAGE_TEXT_TESTIMONIAL_PAGE_SIZE = 4;
+
+const videoTestimonialPlaceholders: HomepageVideoTestimonialData[] = [
   {
     id: "placeholder-video-1",
     personName: "Founder placeholder",
     personTitle: "B2B SaaS team",
     quote:
       "Short video feedback about how Lumivale helped simplify execution and keep weekly growth activity moving.",
-    type: "video",
     videoFileId: "",
     placeholder: true,
   },
@@ -59,7 +68,6 @@ const videoTestimonialPlaceholders: HomepageTestimonialCardData[] = [
     personTitle: "Lean growth team",
     quote:
       "Video feedback placeholder showing how the team gained structure, cleaner messaging, and a more repeatable growth process.",
-    type: "video",
     videoFileId: "",
     placeholder: true,
   },
@@ -69,7 +77,6 @@ const videoTestimonialPlaceholders: HomepageTestimonialCardData[] = [
     personTitle: "Growth-focused startup",
     quote:
       "Video placeholder describing a smoother way to test outreach, content, and awareness plays without agency overhead.",
-    type: "video",
     videoFileId: "",
     placeholder: true,
   },
@@ -79,21 +86,18 @@ const videoTestimonialPlaceholders: HomepageTestimonialCardData[] = [
     personTitle: "Fast-moving launch team",
     quote:
       "Video placeholder about clearer offers, steadier publishing, and growth activity that keeps momentum visible.",
-    type: "video",
     videoFileId: "",
     placeholder: true,
   },
 ];
 
-const textTestimonialPlaceholders: HomepageTestimonialCardData[] = [
+const textTestimonialPlaceholders: HomepageTextTestimonialData[] = [
   {
     id: "placeholder-text-1",
     personName: "Marketing lead placeholder",
     personTitle: "Consumer startup",
     quote:
       "Text testimonial placeholder for clear channel strategy, faster shipping, and more confidence in what to focus on next.",
-    type: "text",
-    videoFileId: "",
     placeholder: true,
   },
   {
@@ -102,8 +106,6 @@ const textTestimonialPlaceholders: HomepageTestimonialCardData[] = [
     personTitle: "Early-stage brand",
     quote:
       "Text testimonial placeholder focused on practical support, straightforward deliverables, and steady momentum across channels.",
-    type: "text",
-    videoFileId: "",
     placeholder: true,
   },
   {
@@ -112,8 +114,6 @@ const textTestimonialPlaceholders: HomepageTestimonialCardData[] = [
     personTitle: "Service business",
     quote:
       "Text feedback placeholder about keeping priorities clear, reporting simple, and progress visible every week.",
-    type: "text",
-    videoFileId: "",
     placeholder: true,
   },
   {
@@ -122,8 +122,6 @@ const textTestimonialPlaceholders: HomepageTestimonialCardData[] = [
     personTitle: "Scaling media team",
     quote:
       "Text placeholder about smoother reviews, stronger content direction, and more confidence in what ships next.",
-    type: "text",
-    videoFileId: "",
     placeholder: true,
   },
   {
@@ -132,8 +130,6 @@ const textTestimonialPlaceholders: HomepageTestimonialCardData[] = [
     personTitle: "B2B software company",
     quote:
       "Text placeholder focused on practical support, lighter oversight, and output that feels consistent week to week.",
-    type: "text",
-    videoFileId: "",
     placeholder: true,
   },
   {
@@ -142,8 +138,6 @@ const textTestimonialPlaceholders: HomepageTestimonialCardData[] = [
     personTitle: "Lean acquisition team",
     quote:
       "Text placeholder about better execution quality, more useful reporting, and stronger channel follow-through.",
-    type: "text",
-    videoFileId: "",
     placeholder: true,
   },
 ];
@@ -215,37 +209,33 @@ export default async function Home() {
   const caseStudies = getAllCaseStudies();
   const services = getAllServices();
   const [testimonials, faqs] = await Promise.all([getHomeTestimonials(), getHomeFaqs()]);
-  const { textTestimonials, videoTestimonials } = getHomepageTestimonialSlots(testimonials);
+  const textTestimonials = getHomepageTextTestimonials(testimonials);
+  const showPlaceholderTestimonials = !testimonials.some(
+    (testimonial) => testimonial.type === "text",
+  );
 
   return (
     <div className="bg-[#f7f8fb] text-[var(--lumivale-ink)]">
-      <div data-nav-surface="dark" className="relative isolate overflow-hidden bg-[radial-gradient(circle_at_50%_0%,rgba(20,201,131,0.26),transparent_26%),radial-gradient(circle_at_50%_44%,rgba(20,201,131,0.12),transparent_30%),linear-gradient(180deg,#063322_0%,#031410_48%,#031410_74%,#010807_100%)] text-white">
-        <section id="hero" data-theme="dark" className="px-4 pb-6 pt-[72px] sm:px-6 sm:pb-8 sm:pt-20">
+      <div data-nav-surface="dark" className="relative isolate overflow-hidden bg-[radial-gradient(circle_at_50%_100%,rgba(8,20,14,0.22),transparent_42%),linear-gradient(180deg,#081d14_0%,#04110c_34%,#020605_68%,#000000_100%)] text-white">
+        <HeroGlowBlob />
+
+        <section id="hero" data-theme="dark" className="relative z-10 flex min-h-screen flex-col px-4 pb-6 pt-[72px] sm:px-6 sm:pb-8 sm:pt-20">
           <Parallax
             data-testid="hero-parallax"
-            className="mx-auto flex min-h-[52vh] max-w-7xl flex-col items-center justify-center text-center sm:min-h-[56vh]"
+            className="mx-auto flex w-full max-w-7xl flex-1 flex-col items-center justify-center pb-14 pt-10 text-center sm:pb-20 sm:pt-14"
             offset={18}
           >
-            <div className="inline-flex items-center gap-2 rounded-full border border-white/12 bg-white/10 px-3 py-1.5 text-xs font-medium text-[#d7f0e3] shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] sm:px-4 sm:py-2 sm:text-sm">
-              <span className="flex -space-x-2">
-                <span className="grid size-6 place-items-center rounded-full bg-[#ff8a3d] text-[10px] text-white sm:size-7 sm:text-xs">Y</span>
-                <span className="grid size-6 place-items-center rounded-full bg-[#4ecdc4] text-[10px] text-white sm:size-7 sm:text-xs">L</span>
-                <span className="grid size-6 place-items-center rounded-full bg-[#7dba99] text-[10px] text-white sm:size-7 sm:text-xs">S</span>
-              </span>
-              Light up your growth
-            </div>
-
-            <h1 className="mt-6 max-w-6xl text-[1.7rem] font-semibold leading-[1.08] text-white sm:mt-8 sm:text-4xl lg:text-5xl">
+            <h1 className="max-w-6xl text-[1.35rem] font-medium leading-[1.06] text-white sm:text-[3.5rem] lg:text-[3.7rem]">
               Light up your growth with{" "}
               <span className="text-[var(--lumivale-accent-soft)]">simple execution systems</span>
             </h1>
 
-            <p className="mt-5 max-w-3xl text-[0.95rem] leading-7 text-[#c7e7d7] sm:mt-7 sm:text-lg sm:leading-8">
+            <p className="mt-7 max-w-3xl text-[0.48rem] font-normal leading-7 text-[#c7e7d7] sm:mt-9 sm:text-[0.88rem] sm:leading-[2.25rem]">
               Lumivale helps early-stage teams find the channels that actually bring
               customers, then turns those channels into clear, repeatable growth actions.
             </p>
 
-            <div data-testid="hero-cta-card" className="mt-7 flex w-full max-w-[22rem] flex-row gap-2 rounded-full border border-white/14 bg-white/12 p-1.5 shadow-[0_24px_80px_rgba(0,0,0,0.28)] sm:mt-9 sm:max-w-xl sm:gap-3 sm:p-2">
+            <div data-testid="hero-cta-card" className="mt-10 flex w-full max-w-[22rem] flex-row gap-2 rounded-full border border-white/14 bg-white/12 p-1.5 shadow-[0_24px_80px_rgba(0,0,0,0.28)] sm:mt-12 sm:max-w-xl sm:gap-3 sm:p-2">
               <div className="flex flex-1 items-center px-4 py-2.5 text-left text-xs text-[#add7c2] sm:px-5 sm:py-3 sm:text-sm">
                 Ready to grow?
               </div>
@@ -258,10 +248,16 @@ export default async function Home() {
                 Book a call
               </a>
             </div>
+          </Parallax>
+
+          <div className="border-t border-white/8 pb-5 pt-8 sm:pb-6 sm:pt-9">
+            <p className="text-center text-[11px] font-medium uppercase tracking-[0.24em] text-[#8ebba4] sm:text-xs">
+              Channels we activate
+            </p>
 
             <div
               data-testid="platform-row"
-              className="lumivale-marquee-fade mt-8 w-full max-w-4xl overflow-hidden sm:mt-10"
+              className="lumivale-marquee-fade mt-8 w-[calc(100%+2rem)] -translate-x-4 overflow-hidden sm:mt-9 sm:w-[calc(100%+3rem)] sm:-translate-x-6"
             >
               <div
                 data-testid="platform-track"
@@ -272,7 +268,7 @@ export default async function Home() {
                     key={`sequence-${index}`}
                     data-testid="platform-sequence"
                     aria-hidden={index > 0 || undefined}
-                    className="flex shrink-0 items-center gap-x-4 pr-4 text-sm font-semibold text-white/56 sm:gap-x-12 sm:pr-12 sm:text-xl"
+                    className="flex shrink-0 items-center gap-x-8 pr-8 text-sm font-semibold text-white/56 sm:gap-x-16 sm:pr-16 sm:text-xl"
                   >
                     {platformNames.map((name) => (
                       <span
@@ -287,23 +283,24 @@ export default async function Home() {
                 ))}
               </div>
             </div>
-          </Parallax>
+          </div>
         </section>
 
-        <section id="proof" className="px-4 pb-14 pt-0 text-white sm:px-6 sm:pb-[68px]">
-          <Reveal data-testid="proof-reveal" className="mx-auto max-w-7xl text-center">
-            <p className="text-xs font-medium uppercase text-[#8ebba4] sm:text-sm">
-              Built for lean growth teams
-            </p>
-            <h2 className="mx-auto mt-8 max-w-5xl text-2xl font-semibold leading-tight sm:mt-10 sm:text-4xl">
+        <section id="proof" className="relative z-10 -mt-2 px-4 pb-16 pt-10 text-white sm:px-6 sm:pb-20 sm:pt-12">
+          <Reveal data-testid="proof-reveal" className="mx-auto max-w-6xl text-center">
+            <h2 className="mx-auto max-w-4xl text-[1.72rem] font-medium leading-tight sm:text-[2.2rem]">
               Keep growth simple, affordable, and excellent without the agency overhead.
             </h2>
-            <MotionGroup className="mx-auto mt-8 grid max-w-5xl overflow-hidden rounded-lg border border-white/10 bg-white/[0.03] sm:mt-12 md:grid-cols-3">
+            <p className="mx-auto mt-5 max-w-2xl text-[0.92rem] leading-7 text-[#9eb8ac] sm:mt-6 sm:text-[0.98rem] sm:leading-8">
+              Practical support across channel strategy, execution, and reporting, without
+              the layers and drag that usually come with agency retainers.
+            </p>
+            <MotionGroup className="mx-auto mt-10 grid max-w-5xl overflow-hidden rounded-[24px] border border-white/7 bg-[linear-gradient(180deg,rgba(255,255,255,0.035),rgba(255,255,255,0.015))] shadow-[0_22px_64px_rgba(0,0,0,0.2)] backdrop-blur-sm sm:mt-12 md:grid-cols-3">
               {metrics.map((metric) => (
                 <MotionItem key={metric.value}>
-                  <article className="border-white/10 p-6 text-left sm:p-8 md:border-r last:border-r-0">
-                    <p className="text-3xl font-semibold text-white sm:text-4xl">{metric.value}</p>
-                    <p className="mt-3 text-sm text-[#b9d9c8]">{metric.label}</p>
+                  <article className="border-white/7 p-6 text-left sm:p-8 md:border-r last:border-r-0">
+                    <p className="text-[1.55rem] font-medium leading-[1.1] text-white sm:text-[2.05rem]">{metric.value}</p>
+                    <p className="mt-3 text-[0.88rem] leading-[1.85rem] text-[#abc4b8]">{metric.label}</p>
                   </article>
                 </MotionItem>
               ))}
@@ -319,11 +316,11 @@ export default async function Home() {
                 Services
               </p>
               <h2 className="mt-4 text-2xl font-semibold leading-tight text-[var(--lumivale-ink)] sm:text-4xl">
-                Our services
+                How We Can Help
               </h2>
               <p className="mx-auto mt-4 max-w-2xl text-sm leading-7 text-[var(--lumivale-muted)] sm:mt-5 sm:text-base">
-                Choose focused growth support across targeted comments, UGC content,
-                creator collaborations, LinkedIn outreach, and B2B email campaigns.
+                Stop the guesswork and choose from one of our proven channels to unlock
+                targeted growth that turns attention into revenue.
               </p>
           </Reveal>
 
@@ -372,8 +369,9 @@ export default async function Home() {
               Measured Growth, Built with Lumivale
             </h2>
             <p className="mx-auto mt-4 max-w-2xl text-sm leading-7 text-[var(--lumivale-muted)] sm:mt-5 sm:text-base">
-              Each card shows practical growth activity across awareness, content, and
-              outbound channels.
+              Explore our success stories across awareness, content, and outbound
+              strategies with real client outcomes backed by consistent and measurable
+              growth.
             </p>
           </Reveal>
 
@@ -385,42 +383,43 @@ export default async function Home() {
         </div>
       </section>
 
-      <section data-nav-surface="dark" id="testimonials" className="bg-[var(--lumivale-ink)] px-4 py-16 text-white sm:px-6 sm:py-24">
-        <Reveal data-testid="testimonials-reveal" className="mx-auto max-w-6xl">
-          <p className="text-sm font-semibold uppercase text-[var(--lumivale-accent-soft)]">
-            Client signal
-          </p>
-          <div className="mx-auto mt-5 max-w-4xl text-center sm:mt-6">
-            <blockquote className="text-2xl font-semibold leading-tight sm:text-4xl">
-              Lumivale keeps growth focused on the channels that can actually bring users,
-              awareness, and website traffic.
-            </blockquote>
-            <p className="mx-auto mt-5 max-w-2xl text-sm leading-7 text-[#b9d9c8] sm:mt-6 sm:text-base">
-              The strongest early teams do not need more agency jargon. They need simple
-              execution, clear packages, and consistent growth activity.
-            </p>
-          </div>
-
-          <div className="mt-10">
-            <div
-              data-testid="testimonials-video-grid"
-              className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4"
-            >
-              {videoTestimonials.map((testimonial) => (
-                <HomepageTestimonialCard key={testimonial.id} testimonial={testimonial} />
-              ))}
+      <section data-nav-surface="dark" id="testimonials" className="relative isolate overflow-hidden bg-[radial-gradient(circle_at_50%_18%,rgba(12,78,50,0.34),transparent_42%),radial-gradient(circle_at_50%_100%,rgba(6,34,22,0.22),transparent_40%),linear-gradient(180deg,#020302_0%,#050505_100%)] text-white">
+        <TestimonialsSpotlight className="px-4 py-16 sm:px-6 sm:py-24">
+          <Reveal data-testid="testimonials-reveal" className="relative z-10 mx-auto max-w-7xl">
+            <div className="mx-auto max-w-4xl text-center">
+              <h2 className="text-2xl font-semibold leading-tight sm:text-4xl">
+                Hear it from our clients
+              </h2>
             </div>
 
-            <div
-              data-testid="testimonials-text-grid"
-              className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-3"
-            >
-              {textTestimonials.map((testimonial) => (
-                <HomepageTestimonialCard key={testimonial.id} testimonial={testimonial} />
-              ))}
-            </div>
-          </div>
-        </Reveal>
+            {showPlaceholderTestimonials ? (
+              <div className="mt-10">
+                <div
+                  data-testid="testimonials-video-grid"
+                  className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4"
+                >
+                  {videoTestimonialPlaceholders.map((testimonial) => (
+                    <HomepageVideoTestimonialCard key={testimonial.id} testimonial={testimonial} />
+                  ))}
+                </div>
+
+                <div
+                  data-testid="testimonials-text-grid"
+                  className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-3"
+                >
+                  {textTestimonialPlaceholders.map((testimonial) => (
+                    <LegacyHomepageTextTestimonialCard
+                      key={testimonial.id}
+                      testimonial={testimonial}
+                    />
+                  ))}
+                </div>
+              </div>
+            ) : (
+              <HomepageTestimonialsCarousel testimonials={textTestimonials} />
+            )}
+          </Reveal>
+        </TestimonialsSpotlight>
       </section>
 
       <section id="faqs" className="bg-white px-4 py-16 sm:px-6 sm:py-24">
@@ -484,131 +483,68 @@ export default async function Home() {
   );
 }
 
-function HomepageTestimonialCard({
+function LegacyHomepageTextTestimonialCard({
   testimonial,
 }: {
-  testimonial: HomepageTestimonialCardData;
+  testimonial: HomepageTextTestimonialData;
 }) {
-  return testimonial.type === "video"
-    ? <HomepageVideoTestimonialCard testimonial={testimonial} />
-    : <HomepageTextTestimonialCard testimonial={testimonial} />;
-}
-
-function HomepageVideoTestimonialCard({
-  testimonial,
-}: {
-  testimonial: HomepageTestimonialCardData;
-}) {
-  const badgeLabel = testimonial.placeholder ? "Video placeholder" : "Video testimonial";
-
-  return (
-    <article
-      data-testid="homepage-video-testimonial"
-      className="flex min-h-[420px] flex-col overflow-hidden rounded-[24px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.08),rgba(255,255,255,0.03))] p-3 text-left shadow-[0_26px_72px_rgba(0,0,0,0.24)] backdrop-blur-sm"
-    >
-      <div className="relative overflow-hidden rounded-[20px] border border-white/8 bg-[#091310]">
-        {testimonial.videoFileId ? (
-          <video
-            controls
-            preload="metadata"
-            src={`/api/testimonial-videos/${testimonial.videoFileId}`}
-            className="aspect-[9/13] w-full bg-black object-cover"
-          />
-        ) : (
-          <div className="grid aspect-[9/13] w-full place-items-center bg-[linear-gradient(145deg,rgba(20,201,131,0.18),rgba(69,215,180,0.08)_38%,rgba(255,255,255,0.03))] p-6">
-            <div className="text-center">
-              <span className="inline-flex rounded-full border border-white/14 bg-black/20 px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.24em] text-white/80">
-                Play
-              </span>
-              <p className="mt-4 text-sm font-semibold text-white">Preview frame</p>
-              <p className="mt-2 text-xs leading-6 text-[#b9d9c8]">
-                Drop in a client clip, founder reaction, or operator recap here.
-              </p>
-            </div>
-          </div>
-        )}
-
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 bg-[linear-gradient(180deg,transparent,rgba(1,8,7,0.88))] p-4">
-          <span className="inline-flex rounded-full border border-white/12 bg-white/10 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.22em] text-[var(--lumivale-accent-soft)]">
-            {badgeLabel}
-          </span>
-          <p className="mt-3 text-base font-semibold text-white">{testimonial.personName}</p>
-          {testimonial.personTitle ? (
-            <p className="mt-1 text-xs leading-5 text-[#b9d9c8]">{testimonial.personTitle}</p>
-          ) : null}
-        </div>
-      </div>
-
-      <blockquote className="mt-4 flex-1 px-1 text-base font-semibold leading-7 text-white">
-        {testimonial.quote}
-      </blockquote>
-    </article>
-  );
-}
-
-function HomepageTextTestimonialCard({
-  testimonial,
-}: {
-  testimonial: HomepageTestimonialCardData;
-}) {
-  const badgeLabel = testimonial.placeholder ? "Text placeholder" : "Text testimonial";
-
   return (
     <article
       data-testid="homepage-text-testimonial"
-      className="rounded-[20px] border border-white/8 bg-white/[0.04] p-5 text-left shadow-[0_18px_44px_rgba(0,0,0,0.18)] backdrop-blur-sm"
+      className="rounded-[24px] border border-white/8 bg-[linear-gradient(180deg,rgba(255,255,255,0.045),rgba(255,255,255,0.02))] p-5 text-left shadow-[0_18px_40px_rgba(0,0,0,0.22),inset_0_1px_0_rgba(255,255,255,0.04)] backdrop-blur-xl"
     >
       <div className="flex items-start justify-between gap-4">
-        <span className="inline-flex rounded-full border border-white/10 bg-white/[0.05] px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-[var(--lumivale-accent-soft)]">
-          {badgeLabel}
+        <span className="inline-flex rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-[10px] font-medium text-white/62 backdrop-blur-md">
+          Text placeholder
         </span>
-        <span className="text-3xl leading-none text-[var(--lumivale-accent-soft)]">&quot;</span>
+        <span className="text-2xl leading-none text-white/28">&quot;</span>
       </div>
 
-      <blockquote className="mt-4 text-sm leading-7 text-[#d7eee1]">
+      <blockquote className="mt-4 text-sm leading-7 text-[#efefef]">
         {testimonial.quote}
       </blockquote>
 
-      <div className="mt-5 border-t border-white/8 pt-4">
-        <p className="text-sm font-semibold text-white">{testimonial.personName}</p>
+      <div className="mt-5 border-t border-white/6 pt-4">
+        <p className="text-base font-semibold text-white">{testimonial.personName}</p>
         {testimonial.personTitle ? (
-          <p className="mt-1 text-xs leading-5 text-[#9cc7b2]">{testimonial.personTitle}</p>
+          <p className="mt-1 text-sm leading-5 text-white/62">{testimonial.personTitle}</p>
         ) : null}
       </div>
     </article>
   );
 }
 
-function getHomepageTestimonialSlots(testimonials: HomepageTestimonialCardData[]) {
-  const videoTestimonials = testimonials.filter((testimonial) => testimonial.type === "video");
-  const textTestimonials = testimonials.filter((testimonial) => testimonial.type === "text");
+function getHomepageTextTestimonials(testimonials: Testimonial[]) {
+  const textTestimonials = testimonials
+    .filter((testimonial) => testimonial.type === "text")
+    .map((testimonial) => ({
+      id: testimonial.id,
+      personName: testimonial.personName,
+      personTitle: testimonial.personTitle,
+      quote: testimonial.quote,
+    }));
 
-  return {
-    videoTestimonials: fillHomepageTestimonialSlots(
-      videoTestimonials,
-      videoTestimonialPlaceholders,
-      HOMEPAGE_VIDEO_TESTIMONIAL_SLOTS,
-    ),
-    textTestimonials: fillHomepageTestimonialSlots(
-      textTestimonials,
-      textTestimonialPlaceholders,
-      HOMEPAGE_TEXT_TESTIMONIAL_SLOTS,
-    ),
-  };
-}
-
-function fillHomepageTestimonialSlots(
-  testimonials: HomepageTestimonialCardData[],
-  placeholders: HomepageTestimonialCardData[],
-  count: number,
-) {
-  const filled = [...testimonials.slice(0, count)];
-
-  if (filled.length < count) {
-    filled.push(...placeholders.slice(0, count - filled.length));
+  if (!textTestimonials.length) {
+    return [];
   }
 
-  return filled;
+  const remainder = textTestimonials.length % HOMEPAGE_TEXT_TESTIMONIAL_PAGE_SIZE;
+
+  if (remainder === 0) {
+    return textTestimonials;
+  }
+
+  const placeholdersNeeded = HOMEPAGE_TEXT_TESTIMONIAL_PAGE_SIZE - remainder;
+  const placeholderFill = Array.from({ length: placeholdersNeeded }, (_, index) => {
+    const placeholder = textTestimonialPlaceholders[index % textTestimonialPlaceholders.length];
+
+    return {
+      ...placeholder,
+      id: `${placeholder.id}-page-fill-${index + 1}`,
+    };
+  });
+
+  return [...textTestimonials, ...placeholderFill];
 }
 
 async function getHomeTestimonials() {

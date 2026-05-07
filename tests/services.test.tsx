@@ -21,6 +21,7 @@ describe("services data and detail pages", () => {
       "Email B2B Campaigns",
     ]);
     expect(services.every((service) => service.slug && service.description)).toBe(true);
+    expect(services.every((service) => service.privateContent.pricePreview)).toBe(true);
   });
 
   test("looks up services by slug", () => {
@@ -59,6 +60,10 @@ describe("services data and detail pages", () => {
     expect(headerSection).not.toHaveAttribute("data-nav-surface", "dark");
     expect(headerSection?.className).not.toContain("linear-gradient");
     expect(screen.getByText(service.description)).toBeInTheDocument();
+    expect(screen.queryByText("EXAMPLES")).not.toBeInTheDocument();
+    service.privateContent.pricingLines.forEach((line) => {
+      expect(screen.queryByText(line.value)).not.toBeInTheDocument();
+    });
     expect(screen.queryByRole("link", { name: "Book a call" })).not.toBeInTheDocument();
   });
 

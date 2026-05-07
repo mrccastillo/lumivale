@@ -22,6 +22,7 @@ export function SiteNavbarClient({
   publicLinks,
 }: SiteNavbarClientProps) {
   const pathname = usePathname() || "/";
+  const isPricingActive = pathname === "/pricing" || pathname.startsWith("/pricing/");
   const [surface, setSurface] = useState<NavSurface>("dark");
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -129,7 +130,7 @@ export function SiteNavbarClient({
                 <Link
                   href="/pricing"
                   className={`transition ${
-                    pathname === "/pricing" ? navItemActive : ""
+                    isPricingActive ? navItemActive : ""
                   } ${navItemBase}`}
                 >
                   Pricing
@@ -204,7 +205,7 @@ export function SiteNavbarClient({
                 href="/pricing"
                 onClick={closeMenu}
                 className={`border-b px-3 py-3 text-sm font-medium transition ${
-                  pathname === "/pricing" ? navItemActive : ""
+                  isPricingActive ? navItemActive : ""
                 } ${mobileLinkClass}`}
               >
                 Pricing
