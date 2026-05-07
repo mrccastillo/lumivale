@@ -13,9 +13,9 @@ export function HeroGlowBlob() {
         borderRadius: "46% 54% 58% 42% / 42% 38% 62% 58%",
       }
     : {
-        x: [-64, 32, 72, -20, -64],
-        y: [0, 26, -24, 14, 0],
-        scale: [0.94, 1.03, 1.12, 1.02, 0.94],
+        x: [-132, 68, 152, -48, -132],
+        y: [0, 56, -46, 30, 0],
+        scale: [0.86, 1.06, 1.2, 1.01, 0.86],
         borderRadius: [
           "46% 54% 58% 42% / 42% 38% 62% 58%",
           "58% 42% 44% 56% / 50% 55% 45% 50%",
@@ -33,9 +33,9 @@ export function HeroGlowBlob() {
         borderRadius: "58% 42% 52% 48% / 45% 56% 44% 55%",
       }
     : {
-        x: [42, -38, -10, 48, 42],
-        y: [12, 34, -16, 20, 12],
-        scale: [0.92, 1.12, 1.04, 0.98, 0.92],
+        x: [92, -82, -26, 108, 92],
+        y: [24, 66, -34, 36, 24],
+        scale: [0.84, 1.2, 1.08, 0.97, 0.84],
         borderRadius: [
           "58% 42% 52% 48% / 45% 56% 44% 55%",
           "42% 58% 39% 61% / 56% 43% 57% 44%",
@@ -55,12 +55,12 @@ export function HeroGlowBlob() {
         initial={false}
         animate={primaryAnimate}
         transition={{
-          duration: 14,
+          duration: 9,
           repeat: Infinity,
           ease: "easeInOut",
         }}
       >
-        <div className="absolute inset-0 blur-[96px] bg-[radial-gradient(circle_at_50%_52%,rgba(43,181,121,0.62)_0%,rgba(24,119,80,0.5)_28%,rgba(10,50,34,0.26)_56%,transparent_78%)]" />
+        <div className="absolute inset-0 blur-[100px] bg-[radial-gradient(circle_at_50%_52%,rgba(64,214,146,0.56)_0%,rgba(31,148,101,0.42)_28%,rgba(12,60,40,0.22)_56%,transparent_78%)]" />
       </motion.div>
 
       <motion.div
@@ -68,12 +68,12 @@ export function HeroGlowBlob() {
         initial={false}
         animate={secondaryAnimate}
         transition={{
-          duration: 10,
+          duration: 6.8,
           repeat: Infinity,
           ease: "easeInOut",
         }}
       >
-        <div className="absolute inset-0 blur-[78px] bg-[radial-gradient(circle_at_48%_50%,rgba(162,255,216,0.34)_0%,rgba(63,189,133,0.24)_42%,transparent_76%)]" />
+        <div className="absolute inset-0 blur-[84px] bg-[radial-gradient(circle_at_48%_50%,rgba(184,255,225,0.3)_0%,rgba(79,209,149,0.2)_42%,transparent_76%)]" />
       </motion.div>
     </div>
   );

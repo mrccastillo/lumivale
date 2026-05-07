@@ -225,65 +225,77 @@ export default async function Home() {
             className="mx-auto flex w-full max-w-7xl flex-1 flex-col items-center justify-center pb-14 pt-10 text-center sm:pb-20 sm:pt-14"
             offset={18}
           >
-            <h1 className="max-w-6xl text-[1.35rem] font-medium leading-[1.06] text-white sm:text-[3.5rem] lg:text-[3.7rem]">
-              Light up your growth with{" "}
-              <span className="text-[var(--lumivale-accent-soft)]">simple execution systems</span>
-            </h1>
+            <MotionGroup className="flex w-full flex-col items-center" delay={0.08} stagger={0.16}>
+              <MotionItem>
+                <h1 className="max-w-6xl text-[1.9rem] font-medium leading-[1.06] text-white sm:text-[3.5rem] lg:text-[3.7rem]">
+                  Light up your growth with{" "}
+                  <span className="text-[var(--lumivale-accent-soft)]">simple execution systems</span>
+                </h1>
+              </MotionItem>
 
-            <p className="mt-7 max-w-3xl text-[0.48rem] font-normal leading-7 text-[#c7e7d7] sm:mt-9 sm:text-[0.88rem] sm:leading-[2.25rem]">
-              Lumivale helps early-stage teams find the channels that actually bring
-              customers, then turns those channels into clear, repeatable growth actions.
-            </p>
+              <MotionItem>
+                <p className="mt-7 max-w-3xl text-[0.78rem] font-normal leading-6 text-[#c7e7d7] sm:mt-9 sm:text-[0.88rem] sm:leading-[2.25rem]">
+                  Lumivale helps early-stage teams find the channels that actually bring
+                  customers, then turns those channels into clear, repeatable growth actions.
+                </p>
+              </MotionItem>
 
-            <div data-testid="hero-cta-card" className="mt-10 flex w-full max-w-[22rem] flex-row gap-2 rounded-full border border-white/14 bg-white/12 p-1.5 shadow-[0_24px_80px_rgba(0,0,0,0.28)] sm:mt-12 sm:max-w-xl sm:gap-3 sm:p-2">
-              <div className="flex flex-1 items-center px-4 py-2.5 text-left text-xs text-[#add7c2] sm:px-5 sm:py-3 sm:text-sm">
-                Ready to grow?
-              </div>
-              <a
-                href={CALENDLY_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="shrink-0 whitespace-nowrap rounded-full bg-[var(--lumivale-accent)] px-5 py-2.5 text-xs font-semibold text-[#010807] shadow-[0_10px_28px_rgba(20,201,131,0.34)] transition hover:bg-[var(--lumivale-accent-soft)] sm:px-7 sm:py-3 sm:text-sm"
-              >
-                Book a call
-              </a>
-            </div>
+              <MotionItem>
+                <div data-testid="hero-cta-card" className="mt-10 flex w-full max-w-[22rem] flex-row gap-2 rounded-full border border-white/14 bg-white/12 p-1.5 shadow-[0_24px_80px_rgba(0,0,0,0.28)] sm:mt-12 sm:max-w-xl sm:gap-3 sm:p-2">
+                  <div className="flex flex-1 items-center px-4 py-2.5 text-left text-xs text-[#add7c2] sm:px-5 sm:py-3 sm:text-sm">
+                    Ready to grow?
+                  </div>
+                  <a
+                    href={CALENDLY_URL}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="shrink-0 whitespace-nowrap rounded-full bg-[var(--lumivale-accent)] px-5 py-2.5 text-xs font-semibold text-[#010807] shadow-[0_10px_28px_rgba(20,201,131,0.34)] transition hover:bg-[var(--lumivale-accent-soft)] sm:px-7 sm:py-3 sm:text-sm"
+                  >
+                    Book a call
+                  </a>
+                </div>
+              </MotionItem>
+            </MotionGroup>
           </Parallax>
 
-          <div className="border-t border-white/8 pb-5 pt-8 sm:pb-6 sm:pt-9">
-            <p className="text-center text-[11px] font-medium uppercase tracking-[0.24em] text-[#8ebba4] sm:text-xs">
-              Channels we activate
-            </p>
+          <MotionGroup className="w-full" delay={0.28} stagger={0.1}>
+            <MotionItem>
+              <div className="border-t border-white/8 pb-5 pt-8 sm:pb-6 sm:pt-9">
+                <p className="text-center text-[11px] font-medium uppercase tracking-[0.24em] text-[#8ebba4] sm:text-xs">
+                  Channels we activate
+                </p>
 
-            <div
-              data-testid="platform-row"
-              className="lumivale-marquee-fade mt-8 w-[calc(100%+2rem)] -translate-x-4 overflow-hidden sm:mt-9 sm:w-[calc(100%+3rem)] sm:-translate-x-6"
-            >
-              <div
-                data-testid="platform-track"
-                className="lumivale-marquee-track flex w-max items-center"
-              >
-                {Array.from({ length: platformSequenceCopies }, (_, index) => (
+                <div
+                  data-testid="platform-row"
+                  className="lumivale-marquee-fade mt-8 w-[calc(100%+2rem)] -translate-x-4 overflow-hidden sm:mt-9 sm:w-[calc(100%+3rem)] sm:-translate-x-6"
+                >
                   <div
-                    key={`sequence-${index}`}
-                    data-testid="platform-sequence"
-                    aria-hidden={index > 0 || undefined}
-                    className="flex shrink-0 items-center gap-x-8 pr-8 text-sm font-semibold text-white/56 sm:gap-x-16 sm:pr-16 sm:text-xl"
+                    data-testid="platform-track"
+                    className="lumivale-marquee-track flex w-max items-center"
                   >
-                    {platformNames.map((name) => (
-                      <span
-                        key={`sequence-${index}-${name}`}
-                        data-testid="platform-item"
-                        className="whitespace-nowrap"
+                    {Array.from({ length: platformSequenceCopies }, (_, index) => (
+                      <div
+                        key={`sequence-${index}`}
+                        data-testid="platform-sequence"
+                        aria-hidden={index > 0 || undefined}
+                        className="flex shrink-0 items-center gap-x-8 pr-8 text-sm font-semibold text-white/56 sm:gap-x-16 sm:pr-16 sm:text-xl"
                       >
-                        {name}
-                      </span>
+                        {platformNames.map((name) => (
+                          <span
+                            key={`sequence-${index}-${name}`}
+                            data-testid="platform-item"
+                            className="whitespace-nowrap"
+                          >
+                            {name}
+                          </span>
+                        ))}
+                      </div>
                     ))}
                   </div>
-                ))}
+                </div>
               </div>
-            </div>
-          </div>
+            </MotionItem>
+          </MotionGroup>
         </section>
 
         <section id="proof" className="relative z-10 -mt-2 px-4 pb-16 pt-10 text-white sm:px-6 sm:pb-20 sm:pt-12">
@@ -461,19 +473,19 @@ export default async function Home() {
         </Reveal>
       </section>
 
-      <section id="conversion" className="bg-[#f7f8fb] px-4 py-16 sm:px-6 sm:py-24">
+      <section id="conversion" data-nav-surface="dark" className="bg-[radial-gradient(circle_at_50%_0%,rgba(20,201,131,0.12),transparent_32%),linear-gradient(180deg,#03110c_0%,#02100b_44%,#010807_100%)] px-4 py-16 text-white sm:px-6 sm:py-24">
         <Reveal data-testid="conversion-reveal" className="mx-auto max-w-4xl text-center">
           <p className="text-sm font-semibold uppercase text-[var(--lumivale-accent)]">
             Start here
           </p>
-          <h2 className="mt-4 text-2xl font-semibold leading-tight text-[var(--lumivale-ink)] sm:text-4xl">
+          <h2 className="mt-4 text-[1.8rem] font-medium leading-tight text-white sm:text-[3rem]">
             Light up the next growth channel for your brand.
           </h2>
           <a
             href={CALENDLY_URL}
             target="_blank"
             rel="noopener noreferrer"
-            className="mt-8 inline-flex rounded-full bg-[var(--lumivale-accent)] px-7 py-3 text-sm font-semibold text-[#010807] shadow-[0_14px_34px_rgba(20,201,131,0.28)] transition hover:bg-[var(--lumivale-accent-soft)]"
+            className="mt-8 inline-flex rounded-full bg-[var(--lumivale-accent)] px-7 py-3 text-sm font-semibold text-[#010807] transition hover:bg-[var(--lumivale-accent-soft)]"
           >
             Book a call
           </a>

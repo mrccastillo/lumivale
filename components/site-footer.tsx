@@ -2,7 +2,11 @@ import Link from "next/link";
 
 export function SiteFooter() {
   return (
-    <footer data-nav-surface="dark" data-theme="dark" className="bg-[var(--lumivale-ink)] text-white">
+    <footer
+      data-nav-surface="dark"
+      data-theme="dark"
+      className="bg-[#010807] text-white"
+    >
       <div className="mx-auto grid w-full max-w-7xl gap-10 px-6 py-12 md:grid-cols-[1.2fr_0.8fr_0.8fr]">
         <div>
           <p className="text-2xl font-semibold text-white">
@@ -37,7 +41,7 @@ export function SiteFooter() {
           </a>
         </div>
       </div>
-      <div className="border-t border-white/10 px-6 py-[17px]">
+      <div className="border-t border-white/8 px-6 py-[17px]">
         <div className="mx-auto flex max-w-7xl flex-col gap-2 text-xs text-[#8ebba4] sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-3">
             <p>lumivale.net</p>
