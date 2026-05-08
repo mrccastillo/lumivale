@@ -12,6 +12,8 @@ export default async function ClientAccessPage({
   const params = await searchParams;
   const hasSent = params.sent === "1";
   const hasInvalidLinkError = params.error === "invalid-link";
+  const hasNotApprovedError = params.error === "not-approved";
+  const hasEmailFailedError = params.error === "email-failed";
 
   return (
     <section className="mx-auto flex w-full max-w-4xl flex-col gap-6 px-6 pb-[54px] pt-32">
@@ -53,6 +55,20 @@ export default async function ClientAccessPage({
       {hasInvalidLinkError ? (
         <p className="max-w-2xl rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
           That access link is invalid or expired. Request a fresh one.
+        </p>
+      ) : null}
+
+      {hasNotApprovedError ? (
+        <p className="max-w-2xl rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+          This email is not approved for private pricing access. Contact the admin to
+          be added as a trusted client.
+        </p>
+      ) : null}
+
+      {hasEmailFailedError ? (
+        <p className="max-w-2xl rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-900">
+          We could not send the access email. Check the SMTP sender settings and try
+          again.
         </p>
       ) : null}
 

@@ -243,7 +243,7 @@ export function BlogForm({
                 /blog/{form.slug || "your-link"}
               </p>
               <div
-                className="prose prose-stone mt-6 max-w-none"
+                className="lumivale-blog-preview-content mt-6 max-w-none"
                 dangerouslySetInnerHTML={{
                   __html: form.bodyHtml || "<p></p>",
                 }}

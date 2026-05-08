@@ -28,12 +28,14 @@ describe("admin blog editor", () => {
     expect(screen.getByText("Blog Link Ending")).toBeInTheDocument();
     expect(screen.getByText("Short Summary")).toBeInTheDocument();
     expect(screen.getByText("Body Content")).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Heading 1" })).toHaveTextContent("<h1>");
-    expect(screen.getByRole("button", { name: "Heading 2" })).toHaveTextContent("<h2>");
-    expect(screen.getByRole("button", { name: "Heading 3" })).toHaveTextContent("<h3>");
+    expect(screen.getByRole("button", { name: "Paragraph" })).toHaveTextContent("p");
+    expect(screen.getByRole("button", { name: "Heading 1" })).toHaveTextContent("h1");
+    expect(screen.getByRole("button", { name: "Heading 2" })).toHaveTextContent("h2");
+    expect(screen.getByRole("button", { name: "Heading 3" })).toHaveTextContent("h3");
     expect(screen.getByRole("button", { name: "HTML" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Bold" })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Bulleted list" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Bulleted list" }).querySelector("svg")).not.toBeNull();
+    expect(screen.getByRole("button", { name: "Numbered list" }).querySelector("svg")).not.toBeNull();
     expect(screen.getByRole("button", { name: "Unset link" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Code block" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Undo" })).toBeInTheDocument();
@@ -96,6 +98,72 @@ describe("admin blog editor", () => {
 
     expect(visualEditor).toHaveTextContent("Existing section");
     expect(visualEditor.querySelector("h2")).not.toBeNull();
+  });
+
+  test("heading buttons create matching blocks in an empty visual editor", () => {
+    render(<BlogForm />);
+
+    const visualEditor = screen.getByRole("textbox", { name: "Visual blog editor" });
+
+    fireEvent.click(screen.getByRole("button", { name: "Heading 1" }));
+    expect(visualEditor.querySelector("h1")).not.toBeNull();
+
+    fireEvent.click(screen.getByRole("button", { name: "Heading 2" }));
+    expect(visualEditor.querySelector("h2")).not.toBeNull();
+    expect(visualEditor.querySelector("h1")).toBeNull();
+
+    fireEvent.click(screen.getByRole("button", { name: "Heading 3" }));
+    expect(visualEditor.querySelector("h3")).not.toBeNull();
+    expect(visualEditor.querySelector("h2")).toBeNull();
+
+    fireEvent.click(screen.getByRole("button", { name: "Paragraph" }));
+    expect(visualEditor.querySelector("p")).not.toBeNull();
+    expect(visualEditor.querySelector("h3")).toBeNull();
+  });
+
+  test("list buttons convert the current block into visible list markup", () => {
+    const { container } = render(<BlogForm />);
+
+    fireEvent.click(screen.getByRole("button", { name: "HTML" }));
+    fireEvent.change(screen.getByRole("textbox", { name: "HTML editor" }), {
+      target: { value: "<p>List item</p>" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "HTML" }));
+
+    const visualEditor = screen.getByRole("textbox", { name: "Visual blog editor" });
+
+    fireEvent.click(screen.getByRole("button", { name: "Bulleted list" }));
+    expect(visualEditor.querySelector("ul > li")).toHaveTextContent("List item");
+    expect(container.querySelector('textarea[name="body"]')).toHaveValue("- List item");
+    expect(
+      within(screen.getByRole("region", { name: "Blog preview" })).getByText("List item"),
+    ).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("button", { name: "Numbered list" }));
+    expect(visualEditor.querySelector("ol > li")).toHaveTextContent("List item");
+    expect(visualEditor.querySelector("ul")).toBeNull();
+    expect(container.querySelector('textarea[name="body"]')).toHaveValue("1. List item");
+  });
+
+  test("preview uses explicit rich content styling for formatted body HTML", async () => {
+    const { container } = render(<BlogForm />);
+
+    fireEvent.click(screen.getByRole("button", { name: "HTML" }));
+    fireEvent.change(screen.getByRole("textbox", { name: "HTML editor" }), {
+      target: {
+        value:
+          "<h1>Preview heading</h1><ul><li><p>Preview bullet</p></li></ul><blockquote><p>Preview quote</p></blockquote>",
+      },
+    });
+
+    const previewContent = container.querySelector(".lumivale-blog-preview-content");
+
+    expect(previewContent).not.toBeNull();
+    await waitFor(() => {
+      expect(previewContent?.querySelector("h1")).toHaveTextContent("Preview heading");
+      expect(previewContent?.querySelector("ul > li")).toHaveTextContent("Preview bullet");
+      expect(previewContent?.querySelector("blockquote")).toHaveTextContent("Preview quote");
+    });
   });
 
   test("publish controls stay sticky and use the active Lumivale theme", () => {

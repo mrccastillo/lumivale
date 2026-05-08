@@ -33,4 +33,36 @@ describe("client access page", () => {
       "http://localhost/client-access/verify?token=preview-token",
     );
   });
+
+  test("shows contact admin message for unapproved emails", async () => {
+    render(
+      await ClientAccessPage({
+        searchParams: Promise.resolve({
+          error: "not-approved",
+        }),
+      }),
+    );
+
+    expect(
+      screen.getByText(
+        "This email is not approved for private pricing access. Contact the admin to be added as a trusted client.",
+      ),
+    ).toBeInTheDocument();
+  });
+
+  test("shows an SMTP failure message when sending fails", async () => {
+    render(
+      await ClientAccessPage({
+        searchParams: Promise.resolve({
+          error: "email-failed",
+        }),
+      }),
+    );
+
+    expect(
+      screen.getByText(
+        "We could not send the access email. Check the SMTP sender settings and try again.",
+      ),
+    ).toBeInTheDocument();
+  });
 });

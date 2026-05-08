@@ -21,17 +21,25 @@ export async function POST(request: Request) {
   const email = normalizeTrustedClientEmail(String(formData.get("email") ?? ""));
 
   if (!email || !(await hasTrustedClientApproval(db, email))) {
-    return redirectToClientAccess("/client-access?sent=1");
+    return redirectToClientAccess("/client-access?error=not-approved");
   }
 
   const token = createMagicLinkToken(email);
   const verifyUrl = new URL("/client-access/verify", request.url);
   verifyUrl.searchParams.set("token", token);
 
-  const result = await sendTrustedClientMagicLink({
-    email,
-    magicLink: verifyUrl.toString(),
-  });
+  let result: Awaited<ReturnType<typeof sendTrustedClientMagicLink>>;
+
+  try {
+    result = await sendTrustedClientMagicLink({
+      email,
+      magicLink: verifyUrl.toString(),
+    });
+  } catch (error) {
+    console.error("Unable to send trusted client magic link", error);
+
+    return redirectToClientAccess("/client-access?error=email-failed");
+  }
 
   if (result.mode === "preview") {
     return redirectToClientAccess(

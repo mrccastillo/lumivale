@@ -1,0 +1,16 @@
+<svg width="640" height="520" viewBox="0 0 640 520" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">Portrait illustration for Marc Castillo</title>
+  <desc id="desc">Minimal professional founder portrait illustration in Lumivale brand colors.</desc>
+  <rect width="640" height="520" fill="#F7F8FB"/>
+  <circle cx="500" cy="86" r="118" fill="#E8F8F0"/>
+  <circle cx="128" cy="424" r="132" fill="#FFFFFF"/>
+  <path d="M169 405C186 326 239 278 320 278C401 278 454 326 471 405C478 438 452 468 418 468H222C188 468 162 438 169 405Z" fill="#031410"/>
+  <path d="M224 386C240 327 275 298 320 298C365 298 400 327 416 386C422 408 405 429 382 429H258C235 429 218 408 224 386Z" fill="#14C983"/>
+  <circle cx="320" cy="211" r="85" fill="#EFD5C1"/>
+  <path d="M229 207C233 135 269 86 325 86C382 86 421 130 415 199C391 176 359 166 318 169C279 172 248 185 229 207Z" fill="#061B17"/>
+  <path d="M242 226C249 206 263 194 282 194H358C377 194 391 206 398 226C392 269 361 296 320 296C279 296 248 269 242 226Z" fill="#EFD5C1"/>
+  <path d="M281 224C289 231 298 231 306 224" stroke="#031410" stroke-width="9" stroke-linecap="round"/>
+  <path d="M334 224C342 231 351 231 359 224" stroke="#031410" stroke-width="9" stroke-linecap="round"/>
+  <path d="M297 259C312 270 328 270 343 259" stroke="#8A4F3C" stroke-width="8" stroke-linecap="round"/>
+  <path d="M197 153C218 103 260 58 335 58" stroke="#14C983" stroke-width="8" stroke-linecap="round"/>
+</svg>

@@ -50,14 +50,37 @@ body {
   color: white;
 }
 
-.lumivale-visual-editor h2 {
-  margin: 0 0 1rem;
-  font-size: 1.5rem;
-  font-weight: 600;
-  line-height: 1.35;
+.lumivale-visual-editor h1 {
+  display: block !important;
+  margin: 0 0 1rem !important;
+  font-size: 2rem !important;
+  font-weight: 600 !important;
+  line-height: 1.18 !important;
 }
 
-.lumivale-visual-editor h3,
+.lumivale-visual-editor h2 {
+  display: block !important;
+  margin: 0 0 1rem !important;
+  font-size: 1.5rem !important;
+  font-weight: 600 !important;
+  line-height: 1.35 !important;
+}
+
+.lumivale-visual-editor h3 {
+  display: block !important;
+  margin: 1.25rem 0 0.75rem !important;
+  font-size: 1.2rem !important;
+  font-weight: 600 !important;
+  line-height: 1.4 !important;
+}
+
+.lumivale-visual-editor p {
+  display: block !important;
+  font-size: 1rem !important;
+  font-weight: 400 !important;
+  line-height: 1.75 !important;
+}
+
 .lumivale-visual-editor h4 {
   margin: 1.25rem 0 0.75rem;
   font-weight: 600;
@@ -77,6 +100,18 @@ body {
   padding-left: 1.4rem;
 }
 
+.lumivale-visual-editor ul {
+  list-style-type: disc !important;
+}
+
+.lumivale-visual-editor ol {
+  list-style-type: decimal !important;
+}
+
+.lumivale-visual-editor li {
+  display: list-item !important;
+}
+
 .lumivale-visual-editor blockquote {
   border-left: 3px solid var(--lumivale-accent);
   color: var(--lumivale-muted);
@@ -87,6 +122,178 @@ body {
   border: 1px solid var(--lumivale-line);
   border-radius: 0.5rem;
   display: block;
+  max-width: 100%;
+}
+
+.lumivale-tiptap-editor.ProseMirror {
+  min-height: 320px;
+  outline: none;
+}
+
+.lumivale-tiptap-editor h1 {
+  display: block;
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1.18;
+  margin: 0.2rem 0 0.75rem;
+}
+
+.lumivale-tiptap-editor h2 {
+  display: block;
+  font-size: 1.5rem;
+  font-weight: 650;
+  line-height: 1.28;
+  margin: 0.2rem 0 0.65rem;
+}
+
+.lumivale-tiptap-editor h3 {
+  display: block;
+  font-size: 1.2rem;
+  font-weight: 600;
+  line-height: 1.35;
+  margin: 0.2rem 0 0.55rem;
+}
+
+.lumivale-tiptap-editor p {
+  font-size: 1rem;
+  line-height: 1.55;
+  margin: 0 0 0.45rem;
+}
+
+.lumivale-tiptap-editor ul {
+  list-style-type: disc;
+  margin: 0 0 0.65rem;
+  padding-left: 1.5rem;
+}
+
+.lumivale-tiptap-editor ol {
+  list-style-type: decimal;
+  margin: 0 0 0.65rem;
+  padding-left: 1.5rem;
+}
+
+.lumivale-tiptap-editor li {
+  display: list-item;
+  margin: 0.1rem 0;
+}
+
+.lumivale-tiptap-editor li p {
+  margin: 0;
+}
+
+.lumivale-tiptap-editor blockquote {
+  border-left: 3px solid var(--lumivale-accent);
+  color: var(--lumivale-muted);
+  margin: 0.45rem 0 0.65rem;
+  padding-left: 1rem;
+}
+
+.lumivale-tiptap-editor blockquote p {
+  margin: 0 0 0.35rem;
+}
+
+.lumivale-tiptap-editor pre {
+  background: #111827;
+  border-radius: 0.5rem;
+  color: #f9fafb;
+  font-family: var(--font-mono);
+  margin: 0 0 1rem;
+  overflow-x: auto;
+  padding: 1rem;
+}
+
+.lumivale-tiptap-editor img {
+  display: block;
+  height: auto;
+  margin: 1.5rem 0;
+  max-width: 100%;
+}
+
+.lumivale-blog-preview-content h1 {
+  color: var(--lumivale-ink);
+  display: block;
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1.18;
+  margin: 1.1rem 0 0.75rem;
+}
+
+.lumivale-blog-preview-content h2 {
+  color: var(--lumivale-ink);
+  display: block;
+  font-size: 1.5rem;
+  font-weight: 650;
+  line-height: 1.28;
+  margin: 1rem 0 0.65rem;
+}
+
+.lumivale-blog-preview-content h3 {
+  color: var(--lumivale-ink);
+  display: block;
+  font-size: 1.2rem;
+  font-weight: 600;
+  line-height: 1.35;
+  margin: 0.85rem 0 0.55rem;
+}
+
+.lumivale-blog-preview-content p {
+  color: var(--lumivale-ink);
+  font-size: 1rem;
+  line-height: 1.6;
+  margin: 0 0 0.55rem;
+}
+
+.lumivale-blog-preview-content ul {
+  color: var(--lumivale-ink);
+  list-style-type: disc;
+  margin: 0 0 0.75rem;
+  padding-left: 1.5rem;
+}
+
+.lumivale-blog-preview-content ol {
+  color: var(--lumivale-ink);
+  list-style-type: decimal;
+  margin: 0 0 0.75rem;
+  padding-left: 1.5rem;
+}
+
+.lumivale-blog-preview-content li {
+  display: list-item;
+  margin: 0.1rem 0;
+}
+
+.lumivale-blog-preview-content li p {
+  margin: 0;
+}
+
+.lumivale-blog-preview-content blockquote {
+  border-left: 3px solid var(--lumivale-accent);
+  color: var(--lumivale-muted);
+  margin: 0.75rem 0 0.9rem;
+  padding-left: 1rem;
+}
+
+.lumivale-blog-preview-content blockquote p {
+  color: var(--lumivale-muted);
+  margin: 0 0 0.35rem;
+}
+
+.lumivale-blog-preview-content pre {
+  background: #111827;
+  border-radius: 0.5rem;
+  color: #f9fafb;
+  font-family: var(--font-mono);
+  margin: 0.85rem 0;
+  overflow-x: auto;
+  padding: 1rem;
+}
+
+.lumivale-blog-preview-content img {
+  border: 1px solid var(--lumivale-line);
+  border-radius: 0.5rem;
+  display: block;
+  height: auto;
+  margin: 1.25rem 0;
   max-width: 100%;
 }
 

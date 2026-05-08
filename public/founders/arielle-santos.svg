@@ -1,0 +1,16 @@
+<svg width="640" height="520" viewBox="0 0 640 520" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">Portrait illustration for Arielle Santos</title>
+  <desc id="desc">Minimal professional founder portrait illustration in Lumivale brand colors.</desc>
+  <rect width="640" height="520" fill="#F7F8FB"/>
+  <circle cx="128" cy="102" r="122" fill="#E8F8F0"/>
+  <circle cx="506" cy="425" r="126" fill="#FFFFFF"/>
+  <path d="M168 410C183 328 236 278 320 278C404 278 457 328 472 410C478 442 453 468 420 468H220C187 468 162 442 168 410Z" fill="#031410"/>
+  <path d="M228 384C244 326 277 298 320 298C363 298 396 326 412 384C418 406 401 428 378 428H262C239 428 222 406 228 384Z" fill="#FFFFFF"/>
+  <circle cx="320" cy="213" r="82" fill="#D9A887"/>
+  <path d="M226 238C209 161 246 91 319 91C393 91 432 158 415 239C397 210 371 193 337 189C296 184 260 199 226 238Z" fill="#1C1715"/>
+  <path d="M225 251C231 194 265 158 320 158C375 158 409 194 415 251C408 284 371 306 320 306C269 306 232 284 225 251Z" fill="#D9A887"/>
+  <path d="M278 226C287 233 296 233 305 226" stroke="#031410" stroke-width="9" stroke-linecap="round"/>
+  <path d="M335 226C344 233 353 233 362 226" stroke="#031410" stroke-width="9" stroke-linecap="round"/>
+  <path d="M298 260C313 271 329 271 344 260" stroke="#744231" stroke-width="8" stroke-linecap="round"/>
+  <path d="M419 130C451 153 468 187 470 232" stroke="#14C983" stroke-width="8" stroke-linecap="round"/>
+</svg>

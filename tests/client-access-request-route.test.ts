@@ -52,7 +52,7 @@ describe("client access request route", () => {
     );
   });
 
-  test("does not send a magic link for an unapproved email", async () => {
+  test("redirects unapproved emails to the contact admin error", async () => {
     process.env.TRUSTED_CLIENT_MAGIC_LINK_SECRET = "super-secret";
     hasTrustedClientApprovalMock.mockResolvedValue(false);
 
@@ -68,7 +68,7 @@ describe("client access request route", () => {
     );
 
     expect(response.status).toBe(303);
-    expect(response.headers.get("location")).toBe("/client-access?sent=1");
+    expect(response.headers.get("location")).toBe("/client-access?error=not-approved");
     expect(sendTrustedClientMagicLinkMock).not.toHaveBeenCalled();
   });
 
@@ -94,5 +94,25 @@ describe("client access request route", () => {
     expect(response.headers.get("location")).toBe(
       "/client-access?sent=1&preview=http%3A%2F%2Flocalhost%2Fclient-access%2Fverify%3Ftoken%3Dpreview-token",
     );
+  });
+
+  test("redirects to an email failure message when SMTP send fails", async () => {
+    process.env.TRUSTED_CLIENT_MAGIC_LINK_SECRET = "super-secret";
+    hasTrustedClientApprovalMock.mockResolvedValue(true);
+    sendTrustedClientMagicLinkMock.mockRejectedValue(new Error("bad smtp sender"));
+
+    const { POST } = await import("@/app/client-access/request/route");
+    const formData = new FormData();
+    formData.set("email", "client@example.com");
+
+    const response = await POST(
+      new Request("http://localhost/client-access/request", {
+        method: "POST",
+        body: formData,
+      }),
+    );
+
+    expect(response.status).toBe(303);
+    expect(response.headers.get("location")).toBe("/client-access?error=email-failed");
   });
 });

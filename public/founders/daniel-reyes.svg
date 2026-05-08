@@ -1,0 +1,16 @@
+<svg width="640" height="520" viewBox="0 0 640 520" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">Portrait illustration for Daniel Reyes</title>
+  <desc id="desc">Minimal professional founder portrait illustration in Lumivale brand colors.</desc>
+  <rect width="640" height="520" fill="#F7F8FB"/>
+  <circle cx="504" cy="110" r="126" fill="#E8F8F0"/>
+  <circle cx="129" cy="410" r="118" fill="#FFFFFF"/>
+  <path d="M169 407C185 327 239 278 320 278C401 278 455 327 471 407C478 441 452 468 418 468H222C188 468 162 441 169 407Z" fill="#031410"/>
+  <path d="M224 386C240 328 275 298 320 298C365 298 400 328 416 386C422 408 405 429 382 429H258C235 429 218 408 224 386Z" fill="#DFF7EC"/>
+  <circle cx="320" cy="213" r="84" fill="#C98E6C"/>
+  <path d="M232 206C229 143 268 90 326 90C386 90 421 136 412 200C388 183 357 175 320 175C282 175 253 185 232 206Z" fill="#061B17"/>
+  <path d="M239 231C246 205 262 190 284 190H356C378 190 394 205 401 231C393 272 361 299 320 299C279 299 247 272 239 231Z" fill="#C98E6C"/>
+  <path d="M278 226C287 233 296 233 305 226" stroke="#031410" stroke-width="9" stroke-linecap="round"/>
+  <path d="M335 226C344 233 353 233 362 226" stroke="#031410" stroke-width="9" stroke-linecap="round"/>
+  <path d="M294 260C310 274 330 274 346 260" stroke="#6E3B2C" stroke-width="8" stroke-linecap="round"/>
+  <path d="M176 277C178 222 199 177 238 142" stroke="#14C983" stroke-width="8" stroke-linecap="round"/>
+</svg>
