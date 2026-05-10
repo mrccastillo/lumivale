@@ -3,6 +3,7 @@ import { describe, expect, test, vi } from "vitest";
 
 import AdminLoginPage from "@/app/admin/login/page";
 import AdminFaqsPage from "@/app/admin/faqs/page";
+import AdminServicesPage from "@/app/admin/services/page";
 import AdminTestimonialsPage from "@/app/admin/testimonials/page";
 import AdminTrustedClientsPage from "@/app/admin/trusted-clients/page";
 import AdminUsersPage from "@/app/admin/users/page";
@@ -46,6 +47,30 @@ vi.mock("@/lib/faqs", () => ({
       status: "published",
       createdAt: new Date("2026-05-03T08:00:00.000Z"),
       updatedAt: new Date("2026-05-03T08:00:00.000Z"),
+    },
+  ]),
+}));
+
+vi.mock("@/lib/services", () => ({
+  getAdminServices: vi.fn().mockResolvedValue([
+    {
+      slug: "comment-campaign",
+      title: "Comment Campaign",
+      summary: "Post targeted comments on relevant threads.",
+      highlights: ["Relevant conversations"],
+      description: "Posting targeted comments to increase awareness.",
+      sortOrder: 1,
+      status: "published",
+      isDefault: true,
+      createdAt: new Date("2026-05-03T08:00:00.000Z"),
+      updatedAt: new Date("2026-05-03T08:00:00.000Z"),
+      privateContent: {
+        exampleCards: [],
+        examplePlatform: "Reddit",
+        heroDescription: "Private comment campaign detail.",
+        pricePreview: "Starting at $850/mo",
+        pricingLines: [{ label: "Monthly rate", value: "$850" }],
+      },
     },
   ]),
 }));
@@ -115,6 +140,22 @@ describe("admin pages", () => {
     expect(screen.getByRole("link", { name: "Edit" })).toHaveAttribute(
       "href",
       "/admin/faqs/faq-1/edit",
+    );
+  });
+
+  test("renders the admin services list", async () => {
+    render(await AdminServicesPage({ searchParams: Promise.resolve({}) }));
+
+    expect(screen.getByRole("heading", { name: "Services", level: 1 })).toBeInTheDocument();
+    expect(screen.getByText("Service Management")).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "New Service" })).toHaveAttribute(
+      "href",
+      "/admin/services?mode=create",
+    );
+    expect(screen.getByRole("heading", { name: "Comment Campaign", level: 2 })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Edit" })).toHaveAttribute(
+      "href",
+      "/admin/services/comment-campaign/edit",
     );
   });
 

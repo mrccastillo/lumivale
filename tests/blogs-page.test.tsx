@@ -46,7 +46,7 @@ describe("blogs page", () => {
     expect(headerSection?.className).not.toContain("linear-gradient");
     expect(
       screen.getByText(
-        "Field notes on comment campaigns, creator-led content, outreach, and direct response systems that help teams find traction.",
+        "Gain valuable insight from our team on relevant industry news, emerging trends, and practical marketing strategies to help you stay ahead.",
       ),
     ).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "Published Post", level: 2 })).toBeInTheDocument();
@@ -97,6 +97,6 @@ describe("blogs page", () => {
         level: 2,
       }),
     ).toBeInTheDocument();
-    expect(container).toHaveTextContent("Article placeholder");
+    expect(container).toHaveTextContent("Placeholder article");
   });
 });

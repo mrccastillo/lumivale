@@ -11,7 +11,7 @@ import { TestimonialsSpotlight } from "@/components/testimonials-spotlight";
 import { getAllCaseStudies } from "@/lib/case-studies";
 import { defaultFaqs, getPublishedFaqs } from "@/lib/faqs";
 import { getMongoDb } from "@/lib/mongodb";
-import { getAllServices } from "@/lib/services";
+import { getPublishedServicesForSite } from "@/lib/services";
 import { CALENDLY_URL } from "@/lib/site-config";
 import { getPublishedTestimonials, type Testimonial } from "@/lib/testimonials";
 
@@ -207,8 +207,11 @@ function ServiceIcon({ slug, title }: { slug: string; title: string }) {
 
 export default async function Home() {
   const caseStudies = getAllCaseStudies();
-  const services = getAllServices();
-  const [testimonials, faqs] = await Promise.all([getHomeTestimonials(), getHomeFaqs()]);
+  const [services, testimonials, faqs] = await Promise.all([
+    getPublishedServicesForSite(),
+    getHomeTestimonials(),
+    getHomeFaqs(),
+  ]);
   const textTestimonials = getHomepageTextTestimonials(testimonials);
   const showPlaceholderTestimonials = !testimonials.some(
     (testimonial) => testimonial.type === "text",
@@ -399,6 +402,9 @@ export default async function Home() {
         <TestimonialsSpotlight className="px-4 py-16 sm:px-6 sm:py-24">
           <Reveal data-testid="testimonials-reveal" className="relative z-10 mx-auto max-w-7xl">
             <div className="mx-auto max-w-4xl text-center">
+                  <p className="text-sm font-semibold uppercase text-[var(--lumivale-accent)]">
+              Case studies
+            </p>
               <h2 className="text-2xl font-semibold leading-tight sm:text-4xl">
                 Hear it from our clients
               </h2>

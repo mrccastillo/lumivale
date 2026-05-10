@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
-import { getAllServices } from "@/lib/services";
+import { getPublishedServicesForSite } from "@/lib/services";
 import { hasTrustedClientAccess } from "@/lib/trusted-client";
 
 export default async function PricingPage() {
@@ -11,7 +11,7 @@ export default async function PricingPage() {
     notFound();
   }
 
-  const services = getAllServices();
+  const services = await getPublishedServicesForSite();
 
   return (
     <div className="bg-[#f7f8fb] text-[var(--lumivale-ink)]">

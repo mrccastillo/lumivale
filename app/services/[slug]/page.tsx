@@ -1,10 +1,10 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
-import { getAllServices, getServiceBySlug } from "@/lib/services";
+import { getDefaultServices, getPublishedServiceBySlugForSite } from "@/lib/services";
 
 export async function generateStaticParams() {
-  return getAllServices().map((service) => ({ slug: service.slug }));
+  return getDefaultServices().map((service) => ({ slug: service.slug }));
 }
 
 export default async function ServiceDetailPage({
@@ -13,7 +13,7 @@ export default async function ServiceDetailPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const service = getServiceBySlug(slug);
+  const service = await getPublishedServiceBySlugForSite(slug);
 
   if (!service) {
     notFound();

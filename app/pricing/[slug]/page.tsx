@@ -1,13 +1,18 @@
 import Link from "next/link";
+import Image from "next/image";
 import { notFound } from "next/navigation";
 
-import { getAllServices, getServiceBySlug } from "@/lib/services";
+import {
+  getDefaultServices,
+  getPublishedServiceBySlugForSite,
+  getPublishedServicesForSite,
+} from "@/lib/services";
 import { hasTrustedClientAccess } from "@/lib/trusted-client";
 
 const privateNavLabel = "Lumivale Services";
 
 export async function generateStaticParams() {
-  return getAllServices().map((service) => ({ slug: service.slug }));
+  return getDefaultServices().map((service) => ({ slug: service.slug }));
 }
 
 export default async function PrivatePricingServicePage({
@@ -22,13 +27,14 @@ export default async function PrivatePricingServicePage({
   }
 
   const { slug } = await params;
-  const service = getServiceBySlug(slug);
+  const [service, services] = await Promise.all([
+    getPublishedServiceBySlugForSite(slug),
+    getPublishedServicesForSite(),
+  ]);
 
   if (!service) {
     notFound();
   }
-
-  const services = getAllServices();
 
   return (
     <div className="bg-[#f7f8fb] text-[var(--lumivale-ink)]">
@@ -171,6 +177,56 @@ export default async function PrivatePricingServicePage({
                 <p className="mt-3 text-sm leading-7 text-[var(--lumivale-muted)]">
                   {card.summary}
                 </p>
+                {card.exampleType === "photo" && card.imageFileId ? (
+                  <figure className="mt-5 overflow-hidden rounded-xl border border-[var(--lumivale-line)] bg-white">
+                    <Image
+                      src={`/api/service-example-images/${card.imageFileId}`}
+                      alt={card.imageAlt || card.title}
+                      width={960}
+                      height={540}
+                      unoptimized
+                      className="aspect-video w-full object-cover"
+                    />
+                    {card.imageAlt ? (
+                      <figcaption className="px-4 py-3 text-sm leading-6 text-[var(--lumivale-muted)]">
+                        {card.imageAlt}
+                      </figcaption>
+                    ) : null}
+                  </figure>
+                ) : null}
+                {card.exampleType !== "photo" && card.previewUrl ? (
+                  <a
+                    href={card.previewUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mt-5 block rounded-xl border border-[var(--lumivale-line)] bg-white p-4 text-sm transition hover:border-[var(--lumivale-accent)]"
+                  >
+                    <span className="block text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--lumivale-muted)]">
+                      Preview link
+                    </span>
+                    <span className="mt-2 block font-semibold text-[var(--lumivale-ink)]">
+                      {formatPreviewHost(card.previewUrl)}
+                    </span>
+                    <span className="mt-1 block break-all text-xs leading-5 text-[var(--lumivale-muted)]">
+                      {card.previewUrl}
+                    </span>
+                  </a>
+                ) : null}
+                {card.videoFileId ? (
+                  <div className="mt-5 overflow-hidden rounded-xl border border-[var(--lumivale-line)] bg-white">
+                    <video
+                      controls
+                      preload="metadata"
+                      className="aspect-video w-full bg-black"
+                      src={`/api/service-example-videos/${card.videoFileId}`}
+                    />
+                    {card.videoDescription ? (
+                      <p className="px-4 py-3 text-sm leading-6 text-[var(--lumivale-muted)]">
+                        {card.videoDescription}
+                      </p>
+                    ) : null}
+                  </div>
+                ) : null}
               </article>
             ))}
           </div>
@@ -178,4 +234,12 @@ export default async function PrivatePricingServicePage({
       </section>
     </div>
   );
+}
+
+function formatPreviewHost(value: string) {
+  try {
+    return new URL(value).hostname.replace(/^www\./, "");
+  } catch {
+    return "Open preview";
+  }
 }

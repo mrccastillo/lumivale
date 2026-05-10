@@ -72,6 +72,10 @@ describe("admin shell", () => {
       "href",
       "/admin/testimonials",
     );
+    expect(screen.getByRole("link", { name: "Services" })).toHaveAttribute(
+      "href",
+      "/admin/services",
+    );
     expect(screen.getByRole("link", { name: "FAQs" })).toHaveAttribute(
       "href",
       "/admin/faqs",
@@ -123,7 +127,7 @@ describe("admin shell", () => {
     expect(shell).toHaveClass("md:pl-[17.5rem]");
     expect(screen.getByText("Lumivale")).toBeInTheDocument();
     expect(screen.getByText("Admin Portal")).toBeInTheDocument();
-    expect(screen.getAllByRole("link")).toHaveLength(6);
+    expect(screen.getAllByRole("link")).toHaveLength(7);
 
     fireEvent.click(screen.getByRole("button", { name: "Collapse navigation" }));
 
@@ -134,7 +138,7 @@ describe("admin shell", () => {
     expect(shell).toHaveClass("md:pl-[5.5rem]");
     expect(screen.queryByText("Lumivale")).not.toBeInTheDocument();
     expect(screen.queryByText("Admin Portal")).not.toBeInTheDocument();
-    expect(screen.getAllByRole("link")).toHaveLength(5);
+    expect(screen.getAllByRole("link")).toHaveLength(6);
   });
 
   test("does not render sidebar or compact header on admin login", () => {

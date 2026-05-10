@@ -6,6 +6,7 @@ import { useState } from "react";
 
 const adminLinks = [
   { href: "/admin/blogs", icon: BlogsIcon, label: "Blogs" },
+  { href: "/admin/services", icon: ServicesIcon, label: "Services" },
   { href: "/admin/testimonials", icon: TestimonialsIcon, label: "Testimonials" },
   { href: "/admin/faqs", icon: FaqsIcon, label: "FAQs" },
   { href: "/admin/users", icon: UsersIcon, label: "Users" },
@@ -201,6 +202,17 @@ function TestimonialsIcon({ className }: IconProps) {
       <path d="M4 5.5a2.5 2.5 0 0 1 5 0c0 2-1.25 3-2.5 4" strokeLinecap="round" />
       <path d="M9 5.5a2.5 2.5 0 0 1 5 0c0 2-1.25 3-2.5 4" strokeLinecap="round" />
       <path d="M6.5 11.5h3" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+function ServicesIcon({ className }: IconProps) {
+  return (
+    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className={className}>
+      <path d="M3.5 4.5h9" strokeLinecap="round" />
+      <path d="M3.5 8h9" strokeLinecap="round" />
+      <path d="M3.5 11.5h5" strokeLinecap="round" />
+      <circle cx="11.5" cy="11.5" r="1.5" />
     </svg>
   );
 }

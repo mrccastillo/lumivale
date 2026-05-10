@@ -88,13 +88,16 @@ describe("home page", () => {
     );
     expect(container.querySelector("#proof")).toHaveClass(
       "px-4",
-      "pb-14",
+      "pb-16",
       "sm:px-6",
-      "sm:pb-[68px]",
+      "sm:pb-20",
     );
     expect(container.querySelector("#services")).toHaveClass("py-16", "sm:py-24");
     expect(container.querySelector("#case-studies")).toHaveClass("py-16", "sm:py-24");
-    expect(container.querySelector("#testimonials")).toHaveClass("py-16", "sm:py-24");
+    expect(container.querySelector("#testimonials")?.firstElementChild).toHaveClass(
+      "py-16",
+      "sm:py-24",
+    );
     expect(container.querySelector("#faqs")).toHaveClass("py-16", "sm:py-24");
     expect(container.querySelector("#conversion")).toHaveClass("py-16", "sm:py-24");
   });
@@ -107,7 +110,7 @@ describe("home page", () => {
       name: /Light up your growth with simple execution systems/i,
     });
     expect(heroHeading).toBeInTheDocument();
-    expect(heroHeading).toHaveClass("text-[1.7rem]", "sm:text-4xl", "lg:text-5xl");
+    expect(heroHeading).toHaveClass("text-[1.9rem]", "sm:text-[3.5rem]", "lg:text-[3.7rem]");
     expect(heroHeading).not.toHaveClass("text-3xl", "text-4xl", "sm:text-5xl", "lg:text-6xl");
     expect(
       screen.getByText(
@@ -141,8 +144,8 @@ describe("home page", () => {
     );
     expect(heroCta).not.toHaveClass("flex-col");
     expect(platformRow).toHaveClass(
-      "w-full",
-      "max-w-4xl",
+      "w-[calc(100%+2rem)]",
+      "-translate-x-4",
       "overflow-hidden",
       "lumivale-marquee-fade",
     );
