@@ -35,11 +35,10 @@ export async function POST(request: Request) {
 
   try {
     const inputWithImages = await applyServiceExampleImageUploads(
-      db,
       formData,
       parseServiceFormData(formData),
     );
-    const input = await applyServiceExampleVideoUploads(db, formData, inputWithImages);
+    const input = await applyServiceExampleVideoUploads(formData, inputWithImages);
     const service = await createService(db, input);
 
     return redirectTo(`/admin/services/${service.slug}/edit`);

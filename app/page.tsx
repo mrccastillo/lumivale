@@ -45,7 +45,7 @@ type HomepageTextTestimonialData = Pick<
 
 type HomepageVideoTestimonialData = Pick<
   Testimonial,
-  "id" | "personName" | "personTitle" | "quote" | "videoFileId"
+  "id" | "personName" | "personTitle" | "quote" | "videoUrl"
 > & {
   placeholder?: boolean;
 };
@@ -59,7 +59,7 @@ const videoTestimonialPlaceholders: HomepageVideoTestimonialData[] = [
     personTitle: "B2B SaaS team",
     quote:
       "Short video feedback about how Lumivale helped simplify execution and keep weekly growth activity moving.",
-    videoFileId: "",
+    videoUrl: "",
     placeholder: true,
   },
   {
@@ -68,7 +68,7 @@ const videoTestimonialPlaceholders: HomepageVideoTestimonialData[] = [
     personTitle: "Lean growth team",
     quote:
       "Video feedback placeholder showing how the team gained structure, cleaner messaging, and a more repeatable growth process.",
-    videoFileId: "",
+    videoUrl: "",
     placeholder: true,
   },
   {
@@ -77,7 +77,7 @@ const videoTestimonialPlaceholders: HomepageVideoTestimonialData[] = [
     personTitle: "Growth-focused startup",
     quote:
       "Video placeholder describing a smoother way to test outreach, content, and awareness plays without agency overhead.",
-    videoFileId: "",
+    videoUrl: "",
     placeholder: true,
   },
   {
@@ -86,7 +86,7 @@ const videoTestimonialPlaceholders: HomepageVideoTestimonialData[] = [
     personTitle: "Fast-moving launch team",
     quote:
       "Video placeholder about clearer offers, steadier publishing, and growth activity that keeps momentum visible.",
-    videoFileId: "",
+    videoUrl: "",
     placeholder: true,
   },
 ];

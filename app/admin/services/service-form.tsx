@@ -11,28 +11,28 @@ type ExampleDraft = {
   exampleType: "link" | "photo";
   imageAlt: string;
   imageFile: File | null;
-  imageFileId: string;
+  imageUrl: string;
   imageFileName: string;
   previewUrl: string;
   summary: string;
   tag: string;
   title: string;
   videoDescription: string;
-  videoFileId: string;
+  videoUrl: string;
 };
 
 const emptyExample: ExampleDraft = {
   exampleType: "link",
   imageAlt: "",
   imageFile: null,
-  imageFileId: "",
+  imageUrl: "",
   imageFileName: "",
   previewUrl: "",
   summary: "",
   tag: "",
   title: "",
   videoDescription: "",
-  videoFileId: "",
+  videoUrl: "",
 };
 
 export function ServiceForm({
@@ -298,8 +298,8 @@ function ExamplesManager({
               />
               <input
                 type="hidden"
-                name={`exampleCardImageFileId-${index}`}
-                value={example.imageFileId}
+                name={`exampleCardImageUrl-${index}`}
+                value={example.imageUrl}
               />
               <input
                 type="hidden"
@@ -308,8 +308,8 @@ function ExamplesManager({
               />
               <input
                 type="hidden"
-                name={`exampleCardVideoFileId-${index}`}
-                value={example.videoFileId}
+                name={`exampleCardVideoUrl-${index}`}
+                value={example.videoUrl}
               />
 
               <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
@@ -511,17 +511,17 @@ function ExamplesManager({
 
 function toExampleDraft(card: ServiceExampleCard): ExampleDraft {
   return {
-    exampleType: card.exampleType ?? (card.imageFileId ? "photo" : "link"),
+    exampleType: card.exampleType ?? (card.imageUrl ? "photo" : "link"),
     imageAlt: card.imageAlt ?? "",
     imageFile: null,
-    imageFileId: card.imageFileId ?? "",
+    imageUrl: card.imageUrl ?? "",
     imageFileName: "",
     previewUrl: card.previewUrl ?? "",
     summary: card.summary,
     tag: card.tag,
     title: card.title,
     videoDescription: card.videoDescription ?? "",
-    videoFileId: card.videoFileId ?? "",
+    videoUrl: card.videoUrl ?? "",
   };
 }
 

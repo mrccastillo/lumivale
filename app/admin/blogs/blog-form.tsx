@@ -10,7 +10,7 @@ type BlogFormState = {
   bodyHtml: string;
   category: string;
   coverAlt: string;
-  coverImageId: string;
+  coverImageUrl: string;
   excerpt: string;
   readTime: string;
   seoDescription: string;
@@ -31,14 +31,14 @@ export function BlogForm({
   const action = post ? `/api/admin/blogs/${post.id}` : "/api/admin/blogs";
   const [isSlugManuallyEdited, setIsSlugManuallyEdited] = useState(Boolean(post?.slug));
   const [coverPreviewUrl, setCoverPreviewUrl] = useState(
-    post?.coverImageId ? `/api/blog-images/${post.coverImageId}` : "",
+    post?.coverImageUrl ?? "",
   );
   const [form, setForm] = useState<BlogFormState>(() => ({
     body: post?.body ?? "",
     bodyHtml: markdownToPreviewHtml(post?.body ?? ""),
     category: post?.category ?? "",
     coverAlt: post?.coverAlt ?? "",
-    coverImageId: post?.coverImageId ?? "",
+    coverImageUrl: post?.coverImageUrl ?? "",
     excerpt: post?.excerpt ?? "",
     readTime: post?.readTime ?? "",
     seoDescription: post?.seoDescription ?? "",
@@ -105,13 +105,13 @@ export function BlogForm({
     }
 
     setIsSlugManuallyEdited(Boolean(post?.slug));
-    setCoverPreviewUrl(post?.coverImageId ? `/api/blog-images/${post.coverImageId}` : "");
+    setCoverPreviewUrl(post?.coverImageUrl ?? "");
     setForm({
       body: post?.body ?? "",
       bodyHtml: markdownToPreviewHtml(post?.body ?? ""),
       category: post?.category ?? "",
       coverAlt: post?.coverAlt ?? "",
-      coverImageId: post?.coverImageId ?? "",
+      coverImageUrl: post?.coverImageUrl ?? "",
       excerpt: post?.excerpt ?? "",
       readTime: post?.readTime ?? "",
       seoDescription: post?.seoDescription ?? "",
@@ -356,7 +356,7 @@ export function BlogForm({
           </p>
           <p className="mt-2 text-lg font-semibold text-[var(--lumivale-ink)]">Cover Image</p>
 
-          <input type="hidden" name="coverImageId" value={form.coverImageId} />
+          <input type="hidden" name="coverImageUrl" value={form.coverImageUrl} />
           <label className="mt-4 grid min-h-32 cursor-pointer place-items-center rounded-[18px] border border-dashed border-[var(--lumivale-line)] bg-[#fbfcff] p-5 text-center text-sm font-semibold text-[var(--lumivale-ink)] transition hover:border-[var(--lumivale-accent)]">
             Upload cover image
             <span className="mt-1 block text-xs font-normal text-[var(--lumivale-muted)]">

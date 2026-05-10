@@ -34,9 +34,11 @@ beforeEach(() => {
     sortOrder: 1,
     status: "draft",
     type: "video",
-    videoFileId: "",
+    videoUrl: "",
   });
-  uploadTestimonialVideoMock.mockResolvedValue("video-1");
+  uploadTestimonialVideoMock.mockResolvedValue(
+    "https://res.cloudinary.com/demo/video/upload/video-1.mp4",
+  );
   createTestimonialMock.mockResolvedValue({ id: "testimonial-1" });
 });
 
@@ -65,7 +67,9 @@ describe("admin testimonials create route", () => {
     expect(response.headers.get("location")).toBe("/admin/testimonials");
     expect(createTestimonialMock).toHaveBeenCalledWith(
       "test-db",
-      expect.objectContaining({ videoFileId: "video-1" }),
+      expect.objectContaining({
+        videoUrl: "https://res.cloudinary.com/demo/video/upload/video-1.mp4",
+      }),
     );
   });
 

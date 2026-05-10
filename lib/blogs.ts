@@ -14,7 +14,7 @@ export type BlogPost = {
   seoTitle: string;
   seoDescription: string;
   status: BlogPostStatus;
-  coverImageId: string;
+  coverImageUrl: string;
   coverAlt: string;
   createdAt: Date;
   updatedAt: Date;
@@ -31,7 +31,7 @@ export type BlogPostInput = {
   seoTitle: string;
   seoDescription: string;
   status: BlogPostStatus;
-  coverImageId: string;
+  coverImageUrl: string;
   coverAlt: string;
 };
 
@@ -85,7 +85,7 @@ function normalizeInput(input: BlogPostInput): BlogPostInput {
     body: input.body.trim(),
     category: input.category.trim(),
     coverAlt: input.coverAlt.trim(),
-    coverImageId: input.coverImageId.trim(),
+    coverImageUrl: input.coverImageUrl.trim(),
     excerpt: input.excerpt.trim(),
     readTime: input.readTime.trim(),
     seoDescription: input.seoDescription.trim(),
@@ -114,7 +114,7 @@ export function parseBlogFormData(formData: FormData): BlogPostInput {
     body: String(formData.get("body") ?? ""),
     category: String(formData.get("category") ?? ""),
     coverAlt: String(formData.get("coverAlt") ?? ""),
-    coverImageId: String(formData.get("coverImageId") ?? ""),
+    coverImageUrl: String(formData.get("coverImageUrl") ?? ""),
     excerpt: String(formData.get("excerpt") ?? ""),
     readTime: String(formData.get("readTime") ?? ""),
     seoDescription: String(formData.get("seoDescription") ?? ""),
@@ -202,7 +202,7 @@ export async function updateBlogPost(
     body: updates.body ?? current.body,
     category: updates.category ?? current.category,
     coverAlt: updates.coverAlt ?? current.coverAlt,
-    coverImageId: updates.coverImageId ?? current.coverImageId,
+    coverImageUrl: updates.coverImageUrl ?? current.coverImageUrl,
     excerpt: updates.excerpt ?? current.excerpt,
     readTime: updates.readTime ?? current.readTime,
     seoDescription: updates.seoDescription ?? current.seoDescription,

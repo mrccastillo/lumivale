@@ -41,14 +41,11 @@ export async function POST(
   }
 
   const input = parseTestimonialFormData(formData);
-  const videoFileId = await uploadTestimonialVideo(
-    db,
-    formData.get("videoFile") as File | null,
-  );
+  const videoUrl = await uploadTestimonialVideo(formData.get("videoFile") as File | null);
 
   await updateTestimonial(db, id, {
     ...input,
-    videoFileId: videoFileId || input.videoFileId,
+    videoUrl: videoUrl || input.videoUrl,
   });
 
   return redirectTo(`/admin/testimonials/${id}/edit`);

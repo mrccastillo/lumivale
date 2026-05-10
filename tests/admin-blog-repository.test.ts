@@ -24,14 +24,14 @@ describe("admin blog repository", () => {
       seoTitle: "Mongo Admin Launch SEO",
       seoDescription: "SEO summary",
       status: "draft",
-      coverImageId: "image-1",
+      coverImageUrl: "https://res.cloudinary.com/demo/image/upload/image-1.jpg",
       coverAlt: "Dashboard screenshot",
     });
 
     expect(created).toMatchObject({
       title: "Mongo Admin Launch",
       status: "draft",
-      coverImageId: "image-1",
+      coverImageUrl: "https://res.cloudinary.com/demo/image/upload/image-1.jpg",
     });
     await expect(getPublicBlogPosts(db)).resolves.toEqual([]);
 
@@ -79,7 +79,7 @@ function makePostInput(overrides: Partial<Parameters<typeof createBlogPost>[1]> 
     seoTitle: "",
     seoDescription: "",
     status: "draft" as const,
-    coverImageId: "",
+    coverImageUrl: "",
     coverAlt: "",
     ...overrides,
   };

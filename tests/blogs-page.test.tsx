@@ -23,7 +23,7 @@ vi.mock("@/lib/blogs", () => ({
       seoTitle: "Published Post SEO",
       seoDescription: "Published SEO description",
       status: "published",
-      coverImageId: "cover-1",
+      coverImageUrl: "https://res.cloudinary.com/demo/image/upload/cover-1.jpg",
       coverAlt: "Published post cover",
       createdAt: new Date("2026-05-03T08:00:00.000Z"),
       updatedAt: new Date("2026-05-03T08:00:00.000Z"),
@@ -53,7 +53,7 @@ describe("blogs page", () => {
     expect(screen.getAllByText("CMS").length).toBeGreaterThanOrEqual(1);
     expect(screen.getByRole("img", { name: "Published post cover" })).toHaveAttribute(
       "src",
-      "/api/blog-images/cover-1",
+      "https://res.cloudinary.com/demo/image/upload/cover-1.jpg",
     );
 
     for (const post of await getPublicBlogPosts("test-db")) {

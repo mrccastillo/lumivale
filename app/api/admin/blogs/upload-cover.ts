@@ -1,4 +1,4 @@
-import { GridFSBucket, ObjectId, type Db } from "mongodb";
+import { uploadMediaToCloudinary } from "@/lib/cloudinary";
 
 const MAX_COVER_IMAGE_BYTES = 5 * 1024 * 1024;
 const ALLOWED_IMAGE_TYPES = new Set([
@@ -8,7 +8,7 @@ const ALLOWED_IMAGE_TYPES = new Set([
   "image/webp",
 ]);
 
-export async function uploadCoverImage(db: Db, file: File | null) {
+export async function uploadCoverImage(file: File | null) {
   if (!file || file.size === 0) {
     return "";
   }
@@ -21,18 +21,8 @@ export async function uploadCoverImage(db: Db, file: File | null) {
     throw new Error("Cover image must be 5MB or smaller.");
   }
 
-  const bucket = new GridFSBucket(db, { bucketName: "blogImages" });
-  const imageId = new ObjectId();
-  const uploadStream = bucket.openUploadStreamWithId(imageId, file.name, {
-    metadata: { contentType: file.type },
+  return uploadMediaToCloudinary(file, {
+    folder: "lumivale/blogs",
+    resourceType: "image",
   });
-  const buffer = Buffer.from(await file.arrayBuffer());
-
-  await new Promise<void>((resolve, reject) => {
-    uploadStream.once("error", reject);
-    uploadStream.once("finish", resolve);
-    uploadStream.end(buffer);
-  });
-
-  return imageId.toString();
 }

@@ -27,7 +27,7 @@ const publishedPost = {
   seoTitle: "Published Post SEO",
   seoDescription: "Published SEO description",
   status: "published" as const,
-  coverImageId: "cover-1",
+  coverImageUrl: "https://res.cloudinary.com/demo/image/upload/cover-1.jpg",
   coverAlt: "Published post cover",
   createdAt: new Date("2026-05-03T08:00:00.000Z"),
   updatedAt: new Date("2026-05-03T08:00:00.000Z"),
@@ -56,7 +56,7 @@ describe("blog data and detail pages", () => {
     ).toBeInTheDocument();
     expect(screen.getByRole("img", { name: publishedPost.coverAlt })).toHaveAttribute(
       "src",
-      `/api/blog-images/${publishedPost.coverImageId}`,
+      publishedPost.coverImageUrl,
     );
     expect(screen.getByText(publishedPost.excerpt)).toBeInTheDocument();
     expect(screen.getByRole("heading", { level: 2, name: "Launch notes" })).toBeInTheDocument();

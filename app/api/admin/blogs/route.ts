@@ -17,10 +17,10 @@ export async function POST(request: Request) {
   const db = await getMongoDb();
   const formData = await request.formData();
   const input = parseBlogFormData(formData);
-  const coverImageId = await uploadCoverImage(db, formData.get("coverImage") as File | null);
+  const coverImageUrl = await uploadCoverImage(formData.get("coverImage") as File | null);
   const post = await createBlogPost(db, {
     ...input,
-    coverImageId: coverImageId || input.coverImageId,
+    coverImageUrl: coverImageUrl || input.coverImageUrl,
   });
 
   return redirectTo(`/admin/blogs/${post.id}/edit`);

@@ -3,6 +3,7 @@ export type PlaceholderBlogPost = {
   category: string;
   excerpt: string;
   readTime: string;
+  coverImageUrl?: string;
   coverAlt?: string; 
   title: string;
   body: string;

@@ -124,7 +124,7 @@ function buildFormData(overrides: Record<string, string> = {}) {
   formData.set("exampleCardSummary-0", "Match relevant creators.");
   formData.set("exampleCardType-0", overrides.exampleCardType ?? "link");
   formData.set("exampleCardPreviewUrl-0", overrides.exampleCardPreviewUrl ?? "https://example.com/demo");
-  formData.set("exampleCardImageFileId-0", overrides.exampleCardImageFileId ?? "");
+  formData.set("exampleCardImageUrl-0", overrides.exampleCardImageUrl ?? "");
   formData.set("exampleCardImageAlt-0", overrides.exampleCardImageAlt ?? "");
   formData.set(
     "exampleCardVideoDescription-0",
@@ -223,5 +223,27 @@ describe("services repository", () => {
     await expect(createService(db, input)).rejects.toThrow(
       "Photo examples require an uploaded photo.",
     );
+  });
+
+  test("accepts uploaded photo URLs for photo examples", async () => {
+    const db = createFakeDb();
+    const input = parseServiceFormData(
+      buildFormData({
+        exampleCardImageAlt: "Screenshot of a placed comment.",
+        exampleCardImageUrl: "https://res.cloudinary.com/demo/image/upload/example.jpg",
+        exampleCardPreviewUrl: "",
+        exampleCardType: "photo",
+      }),
+    );
+
+    await expect(createService(db, input)).resolves.toMatchObject({
+      privateContent: {
+        exampleCards: [
+          expect.objectContaining({
+            imageUrl: "https://res.cloudinary.com/demo/image/upload/example.jpg",
+          }),
+        ],
+      },
+    });
   });
 });

@@ -28,7 +28,8 @@ vi.mock("@/lib/blogs", () => ({
       seoTitle: "",
       seoDescription: "",
       status: index < 4 ? "published" : "draft",
-      coverImageId: index === 0 ? "cover-1" : "",
+      coverImageUrl:
+        index === 0 ? "https://res.cloudinary.com/demo/image/upload/cover-1.jpg" : "",
       coverAlt: "Cover image",
       createdAt: new Date(`2026-05-0${Math.min(index + 1, 9)}T08:00:00.000Z`),
       updatedAt: new Date(`2026-05-0${Math.min(index + 1, 9)}T08:00:00.000Z`),

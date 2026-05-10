@@ -7,7 +7,7 @@ type HomepageVideoTestimonialCardProps = {
     personName: string;
     personTitle: string;
     quote: string;
-    videoFileId: string;
+    videoUrl: string;
     placeholder?: boolean;
   };
 };
@@ -24,11 +24,11 @@ export function HomepageVideoTestimonialCard({
       className="overflow-hidden rounded-[18px] border border-white/5 bg-[#111111] text-left shadow-[0_18px_40px_rgba(0,0,0,0.26)]"
     >
       <div className="relative overflow-hidden bg-[#0b0b0b]">
-        {testimonial.videoFileId ? (
+        {testimonial.videoUrl ? (
           <video
             controls
             preload="metadata"
-            src={`/api/testimonial-videos/${testimonial.videoFileId}`}
+            src={testimonial.videoUrl}
             className="aspect-[9/13] w-full bg-black object-cover"
             onEnded={() => setIsPlaying(false)}
             onPause={() => setIsPlaying(false)}

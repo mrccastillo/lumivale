@@ -51,11 +51,10 @@ export async function POST(
     }
 
     const inputWithImages = await applyServiceExampleImageUploads(
-      db,
       formData,
       parseServiceFormData(formData),
     );
-    const input = await applyServiceExampleVideoUploads(db, formData, inputWithImages);
+    const input = await applyServiceExampleVideoUploads(formData, inputWithImages);
 
     await updateService(db, slug, input);
   } catch (error) {

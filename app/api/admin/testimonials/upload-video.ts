@@ -1,8 +1,7 @@
-import { GridFSBucket, ObjectId, type Db } from "mongodb";
-
+import { uploadMediaToCloudinary } from "@/lib/cloudinary";
 import { validateTestimonialVideoFile } from "@/lib/testimonials";
 
-export async function uploadTestimonialVideo(db: Db, file: File | null) {
+export async function uploadTestimonialVideo(file: File | null) {
   const validationError = validateTestimonialVideoFile(file);
 
   if (validationError) {
@@ -13,18 +12,8 @@ export async function uploadTestimonialVideo(db: Db, file: File | null) {
     return "";
   }
 
-  const bucket = new GridFSBucket(db, { bucketName: "testimonialVideos" });
-  const videoId = new ObjectId();
-  const uploadStream = bucket.openUploadStreamWithId(videoId, file.name, {
-    metadata: { contentType: file.type },
+  return uploadMediaToCloudinary(file, {
+    folder: "lumivale/testimonials",
+    resourceType: "video",
   });
-  const buffer = Buffer.from(await file.arrayBuffer());
-
-  await new Promise<void>((resolve, reject) => {
-    uploadStream.once("error", reject);
-    uploadStream.once("finish", resolve);
-    uploadStream.end(buffer);
-  });
-
-  return videoId.toString();
 }

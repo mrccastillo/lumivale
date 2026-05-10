@@ -41,10 +41,10 @@ export default async function BlogsPage() {
                 aria-label={`Read ${post.title}`}
                 className="group flex min-h-[320px] flex-col overflow-hidden rounded-lg border border-[var(--lumivale-line)] bg-white shadow-[0_20px_60px_rgba(42,47,82,0.06)] transition hover:-translate-y-1 hover:border-[var(--lumivale-accent)] hover:shadow-[0_24px_70px_rgba(42,47,82,0.1)]"
               >
-                {post.coverImageId ? (
+                {post.coverImageUrl ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img
-                    src={`/api/blog-images/${post.coverImageId}`}
+                    src={post.coverImageUrl}
                     alt={post.coverAlt || post.title}
                     className="aspect-[16/9] w-full object-cover"
                   />

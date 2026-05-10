@@ -11,7 +11,7 @@ export type Testimonial = {
   sortOrder: number;
   status: TestimonialStatus;
   type: TestimonialType;
-  videoFileId: string;
+  videoUrl: string;
   createdAt: Date;
   updatedAt: Date;
 };
@@ -23,7 +23,7 @@ export type TestimonialInput = {
   sortOrder: number;
   status: TestimonialStatus;
   type: TestimonialType;
-  videoFileId: string;
+  videoUrl: string;
 };
 
 type TestimonialDocument = Omit<Testimonial, "id"> & {
@@ -77,7 +77,7 @@ function normalizeInput(input: TestimonialInput): TestimonialInput {
     sortOrder: Number.isFinite(input.sortOrder) ? input.sortOrder : 0,
     status: input.status === "published" ? "published" : "draft",
     type,
-    videoFileId: type === "video" ? input.videoFileId.trim() : "",
+    videoUrl: type === "video" ? input.videoUrl.trim() : "",
   };
 }
 
@@ -86,7 +86,7 @@ function validateInput(input: TestimonialInput) {
     throw new Error("Name and quote are required.");
   }
 
-  if (input.type === "video" && !input.videoFileId) {
+  if (input.type === "video" && !input.videoUrl) {
     throw new Error("Video testimonials require a video file.");
   }
 }
@@ -128,7 +128,7 @@ export function parseTestimonialFormData(formData: FormData): TestimonialInput {
     sortOrder: Number(formData.get("sortOrder") ?? 0),
     status: formData.get("status") === "published" ? "published" : "draft",
     type: formData.get("type") === "video" ? "video" : "text",
-    videoFileId: String(formData.get("videoFileId") ?? ""),
+    videoUrl: String(formData.get("videoUrl") ?? ""),
   });
 }
 
@@ -191,7 +191,7 @@ export async function updateTestimonial(
     sortOrder: updates.sortOrder ?? current.sortOrder,
     status: updates.status ?? current.status,
     type: updates.type ?? current.type,
-    videoFileId: updates.videoFileId ?? current.videoFileId,
+    videoUrl: updates.videoUrl ?? current.videoUrl,
   });
 
   validateInput(next);

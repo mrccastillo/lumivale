@@ -129,9 +129,9 @@ export function BlogRichTextEditor({
         throw new Error("Upload failed.");
       }
 
-      const data = (await response.json()) as { imageId?: string };
+      const data = (await response.json()) as { imageUrl?: string };
 
-      if (!data.imageId) {
+      if (!data.imageUrl) {
         throw new Error("Upload failed.");
       }
 
@@ -142,7 +142,7 @@ export function BlogRichTextEditor({
       editor
         .chain()
         .focus()
-        .setImage({ alt, src: `/api/blog-images/${data.imageId}` })
+        .setImage({ alt, src: data.imageUrl })
         .run();
     } catch {
       setUploadError("Image upload failed. Try another JPG, PNG, WebP, or GIF.");

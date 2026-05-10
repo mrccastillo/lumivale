@@ -37,11 +37,11 @@ export async function POST(
   }
 
   const input = parseBlogFormData(formData);
-  const coverImageId = await uploadCoverImage(db, formData.get("coverImage") as File | null);
+  const coverImageUrl = await uploadCoverImage(formData.get("coverImage") as File | null);
 
   await updateBlogPost(db, id, {
     ...input,
-    coverImageId: coverImageId || input.coverImageId,
+    coverImageUrl: coverImageUrl || input.coverImageUrl,
   });
 
   return redirectTo(`/admin/blogs/${id}/edit`);

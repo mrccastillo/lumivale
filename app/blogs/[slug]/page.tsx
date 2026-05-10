@@ -148,10 +148,10 @@ export default async function BlogDetailPage({
             <p className="max-w-3xl text-base leading-8 text-stone-600">{post.excerpt}</p>
           </header>
 
-          {"coverImageId" in post && post.coverImageId ? (
+          {post.coverImageUrl ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img
-              src={`/api/blog-images/${post.coverImageId}`}
+              src={post.coverImageUrl}
               alt={post.coverAlt || post.title}
               className="aspect-[16/9] w-full rounded-[20px] border border-[var(--lumivale-line)] object-cover"
             />
@@ -230,10 +230,10 @@ export default async function BlogDetailPage({
                     href={`/blogs/${relatedPost.slug}`}
                     className="group overflow-hidden rounded-[20px] border border-[var(--lumivale-line)] bg-white shadow-[0_18px_54px_rgba(42,47,82,0.06)] transition hover:-translate-y-1 hover:border-[var(--lumivale-accent)] hover:shadow-[0_24px_70px_rgba(42,47,82,0.1)]"
                   >
-                    {"coverImageId" in relatedPost && relatedPost.coverImageId ? (
+                    {relatedPost.coverImageUrl ? (
                       // eslint-disable-next-line @next/next/no-img-element
                       <img
-                        src={`/api/blog-images/${relatedPost.coverImageId}`}
+                        src={relatedPost.coverImageUrl}
                         alt={relatedPost.coverAlt || relatedPost.title}
                         className="aspect-[16/9] w-full object-cover"
                       />

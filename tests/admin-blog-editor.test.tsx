@@ -15,7 +15,7 @@ const existingPost = {
   seoTitle: "",
   seoDescription: "",
   status: "draft" as const,
-  coverImageId: "",
+  coverImageUrl: "",
   coverAlt: "",
   createdAt: new Date("2026-05-03T08:00:00.000Z"),
   updatedAt: new Date("2026-05-03T08:00:00.000Z"),

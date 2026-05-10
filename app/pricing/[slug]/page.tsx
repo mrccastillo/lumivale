@@ -177,10 +177,10 @@ export default async function PrivatePricingServicePage({
                 <p className="mt-3 text-sm leading-7 text-[var(--lumivale-muted)]">
                   {card.summary}
                 </p>
-                {card.exampleType === "photo" && card.imageFileId ? (
+                {card.exampleType === "photo" && card.imageUrl ? (
                   <figure className="mt-5 overflow-hidden rounded-xl border border-[var(--lumivale-line)] bg-white">
                     <Image
-                      src={`/api/service-example-images/${card.imageFileId}`}
+                      src={card.imageUrl}
                       alt={card.imageAlt || card.title}
                       width={960}
                       height={540}
@@ -212,13 +212,13 @@ export default async function PrivatePricingServicePage({
                     </span>
                   </a>
                 ) : null}
-                {card.videoFileId ? (
+                {card.videoUrl ? (
                   <div className="mt-5 overflow-hidden rounded-xl border border-[var(--lumivale-line)] bg-white">
                     <video
                       controls
                       preload="metadata"
                       className="aspect-video w-full bg-black"
-                      src={`/api/service-example-videos/${card.videoFileId}`}
+                      src={card.videoUrl}
                     />
                     {card.videoDescription ? (
                       <p className="px-4 py-3 text-sm leading-6 text-[var(--lumivale-muted)]">

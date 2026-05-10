@@ -243,10 +243,10 @@ export default async function AdminBlogsPage({ searchParams }: AdminBlogsPagePro
 function BlogCard({ post }: { post: BlogPost }) {
   return (
     <article className="overflow-hidden rounded-lg border border-[var(--lumivale-admin-border)] bg-white">
-      {post.coverImageId ? (
+      {post.coverImageUrl ? (
         // eslint-disable-next-line @next/next/no-img-element
         <img
-          src={`/api/blog-images/${post.coverImageId}`}
+          src={post.coverImageUrl}
           alt={post.coverAlt || post.title}
           className="aspect-[16/9] w-full object-cover"
         />

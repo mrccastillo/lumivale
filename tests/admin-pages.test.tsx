@@ -30,7 +30,7 @@ vi.mock("@/lib/testimonials", () => ({
       sortOrder: 1,
       status: "published",
       type: "text",
-      videoFileId: "",
+      videoUrl: "",
       createdAt: new Date("2026-05-03T08:00:00.000Z"),
       updatedAt: new Date("2026-05-03T08:00:00.000Z"),
     },

@@ -34,7 +34,10 @@ vi.mock("@/lib/testimonials", () => ({
       sortOrder: index + 1,
       status: index < 4 ? "published" : "draft",
       type: index % 2 === 0 ? "text" : "video",
-      videoFileId: index % 2 === 0 ? "" : `video-${index + 1}`,
+      videoUrl:
+        index % 2 === 0
+          ? ""
+          : `https://res.cloudinary.com/demo/video/upload/video-${index + 1}.mp4`,
       createdAt: new Date(`2026-05-0${Math.min(index + 1, 9)}T08:00:00.000Z`),
       updatedAt: new Date(`2026-05-0${Math.min(index + 1, 9)}T08:00:00.000Z`),
     })),

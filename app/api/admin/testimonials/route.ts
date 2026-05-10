@@ -34,14 +34,11 @@ export async function POST(request: Request) {
 
   try {
     const input = parseTestimonialFormData(formData);
-    const videoFileId = await uploadTestimonialVideo(
-      db,
-      formData.get("videoFile") as File | null,
-    );
+    const videoUrl = await uploadTestimonialVideo(formData.get("videoFile") as File | null);
 
     await createTestimonial(db, {
       ...input,
-      videoFileId: videoFileId || input.videoFileId,
+      videoUrl: videoUrl || input.videoUrl,
     });
   } catch (error) {
     return redirectTo(buildCreateErrorHref(getErrorMessage(error)));

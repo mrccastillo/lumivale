@@ -20,7 +20,7 @@ describe("testimonial repository", () => {
       sortOrder: 2,
       status: "draft",
       type: "text",
-      videoFileId: "",
+      videoUrl: "",
     });
     const video = await createTestimonial(db, {
       personName: "Jon Ramos",
@@ -29,7 +29,7 @@ describe("testimonial repository", () => {
       sortOrder: 1,
       status: "published",
       type: "video",
-      videoFileId: "video-1",
+      videoUrl: "https://res.cloudinary.com/demo/video/upload/video-1.mp4",
     });
 
     await expect(getPublishedTestimonials(db)).resolves.toEqual([
@@ -48,7 +48,7 @@ describe("testimonial repository", () => {
     await updateTestimonial(db, video.id, {
       quote: "Updated quote.",
       type: "text",
-      videoFileId: "",
+      videoUrl: "",
     });
 
     await expect(getAdminTestimonials(db)).resolves.toContainEqual(
@@ -56,7 +56,7 @@ describe("testimonial repository", () => {
         id: video.id,
         quote: "Updated quote.",
         type: "text",
-        videoFileId: "",
+        videoUrl: "",
       }),
     );
 
@@ -65,7 +65,7 @@ describe("testimonial repository", () => {
     await expect(getAdminTestimonials(db)).resolves.toHaveLength(1);
   });
 
-  test("requires video testimonials to include a video file id", async () => {
+  test("requires video testimonials to include a video URL", async () => {
     const db = createTestDb();
 
     await expect(
@@ -76,7 +76,7 @@ describe("testimonial repository", () => {
         sortOrder: 1,
         status: "published",
         type: "video",
-        videoFileId: "",
+        videoUrl: "",
       }),
     ).rejects.toThrow("Video testimonials require a video file.");
   });

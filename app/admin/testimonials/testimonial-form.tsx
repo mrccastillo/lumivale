@@ -32,7 +32,7 @@ export function TestimonialForm({
       className="grid gap-6 rounded-[24px] border border-[var(--lumivale-line)] bg-white p-6 shadow-[0_20px_60px_rgba(42,47,82,0.06)] sm:p-7"
     >
       <input type="hidden" name="action" value="save" />
-      <input type="hidden" name="videoFileId" value={testimonial?.videoFileId ?? ""} />
+      <input type="hidden" name="videoUrl" value={testimonial?.videoUrl ?? ""} />
 
       {errorMessage ? (
         <div
@@ -109,7 +109,7 @@ export function TestimonialForm({
           <p className="mt-2 text-xs leading-6 text-[var(--lumivale-muted)]">
             Supported formats: MP4, WEBM, and MOV. Maximum file size: 50MB.
           </p>
-          {testimonial?.videoFileId ? (
+          {testimonial?.videoUrl ? (
             <p className="mt-2 text-xs leading-6 text-[var(--lumivale-muted)]">
               A saved video is already attached. Upload a new file to replace it.
             </p>

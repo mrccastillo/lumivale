@@ -13,10 +13,10 @@ export type ServiceExampleCard = {
   tag: string;
   exampleType?: "link" | "photo";
   imageAlt?: string;
-  imageFileId?: string;
+  imageUrl?: string;
   previewUrl?: string;
   videoDescription?: string;
-  videoFileId?: string;
+  videoUrl?: string;
 };
 
 export type PrivateServiceContent = {
@@ -142,10 +142,10 @@ export const defaultServices: Service[] = [
           tag: "Awareness",
           exampleType: "link",
           imageAlt: "",
-          imageFileId: "",
+          imageUrl: "",
           previewUrl: "",
           videoDescription: "",
-          videoFileId: "",
+          videoUrl: "",
         },
         {
           title: "Quora answer placement",
@@ -153,10 +153,10 @@ export const defaultServices: Service[] = [
           tag: "Traffic",
           exampleType: "link",
           imageAlt: "",
-          imageFileId: "",
+          imageUrl: "",
           previewUrl: "",
           videoDescription: "",
-          videoFileId: "",
+          videoUrl: "",
         },
         {
           title: "X conversation post",
@@ -164,10 +164,10 @@ export const defaultServices: Service[] = [
           tag: "Social proof",
           exampleType: "link",
           imageAlt: "",
-          imageFileId: "",
+          imageUrl: "",
           previewUrl: "",
           videoDescription: "",
-          videoFileId: "",
+          videoUrl: "",
         },
         ],
       },
@@ -203,10 +203,10 @@ export const defaultServices: Service[] = [
           tag: "UGC",
           exampleType: "link",
           imageAlt: "",
-          imageFileId: "",
+          imageUrl: "",
           previewUrl: "",
           videoDescription: "",
-          videoFileId: "",
+          videoUrl: "",
         },
         {
           title: "Shorts repost system",
@@ -214,10 +214,10 @@ export const defaultServices: Service[] = [
           tag: "Distribution",
           exampleType: "link",
           imageAlt: "",
-          imageFileId: "",
+          imageUrl: "",
           previewUrl: "",
           videoDescription: "",
-          videoFileId: "",
+          videoUrl: "",
         },
         {
           title: "Creator-style screen demo",
@@ -225,10 +225,10 @@ export const defaultServices: Service[] = [
           tag: "Testing",
           exampleType: "link",
           imageAlt: "",
-          imageFileId: "",
+          imageUrl: "",
           previewUrl: "",
           videoDescription: "",
-          videoFileId: "",
+          videoUrl: "",
         },
         ],
       },
@@ -267,10 +267,10 @@ export const defaultServices: Service[] = [
           tag: "Sourcing",
           exampleType: "link",
           imageAlt: "",
-          imageFileId: "",
+          imageUrl: "",
           previewUrl: "",
           videoDescription: "",
-          videoFileId: "",
+          videoUrl: "",
         },
         {
           title: "Deal coordination",
@@ -278,10 +278,10 @@ export const defaultServices: Service[] = [
           tag: "Execution",
           exampleType: "link",
           imageAlt: "",
-          imageFileId: "",
+          imageUrl: "",
           previewUrl: "",
           videoDescription: "",
-          videoFileId: "",
+          videoUrl: "",
         },
         {
           title: "Content delivery",
@@ -289,10 +289,10 @@ export const defaultServices: Service[] = [
           tag: "Publishing",
           exampleType: "link",
           imageAlt: "",
-          imageFileId: "",
+          imageUrl: "",
           previewUrl: "",
           videoDescription: "",
-          videoFileId: "",
+          videoUrl: "",
         },
         ],
       },
@@ -325,10 +325,10 @@ export const defaultServices: Service[] = [
           tag: "Prospecting",
           exampleType: "link",
           imageAlt: "",
-          imageFileId: "",
+          imageUrl: "",
           previewUrl: "",
           videoDescription: "",
-          videoFileId: "",
+          videoUrl: "",
         },
         {
           title: "Message sequencing",
@@ -336,10 +336,10 @@ export const defaultServices: Service[] = [
           tag: "Messaging",
           exampleType: "link",
           imageAlt: "",
-          imageFileId: "",
+          imageUrl: "",
           previewUrl: "",
           videoDescription: "",
-          videoFileId: "",
+          videoUrl: "",
         },
         {
           title: "Lead handoff",
@@ -347,10 +347,10 @@ export const defaultServices: Service[] = [
           tag: "Pipeline",
           exampleType: "link",
           imageAlt: "",
-          imageFileId: "",
+          imageUrl: "",
           previewUrl: "",
           videoDescription: "",
-          videoFileId: "",
+          videoUrl: "",
         },
         ],
       },
@@ -383,10 +383,10 @@ export const defaultServices: Service[] = [
           tag: "Setup",
           exampleType: "link",
           imageAlt: "",
-          imageFileId: "",
+          imageUrl: "",
           previewUrl: "",
           videoDescription: "",
-          videoFileId: "",
+          videoUrl: "",
         },
         {
           title: "Lead list building",
@@ -394,10 +394,10 @@ export const defaultServices: Service[] = [
           tag: "Leads",
           exampleType: "link",
           imageAlt: "",
-          imageFileId: "",
+          imageUrl: "",
           previewUrl: "",
           videoDescription: "",
-          videoFileId: "",
+          videoUrl: "",
         },
         {
           title: "Outbound cadence",
@@ -405,10 +405,10 @@ export const defaultServices: Service[] = [
           tag: "Sending",
           exampleType: "link",
           imageAlt: "",
-          imageFileId: "",
+          imageUrl: "",
           previewUrl: "",
           videoDescription: "",
-          videoFileId: "",
+          videoUrl: "",
         },
         ],
       },
@@ -484,10 +484,10 @@ function normalizeInput(input: ServiceInput): ServiceInput {
           tag: card.tag.trim(),
           exampleType: card.exampleType === "photo" ? ("photo" as const) : ("link" as const),
           imageAlt: (card.imageAlt ?? "").trim(),
-          imageFileId: (card.imageFileId ?? "").trim(),
+          imageUrl: (card.imageUrl ?? "").trim(),
           previewUrl: normalizeOptionalUrl(card.previewUrl ?? ""),
           videoDescription: (card.videoDescription ?? "").trim(),
-          videoFileId: (card.videoFileId ?? "").trim(),
+          videoUrl: (card.videoUrl ?? "").trim(),
         }))
         .filter(
           (card) =>
@@ -495,10 +495,10 @@ function normalizeInput(input: ServiceInput): ServiceInput {
             card.summary ||
             card.tag ||
             card.imageAlt ||
-            card.imageFileId ||
+            card.imageUrl ||
             card.previewUrl ||
             card.videoDescription ||
-            card.videoFileId,
+            card.videoUrl,
         ),
     },
   };
@@ -566,7 +566,7 @@ function validateInput(input: ServiceInput) {
 
   if (
     input.privateContent.exampleCards.some(
-      (card) => card.exampleType === "photo" && !card.imageFileId,
+      (card) => card.exampleType === "photo" && !card.imageUrl,
     )
   ) {
     throw new Error("Photo examples require an uploaded photo.");
@@ -654,23 +654,23 @@ function parseExampleCardFormData(formData: FormData) {
   const indexedCards = Array.from({ length: 6 }, (_, index) => ({
     exampleType: formData.get(`exampleCardType-${index}`) === "photo" ? "photo" : "link",
     imageAlt: String(formData.get(`exampleCardImageAlt-${index}`) ?? ""),
-    imageFileId: String(formData.get(`exampleCardImageFileId-${index}`) ?? ""),
+    imageUrl: String(formData.get(`exampleCardImageUrl-${index}`) ?? ""),
     title: String(formData.get(`exampleCardTitle-${index}`) ?? ""),
     tag: String(formData.get(`exampleCardTag-${index}`) ?? ""),
     summary: String(formData.get(`exampleCardSummary-${index}`) ?? ""),
     previewUrl: String(formData.get(`exampleCardPreviewUrl-${index}`) ?? ""),
     videoDescription: String(formData.get(`exampleCardVideoDescription-${index}`) ?? ""),
-    videoFileId: String(formData.get(`exampleCardVideoFileId-${index}`) ?? ""),
+    videoUrl: String(formData.get(`exampleCardVideoUrl-${index}`) ?? ""),
   })).filter(
     (card) =>
       card.title ||
       card.tag ||
       card.summary ||
       card.imageAlt ||
-      card.imageFileId ||
+      card.imageUrl ||
       card.previewUrl ||
       card.videoDescription ||
-      card.videoFileId,
+      card.videoUrl,
   );
 
   if (indexedCards.length) {

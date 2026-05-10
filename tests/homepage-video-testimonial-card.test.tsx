@@ -11,7 +11,7 @@ describe("homepage video testimonial card", () => {
           personName: "Jon Ramos",
           personTitle: "CEO, Signal Labs",
           quote: "The execution support helped us move faster.",
-          videoFileId: "video-1",
+          videoUrl: "https://res.cloudinary.com/demo/video/upload/video-1.mp4",
         }}
       />,
     );
@@ -47,7 +47,7 @@ describe("homepage video testimonial card", () => {
           personName: "Founder placeholder",
           personTitle: "B2B SaaS team",
           quote: "Placeholder quote",
-          videoFileId: "",
+          videoUrl: "",
           placeholder: true,
         }}
       />,
