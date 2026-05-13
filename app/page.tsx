@@ -10,12 +10,12 @@ import { Reveal } from "@/components/reveal";
 import { TestimonialsSpotlight } from "@/components/testimonials-spotlight";
 import { getAllCaseStudies } from "@/lib/case-studies";
 import { defaultFaqs, getPublishedFaqs } from "@/lib/faqs";
+import { defaultHeroClients, getHeroClients, type HeroClientInput } from "@/lib/hero-clients";
 import { getMongoDb } from "@/lib/mongodb";
 import { getPublishedServicesForSite } from "@/lib/services";
 import { CALENDLY_URL } from "@/lib/site-config";
 import { getPublishedTestimonials, type Testimonial } from "@/lib/testimonials";
 
-const platformNames = ["Reddit", "Quora", "X", "TikTok", "LinkedIn"];
 const platformSequenceCopies = 4;
 
 const metrics = [
@@ -207,10 +207,11 @@ function ServiceIcon({ slug, title }: { slug: string; title: string }) {
 
 export default async function Home() {
   const caseStudies = getAllCaseStudies();
-  const [services, testimonials, faqs] = await Promise.all([
+  const [services, testimonials, faqs, heroClients] = await Promise.all([
     getPublishedServicesForSite(),
     getHomeTestimonials(),
     getHomeFaqs(),
+    getHomeHeroClients(),
   ]);
   const textTestimonials = getHomepageTextTestimonials(testimonials);
   const showPlaceholderTestimonials = !testimonials.some(
@@ -265,7 +266,7 @@ export default async function Home() {
             <MotionItem>
               <div className="border-t border-white/8 pb-5 pt-8 sm:pb-6 sm:pt-9">
                 <p className="text-center text-[11px] font-medium uppercase tracking-[0.24em] text-[#8ebba4] sm:text-xs">
-                  Channels we activate
+                  Clients we support
                 </p>
 
                 <div
@@ -283,13 +284,25 @@ export default async function Home() {
                         aria-hidden={index > 0 || undefined}
                         className="flex shrink-0 items-center gap-x-8 pr-8 text-sm font-semibold text-white/56 sm:gap-x-16 sm:pr-16 sm:text-xl"
                       >
-                        {platformNames.map((name) => (
+                        {heroClients.map((client) => (
                           <span
-                            key={`sequence-${index}-${name}`}
+                            key={`sequence-${index}-${client.clientName}`}
                             data-testid="platform-item"
-                            className="whitespace-nowrap"
+                            className="inline-flex min-h-9 items-center whitespace-nowrap"
                           >
-                            {name}
+                            {client.logoUrl ? (
+                              <>
+                                {/* eslint-disable-next-line @next/next/no-img-element */}
+                                <img
+                                  src={client.logoUrl}
+                                  alt={`${client.clientName} logo`}
+                                  className="max-h-8 max-w-[9rem] object-contain opacity-75 grayscale"
+                                />
+                                <span className="sr-only">{client.clientName}</span>
+                              </>
+                            ) : (
+                              client.clientName
+                            )}
                           </span>
                         ))}
                       </div>
@@ -581,12 +594,31 @@ async function getHomeFaqs() {
   try {
     const db = await getMongoDb();
     const faqs = await getPublishedFaqs(db);
+    const homepageFaqs = faqs.length ? faqs : defaultFaqs;
 
-    return faqs.length ? faqs : defaultFaqs;
+    return homepageFaqs.slice(0, 5);
   } catch (error) {
     console.error("Unable to load homepage FAQs", error);
 
-    return defaultFaqs;
+    return defaultFaqs.slice(0, 5);
+  }
+}
+
+async function getHomeHeroClients(): Promise<HeroClientInput[]> {
+  try {
+    const db = await getMongoDb();
+    const clients = await getHeroClients(db);
+
+    return clients.length
+      ? clients.map((client) => ({
+          clientName: client.clientName,
+          logoUrl: client.logoUrl,
+        }))
+      : defaultHeroClients;
+  } catch (error) {
+    console.error("Unable to load homepage hero clients", error);
+
+    return defaultHeroClients;
   }
 }
 

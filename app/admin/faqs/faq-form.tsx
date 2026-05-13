@@ -49,14 +49,9 @@ export function FaqForm({
         defaultValue={faq?.answer}
         rows={6}
       />
+      <input type="hidden" name="sortOrder" value={String(faq?.sortOrder ?? 999)} />
 
-      <div className="grid gap-5 sm:grid-cols-2">
-        <Field
-          label="Sort order"
-          name="sortOrder"
-          type="number"
-          defaultValue={String(faq?.sortOrder ?? 0)}
-        />
+      <div>
         <div>
           <FieldLabel htmlFor="faq-status">Status</FieldLabel>
           <select

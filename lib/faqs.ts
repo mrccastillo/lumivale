@@ -105,9 +105,11 @@ function validateInput(input: FaqInput) {
 }
 
 function toFaq(document: FaqDocument): Faq {
+  const { _id, ...faq } = document;
+
   return {
-    ...document,
-    id: String(document._id),
+    ...faq,
+    id: String(_id),
   };
 }
 
@@ -127,7 +129,7 @@ export function parseFaqFormData(formData: FormData): FaqInput {
 }
 
 export async function getAdminFaqs(db: FaqDb) {
-  const faqs = await collection(db).find({}).sort({ createdAt: -1 }).toArray();
+  const faqs = await collection(db).find({}).sort({ sortOrder: 1, createdAt: -1 }).toArray();
 
   return faqs.map(toFaq);
 }
@@ -194,6 +196,31 @@ export async function updateFaq(db: FaqDb, id: string, updates: Partial<FaqInput
   }
 
   return toFaq(updated);
+}
+
+export async function reorderFaqs(db: FaqDb, orderedIds: string[]) {
+  const uniqueIds = Array.from(new Set(orderedIds.map((id) => id.trim()).filter(Boolean)));
+
+  if (!uniqueIds.length || uniqueIds.length !== orderedIds.length) {
+    throw new Error("FAQ order is invalid.");
+  }
+
+  const now = new Date();
+  const updates = await Promise.all(
+    uniqueIds.map((id, index) =>
+      collection(db).findOneAndUpdate(
+        idFilter(id),
+        { $set: { sortOrder: index + 1, updatedAt: now } },
+        { returnDocument: "after" },
+      ),
+    ),
+  );
+
+  if (updates.some((faq) => !faq)) {
+    throw new Error("FAQ not found.");
+  }
+
+  return updates.map((faq) => toFaq(faq as FaqDocument));
 }
 
 export async function deleteFaq(db: FaqDb, id: string) {

@@ -8,6 +8,7 @@ const adminLinks = [
   { href: "/admin/blogs", icon: BlogsIcon, label: "Blogs" },
   { href: "/admin/services", icon: ServicesIcon, label: "Services" },
   { href: "/admin/testimonials", icon: TestimonialsIcon, label: "Testimonials" },
+  { href: "/admin/hero-clients", icon: HeroClientsIcon, label: "Hero Clients" },
   { href: "/admin/faqs", icon: FaqsIcon, label: "FAQs" },
   { href: "/admin/users", icon: UsersIcon, label: "Users" },
   { href: "/admin/trusted-clients", icon: TrustedClientsIcon, label: "Trusted Clients" },
@@ -231,6 +232,16 @@ function TrustedClientsIcon({ className }: IconProps) {
     <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className={className}>
       <rect x="3" y="3.25" width="10" height="9.5" rx="2" />
       <path d="M5.25 6.25h5.5M5.25 8.5h5.5M5.25 10.75h3.5" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+function HeroClientsIcon({ className }: IconProps) {
+  return (
+    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className={className}>
+      <rect x="2.75" y="4" width="10.5" height="8" rx="1.75" />
+      <path d="M5 10.5 7 8.25l1.5 1.5L10 8l1.25 2.5" strokeLinecap="round" strokeLinejoin="round" />
+      <circle cx="5.75" cy="6.5" r=".75" />
     </svg>
   );
 }

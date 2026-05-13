@@ -5,6 +5,7 @@ import Home from "@/app/page";
 import { getAllCaseStudies } from "@/lib/case-studies";
 import { getMongoDb } from "@/lib/mongodb";
 import { getPublishedFaqs } from "@/lib/faqs";
+import { getHeroClients } from "@/lib/hero-clients";
 import { getAllServices } from "@/lib/services";
 import { CALENDLY_URL } from "@/lib/site-config";
 import { getPublishedTestimonials } from "@/lib/testimonials";
@@ -55,6 +56,17 @@ vi.mock("@/lib/faqs", () => ({
       sortOrder: 5,
       status: "published",
     },
+  ],
+}));
+
+vi.mock("@/lib/hero-clients", () => ({
+  getHeroClients: vi.fn().mockResolvedValue([]),
+  defaultHeroClients: [
+    { clientName: "Reddit", logoUrl: "" },
+    { clientName: "Quora", logoUrl: "" },
+    { clientName: "X", logoUrl: "" },
+    { clientName: "TikTok", logoUrl: "" },
+    { clientName: "LinkedIn", logoUrl: "" },
   ],
 }));
 
@@ -176,6 +188,36 @@ describe("home page", () => {
     ).map((item) => item.textContent);
     expect(primaryLabels).toEqual(["Reddit", "Quora", "X", "TikTok", "LinkedIn"]);
     expect(duplicateSequences.every((sequence) => sequence.getAttribute("aria-hidden") === "true")).toBe(true);
+  });
+
+  test("renders managed hero client logos from MongoDB", async () => {
+    vi.mocked(getHeroClients).mockResolvedValueOnce([
+      {
+        id: "hero-client-1",
+        clientName: "Northstar",
+        logoUrl: "https://example.com/northstar.svg",
+        createdAt: new Date("2026-05-03T08:00:00.000Z"),
+        updatedAt: new Date("2026-05-03T08:00:00.000Z"),
+      },
+      {
+        id: "hero-client-2",
+        clientName: "Signal Labs",
+        logoUrl: "https://example.com/signal.svg",
+        createdAt: new Date("2026-05-03T08:01:00.000Z"),
+        updatedAt: new Date("2026-05-03T08:01:00.000Z"),
+      },
+    ]);
+
+    render(await Home());
+
+    expect(screen.getAllByAltText("Northstar logo")[0]).toHaveAttribute(
+      "src",
+      "https://example.com/northstar.svg",
+    );
+    expect(screen.getAllByAltText("Signal Labs logo")[0]).toHaveAttribute(
+      "src",
+      "https://example.com/signal.svg",
+    );
   });
 
   test("renders homepage sections inside motion wrappers", async () => {
@@ -447,7 +489,7 @@ describe("home page", () => {
     expect(screen.getByText("Maya Lee")).toBeInTheDocument();
   });
 
-  test("renders at least five collapsible FAQs", async () => {
+  test("renders five collapsible FAQs", async () => {
     const { container } = render(await Home());
     const faqSection = container.querySelector("#faqs");
 
@@ -458,7 +500,7 @@ describe("home page", () => {
     const faqItems = Array.from(faqSection.querySelectorAll("details"));
     const [firstFaq] = faqItems;
 
-    expect(faqItems.length).toBeGreaterThanOrEqual(5);
+    expect(faqItems).toHaveLength(5);
     expect(faqSection.querySelectorAll("summary")).toHaveLength(faqItems.length);
     expect(faqSection.querySelector("article")).not.toBeInTheDocument();
     expect(screen.getByRole("heading", { level: 2, name: "FAQ" })).toBeInTheDocument();
@@ -514,5 +556,26 @@ describe("home page", () => {
     );
     expect(faqSection).toHaveTextContent("Can we start small?");
     expect(faqSection).not.toHaveTextContent("How soon can Lumivale start?");
+  });
+
+  test("limits published MongoDB FAQs to five visible items", async () => {
+    vi.mocked(getPublishedFaqs).mockResolvedValueOnce(
+      Array.from({ length: 6 }, (_, index) => ({
+        id: `faq-${index + 1}`,
+        question: `Published question ${index + 1}?`,
+        answer: `Published answer ${index + 1}.`,
+        sortOrder: index + 1,
+        status: "published" as const,
+        createdAt: new Date(`2026-05-03T08:0${index}:00.000Z`),
+        updatedAt: new Date(`2026-05-03T08:0${index}:00.000Z`),
+      })),
+    );
+
+    const { container } = render(await Home());
+    const faqSection = container.querySelector("#faqs");
+
+    expect(faqSection?.querySelectorAll("details")).toHaveLength(5);
+    expect(faqSection).toHaveTextContent("Published question 5?");
+    expect(faqSection).not.toHaveTextContent("Published question 6?");
   });
 });

@@ -5,6 +5,7 @@ import {
   deleteFaq,
   getAdminFaqs,
   getPublishedFaqs,
+  reorderFaqs,
   updateFaq,
 } from "@/lib/faqs";
 
@@ -36,6 +37,13 @@ describe("FAQ repository", () => {
     await expect(getPublishedFaqs(db)).resolves.toEqual([
       expect.objectContaining({ id: published.id, sortOrder: 1 }),
       expect.objectContaining({ id: publishedDraft.id, sortOrder: 2 }),
+    ]);
+
+    await reorderFaqs(db, [publishedDraft.id, published.id]);
+
+    await expect(getPublishedFaqs(db)).resolves.toEqual([
+      expect.objectContaining({ id: publishedDraft.id, sortOrder: 1 }),
+      expect.objectContaining({ id: published.id, sortOrder: 2 }),
     ]);
 
     await updateFaq(db, published.id, {

@@ -42,7 +42,7 @@ export default function AboutPage() {
             </p>
           </div>
 
-          <div className="mt-12 grid gap-5 md:grid-cols-3">
+          <div className="mx-auto mt-12 grid max-w-6xl gap-5 md:grid-cols-3">
             {founders.map((founder) => (
               <article
                 key={founder.id}

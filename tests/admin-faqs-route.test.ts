@@ -9,6 +9,7 @@ const requireAdminAccessMock = vi.hoisted(() =>
 const getMongoDbMock = vi.hoisted(() => vi.fn().mockResolvedValue("test-db"));
 const createFaqMock = vi.hoisted(() => vi.fn());
 const parseFaqFormDataMock = vi.hoisted(() => vi.fn());
+const reorderFaqsMock = vi.hoisted(() => vi.fn());
 
 vi.mock("@/lib/admin-auth", () => ({
   requireAdminAccess: requireAdminAccessMock,
@@ -21,6 +22,7 @@ vi.mock("@/lib/mongodb", () => ({
 vi.mock("@/lib/faqs", () => ({
   createFaq: createFaqMock,
   parseFaqFormData: parseFaqFormDataMock,
+  reorderFaqs: reorderFaqsMock,
 }));
 
 beforeEach(() => {
@@ -31,6 +33,7 @@ beforeEach(() => {
     status: "draft",
   });
   createFaqMock.mockResolvedValue({ id: "faq-1" });
+  reorderFaqsMock.mockResolvedValue([]);
 });
 
 afterEach(() => {
@@ -38,6 +41,7 @@ afterEach(() => {
   getMongoDbMock.mockClear();
   createFaqMock.mockReset();
   parseFaqFormDataMock.mockReset();
+  reorderFaqsMock.mockReset();
 });
 
 describe("admin FAQs create route", () => {
@@ -75,5 +79,46 @@ describe("admin FAQs create route", () => {
     expect(redirectUrl.pathname).toBe("/admin/faqs");
     expect(redirectUrl.searchParams.get("mode")).toBe("create");
     expect(redirectUrl.searchParams.get("error")).toBe("Question and answer are required.");
+  });
+});
+
+describe("admin FAQs reorder route", () => {
+  test("persists FAQ order and redirects back to the dashboard", async () => {
+    const { POST } = await import("@/app/api/admin/faqs/reorder/route");
+    const formData = new FormData();
+
+    formData.set("order", JSON.stringify(["faq-2", "faq-1", "faq-3"]));
+    formData.set("redirectTo", "/admin/faqs?page=1");
+
+    const response = await POST(
+      new Request("http://localhost/api/admin/faqs/reorder", {
+        method: "POST",
+        body: formData,
+      }),
+    );
+
+    expect(response.status).toBe(303);
+    expect(response.headers.get("location")).toBe("/admin/faqs?page=1");
+    expect(reorderFaqsMock).toHaveBeenCalledWith("test-db", ["faq-2", "faq-1", "faq-3"]);
+  });
+
+  test("returns JSON for autosaved FAQ order", async () => {
+    const { POST } = await import("@/app/api/admin/faqs/reorder/route");
+    const formData = new FormData();
+
+    formData.set("order", JSON.stringify(["faq-2", "faq-1"]));
+
+    const response = await POST(
+      new Request("http://localhost/api/admin/faqs/reorder", {
+        method: "POST",
+        body: formData,
+        headers: {
+          "X-FAQ-Reorder": "autosave",
+        },
+      }),
+    );
+
+    await expect(response.json()).resolves.toEqual({ ok: true });
+    expect(reorderFaqsMock).toHaveBeenCalledWith("test-db", ["faq-2", "faq-1"]);
   });
 });

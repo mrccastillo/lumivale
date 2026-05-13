@@ -1,14 +1,21 @@
 import Link from "next/link";
 
 import { FaqForm } from "@/app/admin/faqs/faq-form";
+import {
+  FaqReorderList,
+  type FaqReorderItem,
+} from "@/app/admin/faqs/faq-reorder-list";
 import { requireAdminAccess } from "@/lib/admin-auth";
 import { type Faq, getAdminFaqs } from "@/lib/faqs";
 import { getMongoDb } from "@/lib/mongodb";
 
 const PAGE_SIZE = 6;
+const HOMEPAGE_FAQ_LIMIT = 5;
 const STATUS_OPTIONS = ["all", "published", "draft"] as const;
+const VISIBILITY_OPTIONS = ["displayed", "not-displayed"] as const;
 
 type FaqStatusFilter = (typeof STATUS_OPTIONS)[number];
+type FaqVisibilityFilter = (typeof VISIBILITY_OPTIONS)[number];
 
 type AdminFaqsPageProps = {
   searchParams?: Promise<Record<string, string | string[] | undefined>>
@@ -22,22 +29,30 @@ export default async function AdminFaqsPage({ searchParams }: AdminFaqsPageProps
   const params = await searchParams;
   const query = firstValue(params?.q).trim();
   const status = parseStatus(firstValue(params?.status));
+  const visibility = parseVisibility(firstValue(params?.visibility));
   const mode = parseMode(firstValue(params?.mode));
   const errorMessage = firstValue(params?.error).trim();
   const requestedPage = parsePage(firstValue(params?.page));
-  const filteredFaqs = filterFaqs(faqs, { query, status });
+  const displayedFaqIds = getDisplayedFaqIds(faqs);
+  const visibilityFaqs = filterFaqsByVisibility(faqs, displayedFaqIds, visibility);
+  const filteredFaqs = filterFaqs(visibilityFaqs, { query, status });
   const totalPages = Math.max(1, Math.ceil(filteredFaqs.length / PAGE_SIZE));
   const currentPage = Math.min(requestedPage, totalPages);
   const pageFaqs = filteredFaqs.slice(
     (currentPage - 1) * PAGE_SIZE,
     currentPage * PAGE_SIZE,
   );
+  const reorderFaqs = pageFaqs.map(toFaqReorderItem);
+  const canReorder = !query && status === "all";
   const publishedCount = pageFaqs.filter((faq) => faq.status === "published").length;
   const draftCount = pageFaqs.filter((faq) => faq.status === "draft").length;
+  const displayedCount = displayedFaqIds.size;
+  const notDisplayedCount = faqs.length - displayedCount;
   const baseHref = buildFaqsHref({
     page: currentPage,
     query,
     status,
+    visibility,
   });
 
   return (
@@ -52,11 +67,12 @@ export default async function AdminFaqsPage({ searchParams }: AdminFaqsPageProps
             <p className="mt-4 text-base leading-8 text-white/74">
               Manage public questions and answers with clearer publishing controls,
               search, and a faster create flow for the homepage FAQ section.
+              The homepage displays up to five published FAQs.
             </p>
           </div>
           <div className="flex flex-wrap gap-3">
             <Link
-              href={buildFaqsHref({ page: currentPage, query, status })}
+              href={buildFaqsHref({ page: currentPage, query, status, visibility })}
               className="inline-flex items-center gap-2 rounded-lg border border-white/18 bg-white px-5 py-3 text-sm font-semibold text-[var(--lumivale-panel)] transition hover:border-white/40"
             >
               Refresh
@@ -72,13 +88,13 @@ export default async function AdminFaqsPage({ searchParams }: AdminFaqsPageProps
         </div>
 
         <div className="grid gap-4 border-t border-white/10 bg-white/6 p-6 sm:grid-cols-2 sm:p-8 xl:grid-cols-4">
-          <MetricCard label="Matching FAQs" value={filteredFaqs.length} note="Total results for current filters" />
-          <MetricCard label="Published on page" value={publishedCount} note="Visible public-ready answers in view" />
-          <MetricCard label="Drafts on page" value={draftCount} note="Questions still being prepared" />
+          <MetricCard label="Displayed FAQs" value={displayedCount} note="Published FAQs currently shown on the homepage" />
+          <MetricCard label="Not displayed" value={notDisplayedCount} note="Drafts and published FAQs outside the first five" />
+          <MetricCard label="Published in view" value={publishedCount} note="Published answers in this tab and filter" />
           <MetricCard
-            label="Current mode"
-            value={mode === "create" ? "Create" : "Library"}
-            note={mode === "create" ? "Modal editor is open" : "Browsing FAQs"}
+            label="Drafts in view"
+            value={draftCount}
+            note="Questions still being prepared"
           />
         </div>
       </section>
@@ -93,8 +109,9 @@ export default async function AdminFaqsPage({ searchParams }: AdminFaqsPageProps
               Browse And Manage FAQs
             </h2>
             <p className="mt-3 text-sm leading-7 text-[var(--lumivale-admin-muted)]">
-              Search by question or answer, narrow the list by status, and update
-              public guidance without leaving the admin workspace.
+              Switch between homepage-visible FAQs and the backlog, search by
+              question or answer, and drag cards in the unfiltered view to
+              control FAQ order.
             </p>
           </div>
           <div className="rounded-lg border border-[var(--lumivale-admin-border)] bg-[var(--lumivale-admin-surface)] px-5 py-4 text-sm">
@@ -102,13 +119,31 @@ export default async function AdminFaqsPage({ searchParams }: AdminFaqsPageProps
               Current view
             </p>
             <p className="mt-2 font-semibold text-[var(--lumivale-ink)]">
-              Page {currentPage} of {totalPages}
+              {visibility === "displayed" ? "Displayed FAQs" : "Not displayed FAQs"}
             </p>
             <p className="mt-1 text-xs text-[var(--lumivale-admin-muted)]">
-              {filteredFaqs.length} total FAQs
+              Page {currentPage} of {totalPages} · {filteredFaqs.length} total FAQs
             </p>
           </div>
         </div>
+
+        <nav aria-label="FAQ visibility" className="mt-6 flex flex-wrap gap-2">
+          {VISIBILITY_OPTIONS.map((option) => (
+            <Link
+              key={option}
+              href={buildFaqsHref({ query, status, visibility: option })}
+              className={`rounded-lg border px-4 py-2 text-sm font-semibold transition ${
+                visibility === option
+                  ? "border-[var(--lumivale-panel)] bg-[var(--lumivale-admin-chip)] text-[var(--lumivale-panel)]"
+                  : "border-[var(--lumivale-admin-border)] text-[var(--lumivale-ink)] hover:border-[var(--lumivale-admin-border-strong)]"
+              }`}
+            >
+              {option === "displayed"
+                ? `Displayed (${displayedCount}/${HOMEPAGE_FAQ_LIMIT})`
+                : `Not displayed (${notDisplayedCount})`}
+            </Link>
+          ))}
+        </nav>
 
         <form
           action="/admin/faqs"
@@ -130,6 +165,7 @@ export default async function AdminFaqsPage({ searchParams }: AdminFaqsPageProps
               placeholder="Search question or answer"
               className="min-h-12 flex-1 rounded-lg border border-[var(--lumivale-admin-border)] bg-white px-4 text-sm outline-none transition focus:border-[var(--lumivale-panel)]"
             />
+            <input type="hidden" name="visibility" value={visibility} />
             {status !== "all" ? <input type="hidden" name="status" value={status} /> : null}
             <button
               type="submit"
@@ -142,7 +178,7 @@ export default async function AdminFaqsPage({ searchParams }: AdminFaqsPageProps
             {STATUS_OPTIONS.map((option) => (
               <Link
                 key={option}
-                href={buildFaqsHref({ query, status: option })}
+                href={buildFaqsHref({ query, status: option, visibility })}
                 className={`rounded-full border px-4 py-2 text-sm font-semibold transition ${
                   status === option
                     ? "border-[var(--lumivale-panel)] bg-[var(--lumivale-admin-chip)] text-[var(--lumivale-panel)]"
@@ -155,28 +191,35 @@ export default async function AdminFaqsPage({ searchParams }: AdminFaqsPageProps
           </div>
         </form>
 
-        <div className="mt-6 grid gap-5 lg:grid-cols-2">
-          {pageFaqs.length ? (
-            pageFaqs.map((faq) => <FaqCard key={faq.id} faq={faq} />)
-          ) : (
+        {pageFaqs.length ? (
+          <FaqReorderList
+            allFaqIds={faqs.map((faq) => faq.id)}
+            canReorder={canReorder}
+            faqs={reorderFaqs}
+            returnTo={baseHref}
+          />
+        ) : null}
+
+        {!pageFaqs.length ? (
+          <div className="mt-6 grid gap-5 lg:grid-cols-2">
             <div className="rounded-lg border border-dashed border-[var(--lumivale-admin-border)] p-8 text-center lg:col-span-2">
               <p className="text-lg font-semibold text-[var(--lumivale-ink)]">
-                {faqs.length ? "No matching FAQs." : "No FAQs yet."}
+                {faqs.length ? "No matching FAQs in this tab." : "No FAQs yet."}
               </p>
               <p className="mt-2 text-sm text-[var(--lumivale-admin-muted)]">
                 {faqs.length
-                  ? "Adjust search or status filters to see more FAQs."
+                  ? "Adjust search, status, or visibility filters to see more FAQs."
                   : "Create the first FAQ to start filling the public questions section."}
               </p>
               <Link
-                href={faqs.length ? "/admin/faqs" : "/admin/faqs?mode=create"}
+                href={faqs.length ? buildFaqsHref({ visibility }) : "/admin/faqs?mode=create"}
                 className="mt-5 inline-flex rounded-lg bg-[var(--lumivale-panel)] px-5 py-3 text-sm font-semibold text-white"
               >
                 {faqs.length ? "Clear filters" : "New FAQ"}
               </Link>
             </div>
-          )}
-        </div>
+          </div>
+        ) : null}
 
         <div className="mt-6 flex flex-col gap-3 border-t border-[var(--lumivale-admin-border)] pt-5 sm:flex-row sm:items-center sm:justify-between">
           <p className="text-sm text-[var(--lumivale-admin-muted)]">
@@ -189,6 +232,7 @@ export default async function AdminFaqsPage({ searchParams }: AdminFaqsPageProps
                   page: currentPage - 1,
                   query,
                   status,
+                  visibility,
                   includePageOne: true,
                 })}
                 className="rounded-lg border border-[var(--lumivale-admin-border)] px-5 py-3 text-sm font-semibold text-[var(--lumivale-panel)]"
@@ -202,7 +246,7 @@ export default async function AdminFaqsPage({ searchParams }: AdminFaqsPageProps
             )}
             {currentPage < totalPages ? (
               <Link
-                href={buildFaqsHref({ page: currentPage + 1, query, status })}
+                href={buildFaqsHref({ page: currentPage + 1, query, status, visibility })}
                 className="rounded-lg border border-[var(--lumivale-admin-border)] px-5 py-3 text-sm font-semibold text-[var(--lumivale-panel)]"
               >
                 Next
@@ -274,70 +318,6 @@ function CreateFaqModal({
   );
 }
 
-function FaqCard({ faq }: { faq: Faq }) {
-  return (
-    <article className="overflow-hidden rounded-lg border border-[var(--lumivale-admin-border)] bg-white">
-      <div className="p-5">
-        <div className="flex flex-wrap items-center gap-2">
-          <span className="rounded-full bg-[var(--lumivale-admin-chip)] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--lumivale-panel)]">
-            {faq.status}
-          </span>
-          <span className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--lumivale-admin-muted)]">
-            Sort {faq.sortOrder}
-          </span>
-        </div>
-
-        <h2 className="mt-4 text-xl font-semibold text-[var(--lumivale-ink)]">{faq.question}</h2>
-        <p className="mt-3 text-sm leading-7 text-[var(--lumivale-admin-muted)]">
-          {faq.answer}
-        </p>
-
-        <div className="mt-5 rounded-lg border border-[var(--lumivale-admin-border)] bg-[var(--lumivale-admin-surface)] p-4">
-          <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--lumivale-admin-muted)]">
-            Publishing notes
-          </p>
-          <p className="mt-2 text-sm text-[var(--lumivale-ink)]">
-            {faq.status === "published"
-              ? "Visible on the public FAQ section."
-              : "Draft answer. Publish when the copy is ready for visitors."}
-          </p>
-        </div>
-
-        <div className="mt-5 flex flex-wrap gap-2">
-          <Link
-            href={`/admin/faqs/${faq.id}/edit`}
-            className="rounded-lg border border-[var(--lumivale-admin-border)] px-4 py-2 text-sm font-semibold text-[var(--lumivale-panel)]"
-          >
-            Edit
-          </Link>
-          <form action={`/api/admin/faqs/${faq.id}`} method="post">
-            <input
-              type="hidden"
-              name="action"
-              value={faq.status === "published" ? "draft" : "publish"}
-            />
-            <button
-              type="submit"
-              className="rounded-lg border border-[var(--lumivale-admin-border)] px-4 py-2 text-sm font-semibold text-[var(--lumivale-panel)]"
-            >
-              {faq.status === "published" ? "Unpublish" : "Publish"}
-            </button>
-          </form>
-          <form action={`/api/admin/faqs/${faq.id}`} method="post">
-            <input type="hidden" name="action" value="delete" />
-            <button
-              type="submit"
-              className="rounded-lg border border-red-200 px-4 py-2 text-sm font-semibold text-red-600"
-            >
-              Delete
-            </button>
-          </form>
-        </div>
-      </div>
-    </article>
-  );
-}
-
 function MetricCard({
   label,
   note,
@@ -375,18 +355,50 @@ function filterFaqs(
   });
 }
 
+function getDisplayedFaqIds(faqs: Faq[]) {
+  return new Set(
+    faqs
+      .filter((faq) => faq.status === "published")
+      .slice(0, HOMEPAGE_FAQ_LIMIT)
+      .map((faq) => faq.id),
+  );
+}
+
+function filterFaqsByVisibility(
+  faqs: Faq[],
+  displayedFaqIds: Set<string>,
+  visibility: FaqVisibilityFilter,
+) {
+  return faqs.filter((faq) =>
+    visibility === "displayed"
+      ? displayedFaqIds.has(faq.id)
+      : !displayedFaqIds.has(faq.id),
+  );
+}
+
+function toFaqReorderItem(faq: Faq): FaqReorderItem {
+  return {
+    answer: faq.answer,
+    id: faq.id,
+    question: faq.question,
+    status: faq.status,
+  };
+}
+
 function buildFaqsHref({
   includePageOne = false,
   mode,
   page = 1,
   query = "",
   status = "all",
+  visibility = "displayed",
 }: {
   includePageOne?: boolean;
   mode?: "create";
   page?: number;
   query?: string;
   status?: FaqStatusFilter;
+  visibility?: FaqVisibilityFilter;
 }) {
   const params = new URLSearchParams();
 
@@ -396,6 +408,10 @@ function buildFaqsHref({
 
   if (status !== "all") {
     params.set("status", status);
+  }
+
+  if (visibility !== "displayed") {
+    params.set("visibility", visibility);
   }
 
   if (page > 1 || includePageOne) {
@@ -425,6 +441,12 @@ function parseStatus(value: string): FaqStatusFilter {
   return STATUS_OPTIONS.includes(value as FaqStatusFilter)
     ? (value as FaqStatusFilter)
     : "all";
+}
+
+function parseVisibility(value: string): FaqVisibilityFilter {
+  return VISIBILITY_OPTIONS.includes(value as FaqVisibilityFilter)
+    ? (value as FaqVisibilityFilter)
+    : "displayed";
 }
 
 function parseMode(value: string) {

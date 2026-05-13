@@ -3,6 +3,7 @@ import { describe, expect, test, vi } from "vitest";
 
 import AdminLoginPage from "@/app/admin/login/page";
 import AdminFaqsPage from "@/app/admin/faqs/page";
+import AdminHeroClientsPage from "@/app/admin/hero-clients/page";
 import AdminServicesPage from "@/app/admin/services/page";
 import AdminTestimonialsPage from "@/app/admin/testimonials/page";
 import AdminTrustedClientsPage from "@/app/admin/trusted-clients/page";
@@ -97,6 +98,18 @@ vi.mock("@/lib/trusted-clients", () => ({
   ]),
 }));
 
+vi.mock("@/lib/hero-clients", () => ({
+  getHeroClients: vi.fn().mockResolvedValue([
+    {
+      id: "hero-client-1",
+      clientName: "Northstar",
+      logoUrl: "https://example.com/northstar.svg",
+      createdAt: new Date("2026-05-06T08:00:00.000Z"),
+      updatedAt: new Date("2026-05-06T08:00:00.000Z"),
+    },
+  ]),
+}));
+
 describe("admin pages", () => {
   test("renders the admin login form", () => {
     render(<AdminLoginPage searchParams={Promise.resolve({})} />);
@@ -178,5 +191,19 @@ describe("admin pages", () => {
     expect(screen.getByRole("heading", { name: "client@example.com", level: 3 })).toBeInTheDocument();
     expect(screen.getByLabelText("Email")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Add trusted client" })).toBeInTheDocument();
+  });
+
+  test("renders the admin hero clients page and creation form", async () => {
+    render(await AdminHeroClientsPage({ searchParams: Promise.resolve({}) }));
+
+    expect(screen.getByRole("heading", { name: "Hero Clients", level: 1 })).toBeInTheDocument();
+    expect(screen.getByText("Homepage Content")).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Northstar", level: 3 })).toBeInTheDocument();
+    expect(screen.getByLabelText("Client name")).toBeInTheDocument();
+    expect(screen.getByLabelText("Client logo")).toHaveAttribute(
+      "accept",
+      "image/png,image/jpeg,image/webp,image/gif",
+    );
+    expect(screen.getByRole("button", { name: "Add hero client" })).toBeInTheDocument();
   });
 });
