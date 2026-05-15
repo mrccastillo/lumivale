@@ -1,9 +1,14 @@
 import { notFound } from "next/navigation";
 
-import { getAllCaseStudies, getCaseStudyBySlug } from "@/lib/case-studies";
+import {
+  getPublishedCaseStudiesForSite,
+  getPublishedCaseStudyBySlugForSite,
+} from "@/lib/case-studies";
 
 export async function generateStaticParams() {
-  return getAllCaseStudies().map((study) => ({ slug: study.slug }));
+  const studies = await getPublishedCaseStudiesForSite();
+
+  return studies.map((study) => ({ slug: study.slug }));
 }
 
 export default async function CaseStudyDetailPage({
@@ -12,7 +17,7 @@ export default async function CaseStudyDetailPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const caseStudy = getCaseStudyBySlug(slug);
+  const caseStudy = await getPublishedCaseStudyBySlugForSite(slug);
 
   if (!caseStudy) {
     notFound();

@@ -17,7 +17,9 @@ type ExampleDraft = {
   summary: string;
   tag: string;
   title: string;
+  videoFile: File | null;
   videoDescription: string;
+  videoFileName: string;
   videoUrl: string;
 };
 
@@ -31,7 +33,9 @@ const emptyExample: ExampleDraft = {
   summary: "",
   tag: "",
   title: "",
+  videoFile: null,
   videoDescription: "",
+  videoFileName: "",
   videoUrl: "",
 };
 
@@ -61,6 +65,10 @@ export function ServiceForm({
     examples.forEach((example, index) => {
       if (example.imageFile) {
         formData.set(`exampleCardImageFile-${index}`, example.imageFile);
+      }
+
+      if (example.videoFile) {
+        formData.set(`exampleCardVideoFile-${index}`, example.videoFile);
       }
     });
 
@@ -484,6 +492,40 @@ function ExamplesManager({
                   />
                 )}
 
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <ModalField
+                    label="Video description"
+                    value={draft.videoDescription}
+                    onChange={(value) => setDraft({ ...draft, videoDescription: value })}
+                  />
+                  <div>
+                    <FieldLabel htmlFor="modal-example-video">Upload video</FieldLabel>
+                    <input
+                      id="modal-example-video"
+                      type="file"
+                      accept="video/mp4,video/webm,video/quicktime"
+                      onChange={(event) => {
+                        const file = event.target.files?.[0] ?? null;
+
+                        setDraft({
+                          ...draft,
+                          videoFile: file,
+                          videoFileName: file?.name ?? draft.videoFileName,
+                        });
+                      }}
+                      className={fieldClassName}
+                    />
+                    <p className="mt-2 text-xs leading-6 text-[var(--lumivale-muted)]">
+                      Optional MP4, WEBM, or MOV walkthrough. Maximum file size: 50MB.
+                    </p>
+                    {draft.videoFileName ? (
+                      <p className="mt-2 text-xs font-semibold text-[var(--lumivale-panel)]">
+                        Selected: {draft.videoFileName}
+                      </p>
+                    ) : null}
+                  </div>
+                </div>
+
                 <div className="flex flex-wrap gap-3 border-t border-[var(--lumivale-admin-border)] pt-5">
                   <button
                     type="button"
@@ -520,7 +562,9 @@ function toExampleDraft(card: ServiceExampleCard): ExampleDraft {
     summary: card.summary,
     tag: card.tag,
     title: card.title,
+    videoFile: null,
     videoDescription: card.videoDescription ?? "",
+    videoFileName: "",
     videoUrl: card.videoUrl ?? "",
   };
 }

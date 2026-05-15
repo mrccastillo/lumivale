@@ -12,10 +12,13 @@ import {
 
 const pageTitles: Record<string, string> = {
   "/admin/blogs": "Blogs",
+  "/admin/services": "Services",
+  "/admin/case-studies": "Case Studies",
   "/admin/testimonials": "Testimonials",
   "/admin/hero-clients": "Hero Clients",
   "/admin/faqs": "FAQs",
   "/admin/users": "Users",
+  "/admin/trusted-clients": "Trusted Clients",
 };
 
 export function AdminWorkspace({ children }: { children: ReactNode }) {

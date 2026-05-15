@@ -1,8 +1,8 @@
 import { CaseStudyCards } from "@/components/case-study-cards";
-import { getAllCaseStudies } from "@/lib/case-studies";
+import { getPublishedCaseStudiesForSite } from "@/lib/case-studies";
 
-export default function CaseStudiesPage() {
-  const caseStudies = getAllCaseStudies();
+export default async function CaseStudiesPage() {
+  const caseStudies = await getPublishedCaseStudiesForSite();
 
   return (
     <section className="bg-[#f7f8fb] px-6 py-[68px] text-[var(--lumivale-ink)]">

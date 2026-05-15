@@ -2,6 +2,7 @@ import { render, screen } from "@testing-library/react";
 import { describe, expect, test, vi } from "vitest";
 
 import AdminLoginPage from "@/app/admin/login/page";
+import AdminCaseStudiesPage from "@/app/admin/case-studies/page";
 import AdminFaqsPage from "@/app/admin/faqs/page";
 import AdminHeroClientsPage from "@/app/admin/hero-clients/page";
 import AdminServicesPage from "@/app/admin/services/page";
@@ -72,6 +73,27 @@ vi.mock("@/lib/services", () => ({
         pricePreview: "Starting at $850/mo",
         pricingLines: [{ label: "Monthly rate", value: "$850" }],
       },
+    },
+  ]),
+}));
+
+vi.mock("@/lib/case-studies", () => ({
+  getAdminCaseStudies: vi.fn().mockResolvedValue([
+    {
+      slug: "comment-awareness-sprint",
+      title: "Comment Awareness Sprint",
+      category: "Awareness",
+      headline: "100-140 targeted comments per month",
+      summary: "A focused comment campaign built for relevant conversations.",
+      challenge: "The brand needed early awareness.",
+      solution: "Lumivale mapped relevant threads.",
+      outcomes: ["Clearer channel focus"],
+      metrics: [{ value: "100-140", label: "comments per month" }],
+      sortOrder: 1,
+      status: "published",
+      isDefault: true,
+      createdAt: new Date("2026-05-03T08:00:00.000Z"),
+      updatedAt: new Date("2026-05-03T08:00:00.000Z"),
     },
   ]),
 }));
@@ -169,6 +191,24 @@ describe("admin pages", () => {
     expect(screen.getByRole("link", { name: "Edit" })).toHaveAttribute(
       "href",
       "/admin/services/comment-campaign/edit",
+    );
+  });
+
+  test("renders the admin case studies list", async () => {
+    render(await AdminCaseStudiesPage({ searchParams: Promise.resolve({}) }));
+
+    expect(screen.getByRole("heading", { name: "Case Studies", level: 1 })).toBeInTheDocument();
+    expect(screen.getByText("Story Management")).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "New Case Study" })).toHaveAttribute(
+      "href",
+      "/admin/case-studies?mode=create",
+    );
+    expect(
+      screen.getByRole("heading", { name: "Comment Awareness Sprint", level: 2 }),
+    ).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Edit" })).toHaveAttribute(
+      "href",
+      "/admin/case-studies/comment-awareness-sprint/edit",
     );
   });
 
