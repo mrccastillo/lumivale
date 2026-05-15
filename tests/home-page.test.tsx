@@ -181,11 +181,13 @@ describe("home page", () => {
 
     expect(platformRow).toHaveClass("overflow-hidden");
     expect(marqueeTrack).toHaveClass("lumivale-marquee-track");
-    expect(sequences).toHaveLength(4);
-    expect(primarySequence).not.toHaveClass("min-w-full", "justify-center");
+    expect(sequences).toHaveLength(2);
+    expect(primarySequence).not.toHaveClass("min-w-full");
     const primaryLabels = Array.from(
       primarySequence?.querySelectorAll("[data-testid='platform-item']") ?? [],
-    ).map((item) => item.textContent);
+    )
+      .slice(0, 5)
+      .map((item) => item.textContent);
     expect(primaryLabels).toEqual(["Reddit", "Quora", "X", "TikTok", "LinkedIn"]);
     expect(duplicateSequences.every((sequence) => sequence.getAttribute("aria-hidden") === "true")).toBe(true);
   });
@@ -210,14 +212,19 @@ describe("home page", () => {
 
     render(await Home());
 
-    expect(screen.getAllByAltText("Northstar logo")[0]).toHaveAttribute(
+    const northstarLogo = screen.getAllByAltText("Northstar logo")[0];
+    const signalLogo = screen.getAllByAltText("Signal Labs logo")[0];
+
+    expect(northstarLogo).toHaveAttribute(
       "src",
       "https://example.com/northstar.svg",
     );
-    expect(screen.getAllByAltText("Signal Labs logo")[0]).toHaveAttribute(
+    expect(signalLogo).toHaveAttribute(
       "src",
       "https://example.com/signal.svg",
     );
+    expect(northstarLogo).not.toHaveClass("grayscale");
+    expect(signalLogo).not.toHaveClass("grayscale");
   });
 
   test("renders homepage sections inside motion wrappers", async () => {

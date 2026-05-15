@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { CaseStudyCards } from "@/components/case-study-cards";
+import { HeroClientMarquee } from "@/components/hero-client-marquee";
 import { HeroGlowBlob } from "@/components/hero-glow-blob";
 import { HomepageTestimonialsCarousel } from "@/components/homepage-testimonials-carousel";
 import { HomepageVideoTestimonialCard } from "@/components/homepage-video-testimonial-card";
@@ -15,8 +16,6 @@ import { getMongoDb } from "@/lib/mongodb";
 import { getPublishedServicesForSite } from "@/lib/services";
 import { CALENDLY_URL } from "@/lib/site-config";
 import { getPublishedTestimonials, type Testimonial } from "@/lib/testimonials";
-
-const platformSequenceCopies = 4;
 
 const metrics = [
   {
@@ -269,46 +268,7 @@ export default async function Home() {
                   Clients we support
                 </p>
 
-                <div
-                  data-testid="platform-row"
-                  className="lumivale-marquee-fade mt-8 w-[calc(100%+2rem)] -translate-x-4 overflow-hidden sm:mt-9 sm:w-[calc(100%+3rem)] sm:-translate-x-6"
-                >
-                  <div
-                    data-testid="platform-track"
-                    className="lumivale-marquee-track flex w-max items-center"
-                  >
-                    {Array.from({ length: platformSequenceCopies }, (_, index) => (
-                      <div
-                        key={`sequence-${index}`}
-                        data-testid="platform-sequence"
-                        aria-hidden={index > 0 || undefined}
-                        className="flex shrink-0 items-center gap-x-8 pr-8 text-sm font-semibold text-white/56 sm:gap-x-16 sm:pr-16 sm:text-xl"
-                      >
-                        {heroClients.map((client) => (
-                          <span
-                            key={`sequence-${index}-${client.clientName}`}
-                            data-testid="platform-item"
-                            className="inline-flex min-h-9 items-center whitespace-nowrap"
-                          >
-                            {client.logoUrl ? (
-                              <>
-                                {/* eslint-disable-next-line @next/next/no-img-element */}
-                                <img
-                                  src={client.logoUrl}
-                                  alt={`${client.clientName} logo`}
-                                  className="max-h-8 max-w-[9rem] object-contain opacity-75 grayscale"
-                                />
-                                <span className="sr-only">{client.clientName}</span>
-                              </>
-                            ) : (
-                              client.clientName
-                            )}
-                          </span>
-                        ))}
-                      </div>
-                    ))}
-                  </div>
-                </div>
+                <HeroClientMarquee clients={heroClients} />
               </div>
             </MotionItem>
           </MotionGroup>
