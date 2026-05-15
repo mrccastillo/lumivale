@@ -376,7 +376,7 @@ export default async function Home() {
           <Reveal data-testid="testimonials-reveal" className="relative z-10 mx-auto max-w-7xl">
             <div className="mx-auto max-w-4xl text-center">
                   <p className="text-sm font-semibold uppercase text-[var(--lumivale-accent)]">
-              Case studies
+              Testimonials
             </p>
               <h2 className="text-2xl font-semibold leading-tight sm:text-4xl">
                 Hear it from our clients
