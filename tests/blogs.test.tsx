@@ -64,6 +64,34 @@ describe("blog data and detail pages", () => {
     expect(screen.getByRole("link", { name: "Blogs" })).toHaveAttribute("href", "/blogs");
   });
 
+  test("builds the table of contents from article headings", async () => {
+    vi.mocked(getPublicBlogPostBySlug).mockResolvedValue({
+      ...publishedPost,
+      body:
+        "## Launch notes\n\nFirst section.\n\n### Setup checklist\n\nNested section.\n\n## Launch notes\n\nSecond section.",
+    });
+
+    const { container } = render(
+      await BlogDetailPage({
+        params: Promise.resolve({ slug: publishedPost.slug }),
+      }),
+    );
+
+    expect(screen.getByText("Table of Contents")).toBeInTheDocument();
+    expect(container.querySelector("a[href='#launch-notes']")).toHaveTextContent(
+      "Launch notes",
+    );
+    expect(container.querySelector("a[href='#setup-checklist']")).toHaveTextContent(
+      "Setup checklist",
+    );
+    expect(container.querySelector("a[href='#launch-notes-2']")).toHaveTextContent(
+      "Launch notes",
+    );
+    expect(container.querySelector("#launch-notes")).toHaveTextContent("Launch notes");
+    expect(container.querySelector("#setup-checklist")).toHaveTextContent("Setup checklist");
+    expect(container.querySelector("#launch-notes-2")).toHaveTextContent("Launch notes");
+  });
+
   test("rejects unknown blog slugs", async () => {
     vi.mocked(getPublicBlogPostBySlug).mockResolvedValue(null);
 

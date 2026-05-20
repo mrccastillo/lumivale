@@ -47,6 +47,28 @@ function getTableOfContents(body: string) {
   return items;
 }
 
+function getHeadingId(
+  title: string,
+  level: TocItem["level"],
+  headings: TocItem[],
+  usedIndexes: Set<number>,
+) {
+  const index = headings.findIndex(
+    (heading, headingIndex) =>
+      !usedIndexes.has(headingIndex) &&
+      heading.level === level &&
+      heading.title === title,
+  );
+
+  if (index === -1) {
+    return slugifyHeading(title);
+  }
+
+  usedIndexes.add(index);
+
+  return headings[index].id;
+}
+
 async function getRelatedPosts(currentSlug: string) {
   try {
     const db = await getMongoDb();
@@ -102,6 +124,7 @@ export default async function BlogDetailPage({
   }
 
   const tableOfContents = getTableOfContents(post.body);
+  const usedHeadingIndexes = new Set<number>();
   const relatedPosts = await getRelatedPosts(post.slug);
 
   return (
@@ -175,7 +198,7 @@ export default async function BlogDetailPage({
 
                   return (
                     <h2
-                      id={slugifyHeading(title)}
+                      id={getHeadingId(title, 2, tableOfContents, usedHeadingIndexes)}
                       className="mt-10 text-[1.9rem] font-semibold leading-tight text-stone-900 first:mt-0"
                     >
                       {children}
@@ -187,7 +210,7 @@ export default async function BlogDetailPage({
 
                   return (
                     <h3
-                      id={slugifyHeading(title)}
+                      id={getHeadingId(title, 3, tableOfContents, usedHeadingIndexes)}
                       className="mt-7 text-[1.25rem] font-semibold leading-tight text-stone-900"
                     >
                       {children}

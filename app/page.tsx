@@ -50,6 +50,7 @@ type HomepageVideoTestimonialData = Pick<
 };
 
 const HOMEPAGE_TEXT_TESTIMONIAL_PAGE_SIZE = 4;
+const HOMEPAGE_TEXT_TESTIMONIAL_MIN_PAGES = 2;
 
 const videoTestimonialPlaceholders: HomepageVideoTestimonialData[] = [
   {
@@ -519,13 +520,20 @@ function getHomepageTextTestimonials(testimonials: Testimonial[]) {
     return [];
   }
 
-  const remainder = textTestimonials.length % HOMEPAGE_TEXT_TESTIMONIAL_PAGE_SIZE;
+  const minimumSlots =
+    HOMEPAGE_TEXT_TESTIMONIAL_PAGE_SIZE * HOMEPAGE_TEXT_TESTIMONIAL_MIN_PAGES;
+  const visibleSlots = Math.max(textTestimonials.length, minimumSlots);
+  const remainder = visibleSlots % HOMEPAGE_TEXT_TESTIMONIAL_PAGE_SIZE;
+  const paddedSlotCount =
+    remainder === 0
+      ? visibleSlots
+      : visibleSlots + HOMEPAGE_TEXT_TESTIMONIAL_PAGE_SIZE - remainder;
+  const placeholdersNeeded = paddedSlotCount - textTestimonials.length;
 
-  if (remainder === 0) {
+  if (placeholdersNeeded === 0) {
     return textTestimonials;
   }
 
-  const placeholdersNeeded = HOMEPAGE_TEXT_TESTIMONIAL_PAGE_SIZE - remainder;
   const placeholderFill = Array.from({ length: placeholdersNeeded }, (_, index) => {
     const placeholder = textTestimonialPlaceholders[index % textTestimonialPlaceholders.length];
 

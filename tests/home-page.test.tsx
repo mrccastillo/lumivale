@@ -384,6 +384,9 @@ describe("home page", () => {
     expect(textGrid).toHaveTextContent("Evan Cole");
     expect(textGrid).toHaveTextContent("Placeholder");
     expect(textGrid?.querySelectorAll("[data-testid='homepage-text-testimonial']")).toHaveLength(4);
+    expect(screen.getByText("Page 1 of 2")).toBeInTheDocument();
+    expect(screen.getAllByRole("button", { name: "Previous testimonials" })).toHaveLength(2);
+    expect(screen.getAllByRole("button", { name: "Next testimonials" })).toHaveLength(2);
     expect(testimonialSection).not.toHaveTextContent("Jon Ramos");
     expect(testimonialSection).not.toHaveTextContent("Mina Park");
     expect(testimonialSection?.querySelector("video")).not.toBeInTheDocument();
@@ -482,15 +485,17 @@ describe("home page", () => {
     render(await Home());
 
     expect(screen.getByText("Page 1 of 2")).toBeInTheDocument();
+    expect(screen.getAllByRole("button", { name: "Previous testimonials" })).toHaveLength(2);
+    expect(screen.getAllByRole("button", { name: "Next testimonials" })).toHaveLength(2);
     expect(screen.getByText("Maya Lee")).toBeInTheDocument();
     expect(screen.queryByText("Iris Kent")).not.toBeInTheDocument();
 
-    fireEvent.click(screen.getByRole("button", { name: "Next testimonials" }));
+    fireEvent.click(screen.getAllByRole("button", { name: "Next testimonials" })[0]);
 
     expect(screen.getByText("Page 2 of 2")).toBeInTheDocument();
     expect(screen.getByText("Iris Kent")).toBeInTheDocument();
 
-    fireEvent.click(screen.getByRole("button", { name: "Next testimonials" }));
+    fireEvent.click(screen.getAllByRole("button", { name: "Previous testimonials" })[0]);
 
     expect(screen.getByText("Page 1 of 2")).toBeInTheDocument();
     expect(screen.getByText("Maya Lee")).toBeInTheDocument();

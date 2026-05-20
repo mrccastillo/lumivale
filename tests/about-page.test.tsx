@@ -22,7 +22,13 @@ describe("about page", () => {
       ),
     ).toBeInTheDocument();
     expect(screen.getAllByRole("heading", { name: "John Doe", level: 2 })).toHaveLength(3);
-    expect(screen.getAllByAltText("John Doe portrait illustration")).toHaveLength(3);
+    const founderPhotos = screen.getAllByAltText("John Doe portrait photo");
+    expect(founderPhotos).toHaveLength(3);
+    expect(
+      founderPhotos.every((photo) =>
+        photo.getAttribute("src")?.includes("about-placeholder.jpg"),
+      ),
+    ).toBe(true);
     expect(screen.queryByText("What we support")).not.toBeInTheDocument();
     expect(screen.queryByText("We keep it Simple.")).not.toBeInTheDocument();
     expect(screen.queryByText("Make it Affordable.")).not.toBeInTheDocument();

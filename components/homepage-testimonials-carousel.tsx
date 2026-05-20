@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { MdChevronLeft, MdChevronRight } from "react-icons/md";
 
 type HomepageTestimonialCardData = {
   id: string;
@@ -35,11 +36,13 @@ export function HomepageTestimonialsCarousel({
   return (
     <div className="mt-10 md:mt-12">
       <div className="grid items-center gap-4 md:grid-cols-[auto_minmax(0,1fr)_auto]">
-        <PagerButton
-          direction="previous"
-          hidden={!canPaginate}
-          onClick={goToPreviousPage}
-        />
+        {canPaginate ? (
+          <PagerButton
+            className="hidden md:grid"
+            direction="previous"
+            onClick={goToPreviousPage}
+          />
+        ) : null}
 
         <div
           data-testid="testimonials-text-grid"
@@ -53,17 +56,31 @@ export function HomepageTestimonialsCarousel({
           ))}
         </div>
 
-        <PagerButton
-          direction="next"
-          hidden={!canPaginate}
-          onClick={goToNextPage}
-        />
+        {canPaginate ? (
+          <PagerButton
+            className="hidden md:grid"
+            direction="next"
+            onClick={goToNextPage}
+          />
+        ) : null}
       </div>
 
       {canPaginate ? (
-        <p className="mt-5 text-center text-xs font-medium uppercase tracking-[0.22em] text-white/40">
-          Page {pageIndex + 1} of {pages.length}
-        </p>
+        <div className="mt-5 flex items-center justify-center gap-4">
+          <PagerButton
+            className="md:hidden"
+            direction="previous"
+            onClick={goToPreviousPage}
+          />
+          <p className="text-center text-xs font-medium uppercase tracking-[0.22em] text-white/40">
+            Page {pageIndex + 1} of {pages.length}
+          </p>
+          <PagerButton
+            className="md:hidden"
+            direction="next"
+            onClick={goToNextPage}
+          />
+        </div>
       ) : null}
     </div>
   );
@@ -99,26 +116,24 @@ function HomepageTextTestimonialCard({
 }
 
 function PagerButton({
+  className = "",
   direction,
-  hidden,
   onClick,
 }: {
+  className?: string;
   direction: "next" | "previous";
-  hidden: boolean;
   onClick: () => void;
 }) {
+  const Icon = direction === "next" ? MdChevronRight : MdChevronLeft;
+
   return (
     <button
       type="button"
       aria-label={direction === "next" ? "Next testimonials" : "Previous testimonials"}
       onClick={onClick}
-      className={`grid size-12 place-items-center rounded-full border border-white/8 bg-[#0d0d0d] text-white transition hover:border-white/18 hover:bg-[#141414] ${
-        hidden ? "pointer-events-none opacity-0" : ""
-      }`}
+      className={`grid size-12 place-items-center rounded-full border border-white/8 bg-[#0d0d0d] text-white transition hover:border-white/18 hover:bg-[#141414] ${className}`}
     >
-      <span aria-hidden="true" className="text-2xl leading-none">
-        {direction === "next" ? ">" : "<"}
-      </span>
+      <Icon aria-hidden="true" className="size-7" />
     </button>
   );
 }
