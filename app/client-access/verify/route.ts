@@ -14,19 +14,26 @@ function redirectTo(path: string, status: 307 | 303 = 307) {
   return response;
 }
 
+function invalidLink() {
+  return new Response("This pricing access link is invalid or expired. Please ask the team to send a new magic link.", {
+    status: 400,
+    headers: { "Content-Type": "text/plain; charset=utf-8", "Cache-Control": "no-store" },
+  });
+}
+
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const token = searchParams.get("token");
 
   if (!token) {
-    return redirectTo("/client-access?error=invalid-link");
+    return invalidLink();
   }
 
   try {
     const payload = readMagicLinkToken(token);
 
     if (!payload) {
-      return redirectTo("/client-access?error=invalid-link");
+      return invalidLink();
     }
 
     const response = redirectTo("/pricing");
@@ -43,6 +50,6 @@ export async function GET(request: Request) {
 
     return response;
   } catch {
-    return redirectTo("/client-access?error=invalid-link");
+    return invalidLink();
   }
 }

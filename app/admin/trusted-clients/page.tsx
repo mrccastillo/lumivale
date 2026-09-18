@@ -1,4 +1,5 @@
 import { requireAdminAccess } from "@/lib/admin-auth";
+import { SendMagicLinkButton } from "./send-magic-link-button";
 import { getMongoDb } from "@/lib/mongodb";
 import { type TrustedClient, getTrustedClients } from "@/lib/trusted-clients";
 
@@ -37,7 +38,7 @@ export default async function AdminTrustedClientsPage({
           Trusted Clients
         </h1>
         <p className="mt-3 text-sm leading-7 text-[var(--lumivale-muted)]">
-          Approve client emails that can request private pricing links.
+          Approve client emails and send private pricing links.
         </p>
       </header>
 
@@ -84,8 +85,7 @@ export default async function AdminTrustedClientsPage({
             Add Trusted Client
           </h2>
           <p className="mt-3 text-sm leading-7 text-[var(--lumivale-muted)]">
-            Approved emails can request private pricing access links from the client
-            access page.
+            Add an approved email, then send a magic link from the list.
           </p>
 
           <form action="/api/admin/trusted-clients" method="post" className="mt-6 grid gap-4">
@@ -206,6 +206,8 @@ export default async function AdminTrustedClientsPage({
                         Created {formatLongDate(client.createdAt)}
                       </p>
                     </div>
+                    <div className="flex flex-wrap gap-2">
+                    <SendMagicLinkButton email={client.email} />
                     <form action={`/api/admin/trusted-clients/${client.id}`} method="post">
                       <button
                         type="submit"
@@ -214,6 +216,7 @@ export default async function AdminTrustedClientsPage({
                         Remove
                       </button>
                     </form>
+                    </div>
                   </div>
                 </article>
               ))
