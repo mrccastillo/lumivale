@@ -1,0 +1,41 @@
+schema: spec-driven
+
+context: |
+  LumiVale is a Next.js 16 App Router application written in strict TypeScript,
+  using React 19 and Tailwind CSS 4. Server routes and pages live under app/,
+  reusable UI lives under components/, and domain/data access modules live under
+  lib/. MongoDB stores application data; Cloudinary handles media; Nodemailer
+  handles email; Tiptap powers rich-text editing; and Framer Motion provides
+  animation.
+
+  Tests use Vitest, Testing Library, and jsdom and live under tests/. Preserve
+  server/client component boundaries and follow the patterns in nearby routes,
+  repositories, components, and tests. Do not expose secrets or weaken admin and
+  client-access authorization. Treat existing docs/superpowers plans as historical
+  context; new change planning belongs in OpenSpec.
+
+rules:
+  proposal:
+    - State the user-visible outcome and why the change is needed.
+    - Include explicit non-goals when adjacent behavior could be mistaken as in scope.
+    - Call out affected routes, persistence, media, email, authentication, or migrations.
+  specs:
+    - Express observable behavior with testable scenarios, including relevant failure and authorization cases.
+    - Preserve existing behavior unless the proposal explicitly changes it.
+  design:
+    - Reference the concrete app/, components/, lib/, and tests/ areas expected to change.
+    - Document data-model, security, accessibility, and rollout decisions when applicable.
+  tasks:
+    - Order tasks so tests accompany or precede the behavior they verify.
+    - Include focused tests plus final lint, test, and build verification when applicable.
+    - Keep tasks small enough to complete and verify independently.
+
+operations:
+  apply:
+    guidance:
+      - Run focused tests while implementing, then run npm test and npm run lint before completion.
+      - Run npm run build when the change affects production rendering, routing, configuration, or server behavior.
+      - Preserve unrelated working-tree changes.
+  archive:
+    guidance:
+      - Confirm implementation tasks and applicable verification are complete before archiving.
