@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { defaultSiteContent, type SiteContent } from "@/lib/site-content-defaults";
 
 type NavSurface = "dark" | "light";
 type SiteNavbarLink = {
@@ -11,12 +12,14 @@ type SiteNavbarLink = {
 };
 
 type SiteNavbarClientProps = {
+  content?: SiteContent;
   calendlyUrl: string;
   hasTrustedAccess: boolean;
   publicLinks: readonly SiteNavbarLink[];
 };
 
 export function SiteNavbarClient({
+  content = defaultSiteContent,
   calendlyUrl,
   hasTrustedAccess,
   publicLinks,
@@ -101,10 +104,15 @@ export function SiteNavbarClient({
           onClick={closeMenu}
           className="flex items-center gap-2.5 text-base font-semibold sm:gap-3 sm:text-lg"
         >
-          <span className={`grid size-7 place-items-center rounded-full text-xs sm:size-8 sm:text-sm ${logoChipClass}`}>
-            L
-          </span>
-          Lumivale
+          {content.logoUrl ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={content.logoUrl} alt="" className="size-7 shrink-0 object-contain sm:size-8" />
+          ) : (
+            <span aria-hidden="true" className={`grid size-7 place-items-center rounded-full text-xs sm:size-8 sm:text-sm ${logoChipClass}`}>
+              {content.logoText}
+            </span>
+          )}
+          {content.brandName}
         </Link>
 
         <nav aria-label="Primary" className="hidden md:block">

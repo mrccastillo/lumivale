@@ -3,8 +3,10 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
+import { defaultSiteContent, type SiteContent } from "@/lib/site-content-defaults";
 
 const adminLinks = [
+  { href: "/admin/site-content", icon: ServicesIcon, label: "Site Content" },
   { href: "/admin/blogs", icon: BlogsIcon, label: "Blogs" },
   { href: "/admin/services", icon: ServicesIcon, label: "Services" },
   { href: "/admin/case-studies", icon: CaseStudiesIcon, label: "Case Studies" },
@@ -19,6 +21,7 @@ export const ADMIN_NAV_EXPANDED_OFFSET_CLASS = "md:pl-[17.5rem]";
 export const ADMIN_NAV_COLLAPSED_OFFSET_CLASS = "md:pl-[5.5rem]";
 
 type AdminNavProps = {
+  content?: SiteContent;
   isDesktopExpanded: boolean;
   onDesktopToggle: () => void;
 };
@@ -27,7 +30,7 @@ type IconProps = {
   className?: string;
 };
 
-export function AdminNav({ isDesktopExpanded, onDesktopToggle }: AdminNavProps) {
+export function AdminNav({ content = defaultSiteContent, isDesktopExpanded, onDesktopToggle }: AdminNavProps) {
   const pathname = usePathname() || "/admin/blogs";
   const [isMobileOpen, setIsMobileOpen] = useState(false);
 
@@ -50,13 +53,18 @@ export function AdminNav({ isDesktopExpanded, onDesktopToggle }: AdminNavProps) 
           >
             <span
               aria-hidden="true"
-              className="grid size-9 place-items-center rounded-lg bg-[var(--lumivale-ink)] text-[var(--lumivale-accent-soft)]"
+              className="grid size-9 shrink-0 place-items-center rounded-lg bg-[var(--lumivale-ink)] text-[var(--lumivale-accent-soft)]"
             >
-              <LumivaleMarkIcon className="size-4" />
+              {content.logoUrl ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={content.logoUrl} alt="" className="size-9 rounded-lg object-contain" />
+              ) : (
+                <span className="text-sm">{content.logoText}</span>
+              )}
             </span>
             <span className="truncate">
               <span className="block text-xs font-semibold uppercase tracking-[0.16em] text-[var(--lumivale-accent)]">
-                Lumivale
+                {content.brandName}
               </span>
               <span className="block text-sm">Admin Portal</span>
             </span>
@@ -178,14 +186,6 @@ export function AdminNav({ isDesktopExpanded, onDesktopToggle }: AdminNavProps) 
         </div>
       ) : null}
     </nav>
-  );
-}
-
-function LumivaleMarkIcon({ className }: IconProps) {
-  return (
-    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.8" className={className}>
-      <path d="M4 3v10h8" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
   );
 }
 

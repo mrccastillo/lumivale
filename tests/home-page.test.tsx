@@ -2,6 +2,12 @@ import { fireEvent, render, screen, within } from "@testing-library/react";
 import { describe, expect, test, vi } from "vitest";
 
 import Home from "@/app/page";
+import { defaultSiteContent } from "@/lib/site-content-defaults";
+import { getSiteContentForSite } from "@/lib/site-content";
+
+vi.mock("@/lib/site-content", () => ({
+  getSiteContentForSite: vi.fn(async () => (await import("@/lib/site-content-defaults")).defaultSiteContent),
+}));
 import { getAllCaseStudies } from "@/lib/case-studies";
 import { getMongoDb } from "@/lib/mongodb";
 import { getPublishedFaqs } from "@/lib/faqs";
@@ -71,6 +77,19 @@ vi.mock("@/lib/hero-clients", () => ({
 }));
 
 describe("home page", () => {
+  test("renders saved hero copy and destination", async () => {
+    vi.mocked(getSiteContentForSite).mockResolvedValueOnce({
+      ...defaultSiteContent, heroHeading: "Build your next chapter", heroHighlight: "with us",
+      heroDescription: "Custom description.", heroPrompt: "Let us help", heroButtonText: "Start here",
+      heroButtonUrl: "https://example.com/start",
+    });
+    render(await Home());
+    expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("Build your next chapter with us");
+    expect(screen.getByText("Custom description.")).toBeInTheDocument();
+    expect(screen.getByText("Let us help")).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Start here" })).toHaveAttribute("href", "https://example.com/start");
+  });
+
   test("renders the landing sections in order", async () => {
     const { container } = render(await Home());
 

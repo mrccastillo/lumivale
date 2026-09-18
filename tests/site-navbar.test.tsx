@@ -3,6 +3,10 @@ import { afterEach, describe, expect, test, vi } from "vitest";
 
 import { CALENDLY_URL } from "@/lib/site-config";
 
+vi.mock("@/lib/site-content", () => ({
+  getSiteContentForSite: vi.fn(async () => (await import("@/lib/site-content-defaults")).defaultSiteContent),
+}));
+
 const hasTrustedClientAccessMock = vi.hoisted(() => vi.fn());
 const pathnameMock = vi.hoisted(() => vi.fn());
 

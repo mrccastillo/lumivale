@@ -3,6 +3,7 @@
 import type { ReactNode } from "react";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
+import { defaultSiteContent, type SiteContent } from "@/lib/site-content-defaults";
 
 import {
   ADMIN_NAV_COLLAPSED_OFFSET_CLASS,
@@ -11,6 +12,7 @@ import {
 } from "@/app/admin/admin-nav";
 
 const pageTitles: Record<string, string> = {
+  "/admin/site-content": "Site Content",
   "/admin/blogs": "Blogs",
   "/admin/services": "Services",
   "/admin/case-studies": "Case Studies",
@@ -21,7 +23,7 @@ const pageTitles: Record<string, string> = {
   "/admin/trusted-clients": "Trusted Clients",
 };
 
-export function AdminWorkspace({ children }: { children: ReactNode }) {
+export function AdminWorkspace({ children, content = defaultSiteContent }: { children: ReactNode; content?: SiteContent }) {
   const pathname = usePathname() || "/admin/blogs";
   const [isDesktopExpanded, setIsDesktopExpanded] = useState(true);
 
@@ -40,6 +42,7 @@ export function AdminWorkspace({ children }: { children: ReactNode }) {
       className={`min-h-screen bg-[#f7f8fb] text-[var(--lumivale-ink)] ${shellOffsetClass}`}
     >
       <AdminNav
+        content={content}
         isDesktopExpanded={isDesktopExpanded}
         onDesktopToggle={() => setIsDesktopExpanded((expanded) => !expanded)}
       />
@@ -50,7 +53,7 @@ export function AdminWorkspace({ children }: { children: ReactNode }) {
         <div className="flex items-center justify-between gap-4">
           <div>
             <p className="text-base font-semibold text-[var(--lumivale-ink)]">{title}</p>
-            <p className="text-xs text-[var(--lumivale-muted)]">Lumivale staff portal</p>
+            <p className="text-xs text-[var(--lumivale-muted)]">{content.brandName} staff portal</p>
           </div>
           <div className="flex items-center gap-2 rounded-full border border-[var(--lumivale-line)] bg-white px-3 py-2 text-sm font-semibold text-[var(--lumivale-ink)]">
             <span className="grid size-8 place-items-center rounded-full bg-[#31586a] text-white">

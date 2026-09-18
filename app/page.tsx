@@ -15,6 +15,7 @@ import { defaultHeroClients, getHeroClients, type HeroClientInput } from "@/lib/
 import { getMongoDb } from "@/lib/mongodb";
 import { getPublishedServicesForSite } from "@/lib/services";
 import { CALENDLY_URL } from "@/lib/site-config";
+import { getSiteContentForSite } from "@/lib/site-content";
 import { getPublishedTestimonials, type Testimonial } from "@/lib/testimonials";
 
 const metrics = [
@@ -207,11 +208,12 @@ function ServiceIcon({ slug, title }: { slug: string; title: string }) {
 
 export default async function Home() {
   const caseStudies = getAllCaseStudies();
-  const [services, testimonials, faqs, heroClients] = await Promise.all([
+  const [services, testimonials, faqs, heroClients, content] = await Promise.all([
     getPublishedServicesForSite(),
     getHomeTestimonials(),
     getHomeFaqs(),
     getHomeHeroClients(),
+    getSiteContentForSite(),
   ]);
   const textTestimonials = getHomepageTextTestimonials(testimonials);
   const showPlaceholderTestimonials = !testimonials.some(
@@ -232,30 +234,29 @@ export default async function Home() {
             <MotionGroup className="flex w-full flex-col items-center" delay={0.08} stagger={0.16}>
               <MotionItem>
                 <h1 className="max-w-6xl text-[1.9rem] font-medium leading-[1.06] text-white sm:text-[3.5rem] lg:text-[3.7rem]">
-                  Light up your growth with{" "}
-                  <span className="text-[var(--lumivale-accent-soft)]">simple execution systems</span>
+                  {content.heroHeading}{" "}
+                  <span className="text-[var(--lumivale-accent-soft)]">{content.heroHighlight}</span>
                 </h1>
               </MotionItem>
 
               <MotionItem>
                 <p className="mt-7 max-w-3xl text-[0.78rem] font-normal leading-6 text-[#c7e7d7] sm:mt-9 sm:text-[0.88rem] sm:leading-[2.25rem]">
-                  Lumivale helps early-stage teams find the channels that actually bring
-                  customers, then turns those channels into clear, repeatable growth actions.
+                  {content.heroDescription}
                 </p>
               </MotionItem>
 
               <MotionItem>
                 <div data-testid="hero-cta-card" className="mt-10 flex w-full max-w-[22rem] flex-row gap-2 rounded-full border border-white/14 bg-white/12 p-1.5 shadow-[0_24px_80px_rgba(0,0,0,0.28)] sm:mt-12 sm:max-w-xl sm:gap-3 sm:p-2">
                   <div className="flex flex-1 items-center px-4 py-2.5 text-left text-xs text-[#add7c2] sm:px-5 sm:py-3 sm:text-sm">
-                    Ready to grow?
+                    {content.heroPrompt}
                   </div>
                   <a
-                    href={CALENDLY_URL}
+                    href={content.heroButtonUrl}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="shrink-0 whitespace-nowrap rounded-full bg-[var(--lumivale-accent)] px-5 py-2.5 text-xs font-semibold text-[#010807] shadow-[0_10px_28px_rgba(20,201,131,0.34)] transition hover:bg-[var(--lumivale-accent-soft)] sm:px-7 sm:py-3 sm:text-sm"
                   >
-                    Book a call
+                    {content.heroButtonText}
                   </a>
                 </div>
               </MotionItem>
