@@ -57,3 +57,12 @@ test("unauthorized platform edits cannot upload or save", async () => {
   await expect(create(request(data()))).rejects.toThrow("unauthorized");
   expect(mocks.upload).not.toHaveBeenCalled(); expect(mocks.create).not.toHaveBeenCalled();
 });
+
+
+test("invalid FAQs prevent example uploads and persistence", async () => {
+  const form = data();
+  form.set("serviceFaqs", JSON.stringify([{ id: "q", question: " ", answer: "Answer" }]));
+  const response = await update(request(form), context);
+  expect(response.headers.get("location")).toContain("requires+a+question+and+answer");
+  expect(mocks.upload).not.toHaveBeenCalled(); expect(mocks.update).not.toHaveBeenCalled();
+});

@@ -89,6 +89,9 @@ describe("admin service form uploads", () => {
     });
     fireEvent.click(within(dialog).getByRole("button", { name: "Add example" }));
 
+    fireEvent.click(screen.getByRole("button", { name: "Add FAQ" }));
+    fireEvent.change(screen.getByLabelText("Question"), { target: { value: "How does this work?" } });
+    fireEvent.change(screen.getByLabelText("Answer"), { target: { value: "We show examples." } });
     const form = screen.getByRole("button", { name: "Create service" }).closest("form");
 
     if (!form) {
@@ -104,5 +107,6 @@ describe("admin service form uploads", () => {
     const id = JSON.parse(String(submittedFormData.get("exampleManifest"))).examples[0].id;
     expect(submittedFormData.get(`exampleCardImageFile-${id}`)).toBe(photo);
     expect(submittedFormData.get(`exampleCardVideoFile-${id}`)).toBe(video);
+    expect(JSON.parse(String(submittedFormData.get("serviceFaqs")))[0].question).toBe("How does this work?");
   });
 });

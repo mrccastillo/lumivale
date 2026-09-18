@@ -266,3 +266,27 @@ test("persists platform IDs through rename/reorder and isolates services", async
   await expect(updateService(db, first.slug, { privateContent: { ...next, examplePlatforms: [] } })).rejects.toThrow("belong to a platform");
   expect((await getAdminServiceBySlug(db, first.slug))?.privateContent).toEqual(saved?.privateContent);
 });
+
+
+test("service FAQs persist independently, preserve omitted updates, and clear explicitly", async () => {
+  const db = createFakeDb();
+  const form = buildFormData();
+  form.set("serviceFaqs", JSON.stringify([{ id: "q2", question: " Second? ", answer: " Line one\nLine two " }, { id: "q1", question: "First?", answer: "Answer" }]));
+  const created = await createService(db, parseServiceFormData(form));
+  expect(created.faqs).toEqual([{ id: "q2", question: "Second?", answer: "Line one\nLine two" }, { id: "q1", question: "First?", answer: "Answer" }]);
+  const other = await createService(db, parseServiceFormData(buildFormData({ title: "Other service" })));
+  expect(other.faqs).toEqual([]);
+  await updateService(db, created.slug, parseServiceFormData(buildFormData()));
+  expect((await getAdminServiceBySlug(db, created.slug))?.faqs).toEqual(created.faqs);
+  await expect(updateService(db, created.slug, { faqs: [{ id: "bad", question: " ", answer: "Answer" }] })).rejects.toThrow("requires a question and answer");
+  expect((await getAdminServiceBySlug(db, created.slug))?.faqs).toEqual(created.faqs);
+  await updateService(db, created.slug, { faqs: [] });
+  expect((await getAdminServiceBySlug(db, created.slug))?.faqs).toEqual([]);
+  expect((await getAdminServiceBySlug(db, other.slug))?.faqs).toEqual([]);
+  expect(getDefaultServices().every(service => service.faqs?.length === 0)).toBe(true);
+});
+
+test.each(["{", "null", "{}", '[{"id":"x","question":"Q"}]', '[{"id":"bad/id","question":"Q","answer":"A"}]', '[{"id":"x","question":"Q","answer":"A"},{"id":"x","question":"Q2","answer":"A"}]'])("rejects invalid FAQ payload %s", (payload) => {
+  const form = buildFormData(); form.set("serviceFaqs", payload);
+  expect(() => parseServiceFormData(form)).toThrow(/FAQ/);
+});

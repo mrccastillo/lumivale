@@ -3,6 +3,8 @@
 import { type FormEvent, type ReactNode, useEffect, useState } from "react";
 
 import { normalizeExamplePlatforms, type ExamplePlatform } from "@/lib/service-example-platforms";
+import { ServiceFaqEditor } from "@/app/admin/services/service-faq-editor";
+import type { ServiceFaq } from "@/lib/service-faqs";
 import type { Service, ServiceExampleCard } from "@/lib/services";
 
 const fieldClassName =
@@ -63,10 +65,14 @@ export function ServiceForm({
   const [examples, setExamples] = useState<ExampleDraft[]>(
     (initialContent?.exampleCards ?? []).map(toExampleDraft),
   );
+  const [faqs, setFaqs] = useState<ServiceFaq[]>(service?.faqs ?? []);
+  const [faqValidation, setFaqValidation] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    setFaqValidation(true);
+    if (faqs.some((faq) => !faq.question.trim() || !faq.answer.trim())) return;
     setIsSubmitting(true);
 
     const formData = new FormData(event.currentTarget);
@@ -99,6 +105,7 @@ export function ServiceForm({
       className="grid gap-6 rounded-[24px] border border-[var(--lumivale-line)] bg-white p-6 shadow-[0_20px_60px_rgba(42,47,82,0.06)] sm:p-7"
     >
       <input type="hidden" name="action" value="save" />
+      <input type="hidden" name="serviceFaqs" value={JSON.stringify(faqs)} />
       <input type="hidden" name="exampleManifest" value={JSON.stringify({ platforms, examples: examples.map(({ id, platformId, title, tag, summary, exampleType, imageAlt, imageUrl, previewUrl, videoUrl, videoDescription }) => ({ id, platformId, title, tag, summary, exampleType, imageAlt, imageUrl, previewUrl, videoUrl, videoDescription })) })} />
 
       {errorMessage ? (
@@ -156,6 +163,7 @@ export function ServiceForm({
         rows={4}
       />
 
+      <ServiceFaqEditor faqs={faqs} onChange={setFaqs} showValidation={faqValidation} />
 
       <section className="grid gap-5 rounded-[20px] border border-[var(--lumivale-admin-border)] bg-[var(--lumivale-admin-surface)] p-5">
         <div>

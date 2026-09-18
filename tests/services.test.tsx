@@ -56,9 +56,12 @@ describe("services data and detail pages", () => {
     expect(
       screen.getByRole("heading", { level: 1, name: service.title }),
     ).toBeInTheDocument();
-    expect(headerSection).toHaveClass("bg-white", "pt-32", "pb-[68px]");
-    expect(headerSection).not.toHaveAttribute("data-nav-surface", "dark");
-    expect(headerSection?.className).not.toContain("linear-gradient");
+    expect(headerSection).toHaveClass("pt-24", "pb-16");
+    expect(headerSection).toHaveAttribute("data-nav-surface", "dark");
+    expect(headerSection?.className).toContain("linear-gradient");
+    expect(screen.getByRole("heading", { name: "FAQS" })).toBeInTheDocument();
+    expect(screen.getByText("No FAQs available yet.")).toBeInTheDocument();
+    expect(screen.queryByText("Highlights")).not.toBeInTheDocument();
     expect(screen.getByText(service.description)).toBeInTheDocument();
     expect(screen.queryByText("EXAMPLES")).not.toBeInTheDocument();
     service.privateContent.pricingLines.forEach((line) => {

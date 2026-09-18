@@ -1,5 +1,6 @@
 import { ObjectId, type Filter } from "mongodb";
 
+import { normalizeServiceFaqs, parseServiceFaqs, type ServiceFaq } from "@/lib/service-faqs";
 import { getMongoDb } from "@/lib/mongodb";
 import { normalizeExamplePlatforms, parseExampleManifest, type ExamplePlatform } from "@/lib/service-example-platforms";
 
@@ -36,6 +37,7 @@ export type PrivateServiceContent = {
 export type ServiceStatus = "draft" | "published";
 
 export type Service = {
+  faqs?: ServiceFaq[];
   id?: string;
   slug: string;
   title: string;
@@ -51,6 +53,7 @@ export type Service = {
 };
 
 export type ServiceInput = {
+  faqs?: ServiceFaq[];
   title: string;
   summary: string;
   highlights: string[];
@@ -110,6 +113,7 @@ function withDefaultMeta(
 ): Service {
   return {
     ...service,
+    faqs: normalizeServiceFaqs(service.faqs ?? []),
     privateContent: normalizeExamplePlatforms(service.privateContent),
     createdAt: DEFAULT_CREATED_AT,
     isDefault: true,
@@ -431,6 +435,7 @@ function collection(db: ServiceDb) {
 function toService(document: ServiceDocument): Service {
   return {
     ...document,
+    faqs: normalizeServiceFaqs(document.faqs ?? []),
     privateContent: normalizeExamplePlatforms(document.privateContent),
     id: String(document._id),
     isDefault: defaultServices.some((service) => service.slug === document.slug),
@@ -470,6 +475,7 @@ function mergeWithDefaults(documents: ServiceDocument[]) {
 function normalizeInput(input: ServiceInput): ServiceInput {
   const content = normalizeExamplePlatforms(input.privateContent);
   return {
+    ...(input.faqs === undefined ? {} : { faqs: normalizeServiceFaqs(input.faqs) }),
     title: input.title.trim(),
     summary: input.summary.trim(),
     description: input.description.trim(),
@@ -655,6 +661,7 @@ export function parseServiceFormData(formData: FormData): ServiceInput {
   });
   const uploadKeys = new Map(privateContent.exampleCards.map((card) => [card.id, card.uploadKey]));
   const input = normalizeInput({
+    ...(formData.has("serviceFaqs") ? { faqs: parseServiceFaqs(formData.get("serviceFaqs")) } : {}),
     title: String(formData.get("title") ?? ""),
     summary: String(formData.get("summary") ?? ""),
     description: String(formData.get("description") ?? ""),
@@ -820,7 +827,7 @@ export async function getPublishedServiceBySlugForSite(slug: string) {
 }
 
 export async function createService(db: ServiceDb, input: ServiceInput) {
-  const normalized = normalizeInput(input);
+  const normalized = normalizeInput({ ...input, faqs: input.faqs ?? [] });
 
   validateInput(normalized);
 
@@ -847,6 +854,7 @@ export async function updateService(
   }
 
   const next = normalizeInput({
+    faqs: updates.faqs === undefined ? current.faqs ?? [] : updates.faqs,
     title: updates.title ?? current.title,
     summary: updates.summary ?? current.summary,
     description: updates.description ?? current.description,
