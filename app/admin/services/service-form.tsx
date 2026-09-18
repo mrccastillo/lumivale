@@ -2,12 +2,15 @@
 
 import { type FormEvent, type ReactNode, useEffect, useState } from "react";
 
+import { normalizeExamplePlatforms, type ExamplePlatform } from "@/lib/service-example-platforms";
 import type { Service, ServiceExampleCard } from "@/lib/services";
 
 const fieldClassName =
   "min-h-12 w-full rounded-[18px] border border-[var(--lumivale-line)] bg-white px-4 py-3 text-sm text-[var(--lumivale-ink)] outline-none transition focus:border-[var(--lumivale-accent)]";
 
 type ExampleDraft = {
+  id: string;
+  platformId: string;
   previewMode: "automatic" | "cover";
   exampleType: "link" | "photo";
   imageAlt: string;
@@ -25,6 +28,8 @@ type ExampleDraft = {
 };
 
 const emptyExample: ExampleDraft = {
+  id: "",
+  platformId: "",
   previewMode: "automatic",
   exampleType: "link",
   imageAlt: "",
@@ -53,8 +58,10 @@ export function ServiceForm({
   submitLabel?: string;
 }) {
   const action = service ? `/api/admin/services/${service.slug}` : "/api/admin/services";
+  const initialContent = service ? normalizeExamplePlatforms(service.privateContent) : null;
+  const [platforms, setPlatforms] = useState<ExamplePlatform[]>(initialContent?.examplePlatforms ?? []);
   const [examples, setExamples] = useState<ExampleDraft[]>(
-    (service?.privateContent.exampleCards ?? []).map(toExampleDraft),
+    (initialContent?.exampleCards ?? []).map(toExampleDraft),
   );
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -64,13 +71,14 @@ export function ServiceForm({
 
     const formData = new FormData(event.currentTarget);
 
-    examples.forEach((example, index) => {
+    examples.forEach((example) => {
+      formData.set(`exampleCardPreviewMode-${example.id}`, example.previewMode);
       if (example.imageFile) {
-        formData.set(`exampleCardImageFile-${index}`, example.imageFile);
+        formData.set(`exampleCardImageFile-${example.id}`, example.imageFile);
       }
 
       if (example.videoFile) {
-        formData.set(`exampleCardVideoFile-${index}`, example.videoFile);
+        formData.set(`exampleCardVideoFile-${example.id}`, example.videoFile);
       }
     });
 
@@ -91,6 +99,7 @@ export function ServiceForm({
       className="grid gap-6 rounded-[24px] border border-[var(--lumivale-line)] bg-white p-6 shadow-[0_20px_60px_rgba(42,47,82,0.06)] sm:p-7"
     >
       <input type="hidden" name="action" value="save" />
+      <input type="hidden" name="exampleManifest" value={JSON.stringify({ platforms, examples: examples.map(({ id, platformId, title, tag, summary, exampleType, imageAlt, imageUrl, previewUrl, videoUrl, videoDescription }) => ({ id, platformId, title, tag, summary, exampleType, imageAlt, imageUrl, previewUrl, videoUrl, videoDescription })) })} />
 
       {errorMessage ? (
         <div
@@ -147,6 +156,7 @@ export function ServiceForm({
         rows={4}
       />
 
+
       <section className="grid gap-5 rounded-[20px] border border-[var(--lumivale-admin-border)] bg-[var(--lumivale-admin-surface)] p-5">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[var(--lumivale-panel)]">
@@ -164,12 +174,7 @@ export function ServiceForm({
             required
             defaultValue={service?.privateContent.pricePreview}
           />
-          <Field
-            label="Example platform"
-            name="examplePlatform"
-            required
-            defaultValue={service?.privateContent.examplePlatform}
-          />
+
         </div>
 
         <TextArea
@@ -191,7 +196,7 @@ export function ServiceForm({
           rows={4}
         />
 
-        <ExamplesManager examples={examples} onChange={setExamples} />
+        <ExamplesManager examples={examples} onChange={setExamples} platforms={platforms} onPlatformsChange={setPlatforms} />
       </section>
 
       <div className="flex flex-wrap gap-3">
@@ -218,7 +223,11 @@ export function ServiceForm({
 function ExamplesManager({
   examples,
   onChange,
+  platforms,
+  onPlatformsChange,
 }: {
+  platforms: ExamplePlatform[];
+  onPlatformsChange: (platforms: ExamplePlatform[]) => void;
   examples: ExampleDraft[];
   onChange: (examples: ExampleDraft[]) => void;
 }) {
@@ -226,12 +235,31 @@ function ExamplesManager({
   const [step, setStep] = useState<1 | 2>(1);
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [draft, setDraft] = useState<ExampleDraft>(emptyExample);
-
   const [draftError, setDraftError] = useState("");
 
-  function openAddModal() {
+  const [platformName, setPlatformName] = useState("");
+  const [platformError, setPlatformError] = useState("");
+
+  function savePlatform(id?: string, value = platformName) {
+    const name = value.trim();
+    if (!name || name.length > 60 || platforms.some((item) => item.id !== id && item.name.toLowerCase() === name.toLowerCase())) {
+      setPlatformError("Use a unique platform name with 1 to 60 characters.");
+      return;
+    }
+    onPlatformsChange(id ? platforms.map((item) => item.id === id ? { ...item, name } : item) : [...platforms, { id: crypto.randomUUID(), name }]);
+    setPlatformName("");
+    setPlatformError("");
+  }
+
+  function movePlatform(index: number, offset: number) {
+    const next = [...platforms];
+    [next[index], next[index + offset]] = [next[index + offset], next[index]];
+    onPlatformsChange(next);
+  }
+
+  function openAddModal(platformId: string) {
     setDraftError("");
-    setDraft(emptyExample);
+    setDraft({ ...emptyExample, id: crypto.randomUUID(), platformId });
     setEditingIndex(null);
     setStep(1);
     setIsModalOpen(true);
@@ -288,53 +316,32 @@ function ExamplesManager({
             Add link previews or photo examples for the private pricing service page.
           </p>
         </div>
-        <button
-          type="button"
-          onClick={openAddModal}
-          className="inline-flex min-h-11 items-center justify-center rounded-xl bg-[var(--lumivale-panel)] px-5 text-sm font-semibold text-white transition hover:bg-[var(--lumivale-admin-panel-soft)]"
-        >
-          Add Example
-        </button>
       </div>
-
-      <div className="mt-4 grid gap-3">
-        {examples.length ? (
-          examples.map((example, index) => (
+      <div className="mt-4 flex flex-wrap items-end gap-3">
+        <label className="min-w-0 flex-1 text-sm font-semibold">New platform
+          <input className={`${fieldClassName} mt-2`} value={platformName} maxLength={60} onChange={(event) => setPlatformName(event.target.value)} />
+        </label>
+        <button type="button" className="rounded-xl bg-[var(--lumivale-panel)] px-4 py-3 text-sm font-semibold text-white" onClick={() => savePlatform()}>Add platform</button>
+      </div>
+      {platformError ? <p role="alert" className="mt-2 text-sm text-red-700">{platformError}</p> : null}
+      {!platforms.length ? <p className="mt-4 text-sm">Add a platform to start adding examples.</p> : null}
+      <div className="mt-4 grid gap-5">
+        {platforms.map((platform, platformIndex) => {
+          const cards = examples.map((example, index) => ({ example, index })).filter(({ example }) => example.platformId === platform.id);
+          return <section key={platform.id} aria-label={`${platform.name} examples`} className="min-w-0 rounded-2xl border border-[var(--lumivale-admin-border)] p-4">
+            <PlatformName platform={platform} onSave={(name) => savePlatform(platform.id, name)} />
+            <div className="my-4 flex flex-wrap gap-2 text-sm">
+              <button type="button" disabled={platformIndex === 0} className="rounded-lg border px-3 py-2 disabled:opacity-40" onClick={() => movePlatform(platformIndex, -1)}>Move up</button>
+              <button type="button" disabled={platformIndex === platforms.length - 1} className="rounded-lg border px-3 py-2 disabled:opacity-40" onClick={() => movePlatform(platformIndex, 1)}>Move down</button>
+              <button type="button" disabled={cards.length > 0} title={cards.length ? "Move or remove the examples in this platform first." : undefined} className="rounded-lg border px-3 py-2 disabled:opacity-40" onClick={() => onPlatformsChange(platforms.filter((item) => item.id !== platform.id))}>Remove platform</button>
+              <button type="button" className="rounded-lg bg-[var(--lumivale-panel)] px-4 py-2 font-semibold text-white" onClick={() => openAddModal(platform.id)}>Add Example</button>
+            </div>
+            {cards.length > 0 ? <p className="mb-3 text-xs text-[var(--lumivale-muted)]">Move or remove all examples before removing this platform.</p> : <p className="text-sm text-[var(--lumivale-muted)]">No examples yet. This platform is hidden from visitors.</p>}
+            <div className="grid gap-3">{cards.map(({ example, index }) => (
             <article
-              key={`${example.title}-${index}`}
+              key={example.id}
               className="rounded-[16px] border border-[var(--lumivale-admin-border)] bg-white p-4"
             >
-              <input type="hidden" name={`exampleCardType-${index}`} value={example.exampleType} />
-              <input type="hidden" name={`exampleCardPreviewMode-${index}`} value={example.previewMode} />
-              <input type="hidden" name={`exampleCardTitle-${index}`} value={example.title} />
-              <input type="hidden" name={`exampleCardTag-${index}`} value={example.tag} />
-              <input type="hidden" name={`exampleCardSummary-${index}`} value={example.summary} />
-              <input
-                type="hidden"
-                name={`exampleCardPreviewUrl-${index}`}
-                value={example.previewUrl}
-              />
-              <input
-                type="hidden"
-                name={`exampleCardImageAlt-${index}`}
-                value={example.imageAlt}
-              />
-              <input
-                type="hidden"
-                name={`exampleCardImageUrl-${index}`}
-                value={example.imageUrl}
-              />
-              <input
-                type="hidden"
-                name={`exampleCardVideoDescription-${index}`}
-                value={example.videoDescription}
-              />
-              <input
-                type="hidden"
-                name={`exampleCardVideoUrl-${index}`}
-                value={example.videoUrl}
-              />
-
               <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                 <div>
                   <div className="flex flex-wrap items-center gap-2">
@@ -372,12 +379,9 @@ function ExamplesManager({
                 </div>
               </div>
             </article>
-          ))
-        ) : (
-          <div className="rounded-[16px] border border-dashed border-[var(--lumivale-admin-border)] bg-white p-5 text-sm text-[var(--lumivale-muted)]">
-            No examples yet.
-          </div>
-        )}
+            ))}</div>
+          </section>;
+        })}
       </div>
 
       {isModalOpen ? (
@@ -430,7 +434,7 @@ function ExamplesManager({
                 <button
                   type="button"
                   onClick={() => {
-                    setDraft({ ...draft, exampleType: "link", imageFile: null });
+                    setDraft({ ...draft, exampleType: "link" });
                     setStep(2);
                   }}
                   className="rounded-[18px] border border-[var(--lumivale-admin-border)] p-5 text-left transition hover:border-[var(--lumivale-panel)]"
@@ -445,6 +449,11 @@ function ExamplesManager({
               </div>
             ) : (
               <div className="mt-6 grid gap-5">
+                <label className="text-sm font-semibold">Platform
+                  <select aria-label="Platform" className={`${fieldClassName} mt-2`} value={draft.platformId} onChange={(event) => setDraft({ ...draft, platformId: event.target.value })}>
+                    {platforms.map((platform) => <option key={platform.id} value={platform.id}>{platform.name}</option>)}
+                  </select>
+                </label>
                 <div className="grid gap-4 sm:grid-cols-[minmax(0,1fr)_180px]">
                   <ModalField
                     label="Card title"
@@ -597,8 +606,20 @@ function ExamplesManager({
   );
 }
 
+function PlatformName({ platform, onSave }: { platform: ExamplePlatform; onSave: (name: string) => void }) {
+  const [name, setName] = useState(platform.name);
+  return <div className="flex flex-wrap items-end gap-3">
+    <label className="min-w-0 flex-1 text-sm font-semibold">Platform name
+      <input className={`${fieldClassName} mt-2`} maxLength={60} value={name} onChange={(event) => setName(event.target.value)} />
+    </label>
+    <button type="button" className="rounded-lg border px-3 py-3 text-sm font-semibold" onClick={() => onSave(name)}>Rename platform</button>
+  </div>;
+}
+
 function toExampleDraft(card: ServiceExampleCard): ExampleDraft {
   return {
+    id: card.id!,
+    platformId: card.platformId!,
     previewMode: card.imageUrl ? "cover" : "automatic",
     exampleType: card.exampleType ?? (card.imageUrl ? "photo" : "link"),
     imageAlt: card.imageAlt ?? "",

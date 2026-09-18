@@ -1,6 +1,7 @@
 import { ObjectId, type Filter } from "mongodb";
 
 import { getMongoDb } from "@/lib/mongodb";
+import { normalizeExamplePlatforms, parseExampleManifest, type ExamplePlatform } from "@/lib/service-example-platforms";
 
 export type ServicePricingLine = {
   label: string;
@@ -8,6 +9,10 @@ export type ServicePricingLine = {
 };
 
 export type ServiceExampleCard = {
+  id?: string;
+  platformId?: string;
+  /** Form-only file key; removed by normalization before persistence. */
+  uploadKey?: string;
   title: string;
   summary: string;
   tag: string;
@@ -20,6 +25,7 @@ export type ServiceExampleCard = {
 };
 
 export type PrivateServiceContent = {
+  examplePlatforms?: ExamplePlatform[];
   exampleCards: ServiceExampleCard[];
   examplePlatform: string;
   heroDescription: string;
@@ -104,6 +110,7 @@ function withDefaultMeta(
 ): Service {
   return {
     ...service,
+    privateContent: normalizeExamplePlatforms(service.privateContent),
     createdAt: DEFAULT_CREATED_AT,
     isDefault: true,
     sortOrder,
@@ -424,6 +431,7 @@ function collection(db: ServiceDb) {
 function toService(document: ServiceDocument): Service {
   return {
     ...document,
+    privateContent: normalizeExamplePlatforms(document.privateContent),
     id: String(document._id),
     isDefault: defaultServices.some((service) => service.slug === document.slug),
   };
@@ -440,7 +448,7 @@ function sortServices(services: Service[]) {
 }
 
 function mergeWithDefaults(documents: ServiceDocument[]) {
-  const merged = new Map(defaultServices.map((service) => [service.slug, service]));
+  const merged = new Map<string, Service>(getDefaultServices().map((service) => [service.slug, service]));
 
   documents.map(toService).forEach((service) => {
     const defaultService = merged.get(service.slug);
@@ -460,6 +468,7 @@ function mergeWithDefaults(documents: ServiceDocument[]) {
 }
 
 function normalizeInput(input: ServiceInput): ServiceInput {
+  const content = normalizeExamplePlatforms(input.privateContent);
   return {
     title: input.title.trim(),
     summary: input.summary.trim(),
@@ -468,7 +477,8 @@ function normalizeInput(input: ServiceInput): ServiceInput {
     sortOrder: Number.isFinite(input.sortOrder) ? input.sortOrder : 0,
     status: input.status === "published" ? "published" : "draft",
     privateContent: {
-      examplePlatform: input.privateContent.examplePlatform.trim(),
+      examplePlatforms: content.examplePlatforms,
+      examplePlatform: content.examplePlatforms.map((platform) => platform.name).join(" | "),
       heroDescription: input.privateContent.heroDescription.trim(),
       pricePreview: input.privateContent.pricePreview.trim(),
       pricingLines: input.privateContent.pricingLines
@@ -477,8 +487,10 @@ function normalizeInput(input: ServiceInput): ServiceInput {
           value: line.value.trim(),
         }))
         .filter((line) => line.label || line.value),
-      exampleCards: input.privateContent.exampleCards
+      exampleCards: content.exampleCards
         .map((card) => ({
+          id: card.id,
+          platformId: card.platformId,
           title: card.title.trim(),
           summary: card.summary.trim(),
           tag: card.tag.trim(),
@@ -535,10 +547,9 @@ function validateInput(input: ServiceInput) {
 
   if (
     !input.privateContent.heroDescription ||
-    !input.privateContent.pricePreview ||
-    !input.privateContent.examplePlatform
+    !input.privateContent.pricePreview
   ) {
-    throw new Error("Private pricing summary, price preview, and platform are required.");
+    throw new Error("Private pricing summary and price preview are required.");
   }
 
   if (
@@ -631,28 +642,41 @@ export function parseServiceFormData(formData: FormData): ServiceInput {
     2,
     "Pricing lines must use: Label | Value.",
   ).map(([label, value]) => ({ label, value }));
-  const exampleCards = parseExampleCardFormData(formData);
+  const manifest = formData.has("exampleManifest") ? parseExampleManifest(formData.get("exampleManifest")!) : null;
+  const exampleCards = manifest?.examples ?? parseExampleCardFormData(formData);
 
-  return normalizeInput({
+  const privateContent = normalizeExamplePlatforms({
+      ...(manifest ? { examplePlatforms: manifest.platforms } : {}),
+      examplePlatform: String(formData.get("examplePlatform") ?? ""),
+      heroDescription: String(formData.get("heroDescription") ?? ""),
+      pricePreview: String(formData.get("pricePreview") ?? ""),
+      pricingLines,
+      exampleCards,
+  });
+  const uploadKeys = new Map(privateContent.exampleCards.map((card) => [card.id, card.uploadKey]));
+  const input = normalizeInput({
     title: String(formData.get("title") ?? ""),
     summary: String(formData.get("summary") ?? ""),
     description: String(formData.get("description") ?? ""),
     highlights: String(formData.get("highlights") ?? "").split(/\r?\n/),
     sortOrder: Number(formData.get("sortOrder") ?? 0),
     status: formData.get("status") === "published" ? "published" : "draft",
-    privateContent: {
-      examplePlatform: String(formData.get("examplePlatform") ?? ""),
-      heroDescription: String(formData.get("heroDescription") ?? ""),
-      pricePreview: String(formData.get("pricePreview") ?? ""),
-      pricingLines,
-      exampleCards,
-    },
+    privateContent,
   });
+  input.privateContent.exampleCards.forEach((card) => {
+    card.uploadKey = manifest ? card.id : uploadKeys.get(card.id!);
+  });
+  return input;
 }
 
-function parseExampleCardFormData(formData: FormData) {
-  const indexedCards = Array.from({ length: 6 }, (_, index) => ({
-    exampleType: formData.get(`exampleCardType-${index}`) === "photo" ? "photo" : "link",
+function parseExampleCardFormData(formData: FormData): ServiceExampleCard[] {
+  const indices = [...new Set(Array.from(formData.keys()).flatMap((key) => {
+    const match = key.match(/^exampleCard\w+-(\d+)$/);
+    return match ? [Number(match[1])] : [];
+  }))].sort((left, right) => left - right);
+  const indexedCards = indices.map((index) => ({
+    uploadKey: String(index),
+    exampleType: formData.get(`exampleCardType-${index}`) === "photo" ? "photo" as const : "link" as const,
     imageAlt: String(formData.get(`exampleCardImageAlt-${index}`) ?? ""),
     imageUrl: String(formData.get(`exampleCardImageUrl-${index}`) ?? ""),
     title: String(formData.get(`exampleCardTitle-${index}`) ?? ""),
@@ -729,7 +753,7 @@ function idFilter(id: string): Filter<ServiceDocument> {
 }
 
 export function getDefaultServices() {
-  return defaultServices;
+  return defaultServices.map((service) => ({ ...service, privateContent: normalizeExamplePlatforms(service.privateContent) }));
 }
 
 export function getAllServices() {
@@ -737,7 +761,7 @@ export function getAllServices() {
 }
 
 export function getServiceBySlug(slug: string) {
-  return defaultServices.find((service) => service.slug === slug);
+  return getDefaultServices().find((service) => service.slug === slug);
 }
 
 export async function getAdminServices(db: ServiceDb) {
@@ -777,7 +801,7 @@ export async function getPublishedServicesForSite() {
   } catch (error) {
     console.error("Unable to load services", error);
 
-    return defaultServices.filter((service) => service.status === "published");
+    return getDefaultServices().filter((service) => service.status === "published");
   }
 }
 

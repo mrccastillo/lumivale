@@ -24,7 +24,8 @@ export async function applyServiceExampleImageUploads(
 ) {
   const exampleCards = await Promise.all(
     input.privateContent.exampleCards.map(async (card, index) => {
-      const mode = formData.get(`exampleCardPreviewMode-${index}`);
+      const key = card.uploadKey ?? index;
+      const mode = formData.get(`exampleCardPreviewMode-${key}`);
       if (card.exampleType === "link" && mode !== null && mode !== "automatic" && mode !== "cover") {
         throw new Error("Choose Automatic preview or Custom cover photo.");
       }
@@ -32,7 +33,7 @@ export async function applyServiceExampleImageUploads(
         return { ...card, imageUrl: "", imageAlt: "" };
       }
       const imageUrl = await uploadServiceExampleImage(
-        formData.get(`exampleCardImageFile-${index}`) as File | null,
+        formData.get(`exampleCardImageFile-${key}`) as File | null,
       );
       if (card.exampleType === "link" && mode === "cover" && !imageUrl && !card.imageUrl) {
         throw new Error("Custom cover photo requires an uploaded image.");

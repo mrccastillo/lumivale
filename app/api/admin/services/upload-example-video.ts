@@ -25,7 +25,7 @@ export async function applyServiceExampleVideoUploads(
   const exampleCards = await Promise.all(
     input.privateContent.exampleCards.map(async (card, index) => {
       const videoUrl = await uploadServiceExampleVideo(
-        formData.get(`exampleCardVideoFile-${index}`) as File | null,
+        formData.get(`exampleCardVideoFile-${card.uploadKey ?? index}`) as File | null,
       );
 
       return {

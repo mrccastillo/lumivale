@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ServiceExamplePreview } from "@/components/service-example-preview";
+import { ServiceExamplePlatforms } from "@/components/service-example-platforms";
 import { notFound } from "next/navigation";
 
 import {
@@ -125,44 +125,7 @@ export default async function PrivatePricingServicePage({
 
       <section className="bg-white px-6 py-14 sm:py-16">
         <div className="mx-auto max-w-6xl">
-          <div className="flex flex-wrap items-center gap-3">
-            <span className="rounded-full border border-[var(--lumivale-line)] bg-[#f7f8fb] px-4 py-2 text-sm font-semibold text-[var(--lumivale-ink)]">{service.privateContent.examplePlatform}</span>
-            <p className="text-sm text-[var(--lumivale-muted)]">Explore examples of this service in action.</p>
-          </div>
-          <div className="mt-8 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
-            {service.privateContent.exampleCards.map((card) => (
-              <article
-                key={card.title}
-                className="min-w-0 break-words rounded-[18px] border border-[var(--lumivale-line)] bg-[#fbfcff] p-4 sm:p-6 shadow-[0_18px_44px_rgba(42,47,82,0.06)]"
-              >
-                <span className="inline-flex rounded-full border border-[var(--lumivale-line)] bg-white px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--lumivale-muted)]">
-                  {card.tag}
-                </span>
-                <h2 className="mt-5 text-xl font-semibold text-[var(--lumivale-ink)]">
-                  {card.title}
-                </h2>
-                <p className="mt-3 text-sm leading-7 text-[var(--lumivale-muted)]">
-                  {card.summary}
-                </p>
-                <ServiceExamplePreview card={card} />
-                {card.videoUrl ? (
-                  <div className="mt-5 overflow-hidden rounded-xl border border-[var(--lumivale-line)] bg-white">
-                    <video
-                      controls
-                      preload="metadata"
-                      className="aspect-video w-full bg-black"
-                      src={card.videoUrl}
-                    />
-                    {card.videoDescription ? (
-                      <p className="px-4 py-3 text-sm leading-6 text-[var(--lumivale-muted)]">
-                        {card.videoDescription}
-                      </p>
-                    ) : null}
-                  </div>
-                ) : null}
-              </article>
-            ))}
-          </div>
+          <ServiceExamplePlatforms content={service.privateContent} />
         </div>
       </section>
     </div>

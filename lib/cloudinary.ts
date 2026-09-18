@@ -51,7 +51,7 @@ export async function uploadMediaToCloudinary(
       options,
       (error, result?: UploadApiResponse) => {
         if (error) {
-          reject(error);
+          reject(new Error(error.message || "Media upload failed."));
           return;
         }
 

@@ -247,3 +247,22 @@ describe("services repository", () => {
     });
   });
 });
+
+
+test("persists platform IDs through rename/reorder and isolates services", async () => {
+  const db = createFakeDb();
+  const input = parseServiceFormData(buildFormData());
+  const first = await createService(db, input);
+  const second = await createService(db, { ...input, title: "Second service" });
+  const content = first.privateContent;
+  const oldId = content.examplePlatforms![0].id;
+  const next = { ...content, examplePlatforms: [{ id: "empty", name: "Unused" }, { id: oldId, name: "Renamed" }] };
+  await updateService(db, first.slug, { privateContent: next });
+  const saved = await getAdminServiceBySlug(db, first.slug);
+  expect(saved?.privateContent.examplePlatform).toBe("Unused | Renamed");
+  expect(saved?.privateContent.exampleCards[0].platformId).toBe(oldId);
+  expect(saved?.privateContent.exampleCards[0]).not.toHaveProperty("uploadKey");
+  expect((await getAdminServiceBySlug(db, second.slug))?.privateContent.examplePlatforms).toEqual(content.examplePlatforms);
+  await expect(updateService(db, first.slug, { privateContent: { ...next, examplePlatforms: [] } })).rejects.toThrow("belong to a platform");
+  expect((await getAdminServiceBySlug(db, first.slug))?.privateContent).toEqual(saved?.privateContent);
+});
