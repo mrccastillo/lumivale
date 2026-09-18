@@ -1,4 +1,5 @@
 import { describe, expect, test } from "vitest";
+import { ObjectId } from "mongodb";
 
 import {
   createService,
@@ -289,4 +290,27 @@ test("service FAQs persist independently, preserve omitted updates, and clear ex
 test.each(["{", "null", "{}", '[{"id":"x","question":"Q"}]', '[{"id":"bad/id","question":"Q","answer":"A"}]', '[{"id":"x","question":"Q","answer":"A"},{"id":"x","question":"Q2","answer":"A"}]'])("rejects invalid FAQ payload %s", (payload) => {
   const form = buildFormData(); form.set("serviceFaqs", payload);
   expect(() => parseServiceFormData(form)).toThrow(/FAQ/);
+});
+
+
+test("service results exclude MongoDB ObjectIds from client component props", async () => {
+  const db = createFakeDb();
+  const created = await createService(db, parseServiceFormData(buildFormData({ status: "published" })));
+  const storedId = db.documents[0]._id;
+  expect(storedId).toBeInstanceOf(ObjectId);
+  const updated = await updateService(db, created.slug, { title: "Updated service" });
+  const results = [
+    created,
+    updated,
+    await getAdminServiceBySlug(db, created.slug),
+    await getPublishedServiceBySlug(db, created.slug),
+    ...(await getAdminServices(db)),
+    ...(await getPublishedServices(db)),
+  ].filter(Boolean);
+  for (const service of results) {
+    expect(service).not.toHaveProperty("_id");
+    if (service?.slug === created.slug) expect(service.id).toBe(String(storedId));
+    expect(service?.createdAt).toBeInstanceOf(Date);
+  }
+  expect(db.documents[0]._id).toBe(storedId);
 });

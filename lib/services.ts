@@ -433,11 +433,12 @@ function collection(db: ServiceDb) {
 }
 
 function toService(document: ServiceDocument): Service {
+  const { _id, ...service } = document;
   return {
-    ...document,
+    ...service,
     faqs: normalizeServiceFaqs(document.faqs ?? []),
     privateContent: normalizeExamplePlatforms(document.privateContent),
-    id: String(document._id),
+    id: String(_id),
     isDefault: defaultServices.some((service) => service.slug === document.slug),
   };
 }
@@ -837,7 +838,7 @@ export async function createService(db: ServiceDb, input: ServiceInput) {
   const result = await collection(db).insertOne(document);
 
   return {
-    ...document,
+    ...toService(document),
     id: String(result.insertedId),
   };
 }
