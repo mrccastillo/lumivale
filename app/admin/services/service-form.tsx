@@ -1,6 +1,6 @@
 "use client";
 
-import { type FormEvent, type ReactNode, useState } from "react";
+import { type FormEvent, type ReactNode, useEffect, useState } from "react";
 
 import type { Service, ServiceExampleCard } from "@/lib/services";
 
@@ -8,6 +8,7 @@ const fieldClassName =
   "min-h-12 w-full rounded-[18px] border border-[var(--lumivale-line)] bg-white px-4 py-3 text-sm text-[var(--lumivale-ink)] outline-none transition focus:border-[var(--lumivale-accent)]";
 
 type ExampleDraft = {
+  previewMode: "automatic" | "cover";
   exampleType: "link" | "photo";
   imageAlt: string;
   imageFile: File | null;
@@ -24,6 +25,7 @@ type ExampleDraft = {
 };
 
 const emptyExample: ExampleDraft = {
+  previewMode: "automatic",
   exampleType: "link",
   imageAlt: "",
   imageFile: null,
@@ -225,7 +227,10 @@ function ExamplesManager({
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [draft, setDraft] = useState<ExampleDraft>(emptyExample);
 
+  const [draftError, setDraftError] = useState("");
+
   function openAddModal() {
+    setDraftError("");
     setDraft(emptyExample);
     setEditingIndex(null);
     setStep(1);
@@ -233,6 +238,7 @@ function ExamplesManager({
   }
 
   function openEditModal(index: number) {
+    setDraftError("");
     setDraft(examples[index] ?? emptyExample);
     setEditingIndex(index);
     setStep(2);
@@ -247,6 +253,14 @@ function ExamplesManager({
   }
 
   function saveExample() {
+    if (draft.exampleType === "link" && draft.previewMode === "cover" && !draft.imageFile && !draft.imageUrl) {
+      setDraftError("Upload a cover photo or choose Automatic preview.");
+      return;
+    }
+    if (draft.imageFile && (!["image/png", "image/jpeg", "image/webp", "image/gif"].includes(draft.imageFile.type) || draft.imageFile.size > 5 * 1024 * 1024)) {
+      setDraftError("Choose a PNG, JPG, WEBP, or GIF image up to 5MB.");
+      return;
+    }
     const next = [...examples];
 
     if (editingIndex === null) {
@@ -291,6 +305,7 @@ function ExamplesManager({
               className="rounded-[16px] border border-[var(--lumivale-admin-border)] bg-white p-4"
             >
               <input type="hidden" name={`exampleCardType-${index}`} value={example.exampleType} />
+              <input type="hidden" name={`exampleCardPreviewMode-${index}`} value={example.previewMode} />
               <input type="hidden" name={`exampleCardTitle-${index}`} value={example.title} />
               <input type="hidden" name={`exampleCardTag-${index}`} value={example.tag} />
               <input type="hidden" name={`exampleCardSummary-${index}`} value={example.summary} />
@@ -484,12 +499,42 @@ function ExamplesManager({
                     </div>
                   </div>
                 ) : (
+                  <div className="grid gap-4">
                   <ModalField
                     label="Preview link"
                     type="url"
                     value={draft.previewUrl}
                     onChange={(value) => setDraft({ ...draft, previewUrl: value })}
                   />
+                  <p className="text-xs leading-6 text-[var(--lumivale-muted)]">YouTube, TikTok, and supported Facebook links show embedded previews. Other websites show a link card. Choose a cover photo to show your own image instead.</p>
+                  <label className="text-sm font-semibold">Preview appearance
+                    <select className={`${fieldClassName} mt-2`} value={draft.previewMode} onChange={(event) => {
+                      setDraftError("");
+                      setDraft({ ...draft, previewMode: event.target.value as ExampleDraft["previewMode"], ...(event.target.value === "automatic" ? { imageUrl: "", imageAlt: "", imageFile: null, imageFileName: "" } : {}) });
+                    }}>
+                      <option value="automatic">Automatic preview</option>
+                      <option value="cover">Custom cover photo</option>
+                    </select>
+                  </label>
+                  {draft.previewMode === "cover" ? (
+                    <div className="grid gap-4">
+                      <ModalField label="Cover alt text" value={draft.imageAlt} onChange={(value) => setDraft({ ...draft, imageAlt: value })} />
+                      <label className="text-sm font-semibold">Upload cover photo
+                        <input type="file" accept="image/png,image/jpeg,image/webp,image/gif" className={`${fieldClassName} mt-2`} onChange={(event) => {
+                          const file = event.target.files?.[0] ?? null;
+                          setDraftError("");
+                          setDraft({ ...draft, imageFile: file, imageFileName: file?.name ?? "" });
+                        }} />
+                      </label>
+                      <p className="text-xs text-[var(--lumivale-muted)]">PNG, JPG, WEBP, or GIF, up to 5MB. Clicking the cover opens the preview link.</p>
+                      <CoverPreview file={draft.imageFile} url={draft.imageUrl} alt={draft.imageAlt || draft.title} />
+                      {draft.imageFile || draft.imageUrl ? <button type="button" className="justify-self-start text-sm font-semibold text-red-600" onClick={() => {
+                        setDraftError("");
+                        setDraft({ ...draft, previewMode: "automatic", imageUrl: "", imageAlt: "", imageFile: null, imageFileName: "" });
+                      }}>Remove cover photo</button> : null}
+                    </div>
+                  ) : null}
+                  </div>
                 )}
 
                 <div className="grid gap-4 sm:grid-cols-2">
@@ -526,6 +571,7 @@ function ExamplesManager({
                   </div>
                 </div>
 
+                {draftError ? <p role="alert" className="text-sm text-red-700">{draftError}</p> : null}
                 <div className="flex flex-wrap gap-3 border-t border-[var(--lumivale-admin-border)] pt-5">
                   <button
                     type="button"
@@ -553,6 +599,7 @@ function ExamplesManager({
 
 function toExampleDraft(card: ServiceExampleCard): ExampleDraft {
   return {
+    previewMode: card.imageUrl ? "cover" : "automatic",
     exampleType: card.exampleType ?? (card.imageUrl ? "photo" : "link"),
     imageAlt: card.imageAlt ?? "",
     imageFile: null,
@@ -567,6 +614,20 @@ function toExampleDraft(card: ServiceExampleCard): ExampleDraft {
     videoFileName: "",
     videoUrl: card.videoUrl ?? "",
   };
+}
+
+function CoverPreview({ file, url, alt }: { file: File | null; url: string; alt: string }) {
+  const [localUrl, setLocalUrl] = useState("");
+  useEffect(() => {
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => setLocalUrl(String(reader.result));
+    reader.readAsDataURL(file);
+    return () => reader.abort();
+  }, [file]);
+  const src = file ? localUrl : url;
+  // eslint-disable-next-line @next/next/no-img-element
+  return src ? <img src={src} alt={alt || "Cover preview"} className="max-h-52 w-full rounded-xl object-contain" /> : null;
 }
 
 function ModalField({

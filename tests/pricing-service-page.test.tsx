@@ -56,10 +56,14 @@ describe("private pricing service page", () => {
     expect(screen.getByRole("heading", { level: 1, name: service.title })).toBeInTheDocument();
     expect(screen.getByText(service.privateContent.heroDescription)).toBeInTheDocument();
     service.privateContent.pricingLines.forEach((line) => {
-      expect(screen.getByText(`${line.label}:`, { exact: false })).toBeInTheDocument();
-      expect(screen.getAllByText(line.value).length).toBeGreaterThan(0);
+      expect(screen.getByText(line.label)).toBeInTheDocument();
+      expect(screen.getAllByText(line.value)).toHaveLength(1);
+      expect(screen.queryByText(`${line.label}:`)).not.toBeInTheDocument();
     });
     expect(screen.getByText("EXAMPLES")).toBeInTheDocument();
+    expect(screen.queryByText("Private detail")).not.toBeInTheDocument();
+    expect(screen.queryByText("Example channel")).not.toBeInTheDocument();
+    expect(screen.queryByText(/Placeholder visual panel/)).not.toBeInTheDocument();
     expect(screen.getAllByText(service.privateContent.examplePlatform).length).toBeGreaterThan(0);
     service.privateContent.exampleCards.forEach((card) => {
       expect(screen.getByRole("heading", { level: 2, name: card.title })).toBeInTheDocument();

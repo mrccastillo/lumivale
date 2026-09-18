@@ -1,5 +1,5 @@
 import Link from "next/link";
-import Image from "next/image";
+import { ServiceExamplePreview } from "@/components/service-example-preview";
 import { notFound } from "next/navigation";
 
 import {
@@ -71,7 +71,7 @@ export default async function PrivatePricingServicePage({
             </div>
           </nav>
 
-          <div className="mt-10 grid gap-10 lg:grid-cols-[minmax(0,0.9fr)_minmax(320px,0.8fr)] lg:items-stretch lg:gap-12">
+          <div className="mt-10 grid gap-10 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,0.8fr)] lg:items-center lg:gap-12">
             <div className="max-w-2xl">
               <Link
                 href="/pricing"
@@ -90,27 +90,11 @@ export default async function PrivatePricingServicePage({
                 {service.privateContent.heroDescription}
               </p>
 
-              <div className="mt-10 space-y-3">
-                {service.privateContent.pricingLines.map((line) => (
-                  <p key={`${line.label}-${line.value}`} className="text-lg leading-8 text-white">
-                    <span className="font-medium">{line.label}:</span> {line.value}
-                  </p>
-                ))}
-              </div>
             </div>
 
             <div className="rounded-[20px] border border-white/10 bg-[linear-gradient(160deg,rgba(255,255,255,0.1),rgba(255,255,255,0.04))] p-5 shadow-[0_28px_70px_rgba(0,0,0,0.22)]">
-              <div className="flex h-full min-h-[320px] flex-col justify-between rounded-[16px] border border-white/10 bg-[linear-gradient(135deg,rgba(255,255,255,0.08),rgba(255,255,255,0.02))] p-6">
-                <div className="flex items-start justify-between gap-4">
-                  <span className="rounded-full border border-white/12 bg-white/[0.08] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.22em] text-[var(--lumivale-accent-soft)]">
-                    Private detail
-                  </span>
-                  <span className="rounded-full border border-white/12 bg-white/[0.08] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.22em] text-[var(--lumivale-accent-soft)]">
-                    {service.privateContent.examplePlatform}
-                  </span>
-                </div>
-
-                <div className="mt-8 grid gap-3 sm:grid-cols-2">
+              <div className="grid gap-3">
+                <div className="grid gap-3 sm:grid-cols-2">
                   {service.privateContent.pricingLines.map((line) => (
                     <div
                       key={`visual-${line.label}`}
@@ -124,18 +108,6 @@ export default async function PrivatePricingServicePage({
                   ))}
                 </div>
 
-                <div className="mt-8 rounded-[18px] border border-dashed border-white/[0.14] bg-[rgba(255,255,255,0.03)] p-5">
-                  <p className="text-sm font-semibold uppercase tracking-[0.18em] text-[var(--lumivale-accent-soft)]">
-                    Example channel
-                  </p>
-                  <p className="mt-3 text-3xl font-semibold text-white">
-                    {service.privateContent.examplePlatform}
-                  </p>
-                  <p className="mt-3 max-w-md text-sm leading-7 text-[#d7eee1]">
-                    Placeholder visual panel for trusted-service examples. Replace with
-                    real screenshots or embeds when assets are available.
-                  </p>
-                </div>
               </div>
             </div>
           </div>
@@ -153,20 +125,15 @@ export default async function PrivatePricingServicePage({
 
       <section className="bg-white px-6 py-14 sm:py-16">
         <div className="mx-auto max-w-6xl">
-          <div className="flex items-center gap-3">
-            <span className="rounded-full border border-[var(--lumivale-line)] bg-[#f7f8fb] px-4 py-2 text-sm font-semibold text-[var(--lumivale-ink)]">
-              {service.privateContent.examplePlatform}
-            </span>
-            <p className="text-sm text-[var(--lumivale-muted)]">
-              Placeholder examples for trusted pricing conversations.
-            </p>
+          <div className="flex flex-wrap items-center gap-3">
+            <span className="rounded-full border border-[var(--lumivale-line)] bg-[#f7f8fb] px-4 py-2 text-sm font-semibold text-[var(--lumivale-ink)]">{service.privateContent.examplePlatform}</span>
+            <p className="text-sm text-[var(--lumivale-muted)]">Explore examples of this service in action.</p>
           </div>
-
           <div className="mt-8 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
             {service.privateContent.exampleCards.map((card) => (
               <article
                 key={card.title}
-                className="rounded-[18px] border border-[var(--lumivale-line)] bg-[#fbfcff] p-6 shadow-[0_18px_44px_rgba(42,47,82,0.06)]"
+                className="min-w-0 break-words rounded-[18px] border border-[var(--lumivale-line)] bg-[#fbfcff] p-4 sm:p-6 shadow-[0_18px_44px_rgba(42,47,82,0.06)]"
               >
                 <span className="inline-flex rounded-full border border-[var(--lumivale-line)] bg-white px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--lumivale-muted)]">
                   {card.tag}
@@ -177,41 +144,7 @@ export default async function PrivatePricingServicePage({
                 <p className="mt-3 text-sm leading-7 text-[var(--lumivale-muted)]">
                   {card.summary}
                 </p>
-                {card.exampleType === "photo" && card.imageUrl ? (
-                  <figure className="mt-5 overflow-hidden rounded-xl border border-[var(--lumivale-line)] bg-white">
-                    <Image
-                      src={card.imageUrl}
-                      alt={card.imageAlt || card.title}
-                      width={960}
-                      height={540}
-                      unoptimized
-                      className="aspect-video w-full object-cover"
-                    />
-                    {card.imageAlt ? (
-                      <figcaption className="px-4 py-3 text-sm leading-6 text-[var(--lumivale-muted)]">
-                        {card.imageAlt}
-                      </figcaption>
-                    ) : null}
-                  </figure>
-                ) : null}
-                {card.exampleType !== "photo" && card.previewUrl ? (
-                  <a
-                    href={card.previewUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="mt-5 block rounded-xl border border-[var(--lumivale-line)] bg-white p-4 text-sm transition hover:border-[var(--lumivale-accent)]"
-                  >
-                    <span className="block text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--lumivale-muted)]">
-                      Preview link
-                    </span>
-                    <span className="mt-2 block font-semibold text-[var(--lumivale-ink)]">
-                      {formatPreviewHost(card.previewUrl)}
-                    </span>
-                    <span className="mt-1 block break-all text-xs leading-5 text-[var(--lumivale-muted)]">
-                      {card.previewUrl}
-                    </span>
-                  </a>
-                ) : null}
+                <ServiceExamplePreview card={card} />
                 {card.videoUrl ? (
                   <div className="mt-5 overflow-hidden rounded-xl border border-[var(--lumivale-line)] bg-white">
                     <video
@@ -234,12 +167,4 @@ export default async function PrivatePricingServicePage({
       </section>
     </div>
   );
-}
-
-function formatPreviewHost(value: string) {
-  try {
-    return new URL(value).hostname.replace(/^www\./, "");
-  } catch {
-    return "Open preview";
-  }
 }
