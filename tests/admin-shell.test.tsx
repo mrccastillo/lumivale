@@ -149,6 +149,19 @@ describe("admin shell", () => {
     expect(screen.getAllByRole("link")).toHaveLength(9);
   });
 
+  test("marks the active section and closes the mobile menu with Escape", () => {
+    pathnameMock.mockReturnValue("/admin/blogs/example/edit");
+    render(<AdminWorkspace><p>Editor</p></AdminWorkspace>);
+    expect(screen.getByRole("link", { name: "Blogs" })).toHaveAttribute("aria-current", "page");
+    const toggle = screen.getByRole("button", { name: "Open admin menu" });
+    fireEvent.click(toggle);
+    expect(toggle).toHaveAttribute("aria-expanded", "true");
+    fireEvent.keyDown(screen.getByRole("button", { name: "Close admin menu" }), { key: "Escape" });
+    expect(toggle).toHaveAttribute("aria-expanded", "false");
+    expect(toggle).toHaveFocus();
+    expect(document.getElementById("admin-mobile-menu")).not.toBeInTheDocument();
+  });
+
   test("does not render sidebar or compact header on admin login", () => {
     pathnameMock.mockReturnValue("/admin/login");
 

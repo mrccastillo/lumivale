@@ -3,9 +3,18 @@ import { NextResponse } from "next/server";
 import { requireAdminAccess } from "@/lib/admin-auth";
 import { createCaseStudy, parseCaseStudyFormData } from "@/lib/case-studies";
 import { getMongoDb } from "@/lib/mongodb";
+import {
+  checkStoryOrigin,
+  readStoryRequest,
+  refreshCaseStudies,
+  storyApiError,
+} from "@/lib/case-study-api";
 
 function redirectTo(path: string) {
-  const response = NextResponse.redirect(new URL(path, "http://localhost"), 303);
+  const response = NextResponse.redirect(
+    new URL(path, "http://localhost"),
+    303,
+  );
   response.headers.set("location", path);
 
   return response;
@@ -28,11 +37,24 @@ function getErrorMessage(error: unknown) {
 
 export async function POST(request: Request) {
   await requireAdminAccess();
+  const rejected = checkStoryOrigin(request);
+  if (rejected) return rejected;
+  if (request.headers.get("content-type")?.includes("application/json")) {
+    try {
+      const input = await readStoryRequest(request);
+      const study = await createCaseStudy(await getMongoDb(), input);
+      refreshCaseStudies(study.slug);
+      return NextResponse.json({ study: { ...study, _id: undefined } });
+    } catch (error) {
+      return storyApiError(error);
+    }
+  }
   const db = await getMongoDb();
   const formData = await request.formData();
 
   try {
     const study = await createCaseStudy(db, parseCaseStudyFormData(formData));
+    refreshCaseStudies(study.slug);
 
     return redirectTo(`/admin/case-studies/${study.slug}/edit`);
   } catch (error) {

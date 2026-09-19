@@ -3,6 +3,8 @@ import { describe, expect, test, vi } from "vitest";
 
 import AdminCaseStudiesPage from "@/app/admin/case-studies/page";
 
+vi.mock("next/navigation", () => ({ useRouter: () => ({ refresh: vi.fn(), replace: vi.fn() }) }));
+
 vi.mock("@/lib/admin-auth", () => ({
   requireAdminAccess: vi.fn().mockResolvedValue({
     adminId: "admin-1",
@@ -105,7 +107,7 @@ describe("admin case studies dashboard", () => {
     ).not.toBeInTheDocument();
     expect(screen.getByLabelText("Title")).toBeInTheDocument();
     expect(screen.getByLabelText("Case Study Link Ending")).toBeInTheDocument();
-    expect(screen.getByLabelText("Metrics")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Add metric" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Create Case Study" })).toBeInTheDocument();
   });
 });

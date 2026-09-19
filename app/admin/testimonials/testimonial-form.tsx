@@ -1,6 +1,6 @@
 "use client";
 
-import { useId, useState, type ReactNode } from "react";
+import { useEffect, useId, useState, type ReactNode } from "react";
 
 import type { Testimonial } from "@/lib/testimonials";
 
@@ -23,6 +23,15 @@ export function TestimonialForm({
     : "/api/admin/testimonials";
   const [selectedType, setSelectedType] = useState(testimonial?.type ?? "text");
   const typeHintId = useId();
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState("");
+  const [removeImage, setRemoveImage] = useState(false);
+  useEffect(() => {
+    if (!imagePreview) return;
+    return () => URL.revokeObjectURL(imagePreview);
+  }, [imagePreview]);
+  const previewUrl = imageFile ? imagePreview : removeImage ? "" : testimonial?.imageUrl;
+
 
   return (
     <form
@@ -32,6 +41,7 @@ export function TestimonialForm({
       className="grid gap-6 rounded-[24px] border border-[var(--lumivale-line)] bg-white p-6 shadow-[0_20px_60px_rgba(42,47,82,0.06)] sm:p-7"
     >
       <input type="hidden" name="action" value="save" />
+      <input type="hidden" name="imageUrl" value={testimonial?.imageUrl ?? ""} />
       <input type="hidden" name="videoUrl" value={testimonial?.videoUrl ?? ""} />
 
       {errorMessage ? (
@@ -50,6 +60,36 @@ export function TestimonialForm({
           name="personTitle"
           defaultValue={testimonial?.personTitle}
         />
+      </div>
+
+      <div className="rounded-[22px] border border-[var(--lumivale-line)] bg-[#fbfcff] p-5">
+        <FieldLabel htmlFor="testimonial-image">Logo or photo (optional)</FieldLabel>
+        {previewUrl ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={previewUrl} alt="Testimonial image preview" className="mb-4 size-14 rounded-full object-cover" />
+        ) : null}
+        <input
+          id="testimonial-image"
+          name="imageFile"
+          type="file"
+          accept="image/jpeg,image/png,image/webp"
+          className={fieldClassName}
+          onChange={(event) => {
+            const file = event.target.files?.[0] ?? null;
+            setImageFile(file);
+            setImagePreview(file ? URL.createObjectURL(file) : "");
+            setRemoveImage(false);
+          }}
+        />
+        <p className="mt-2 text-xs leading-6 text-[var(--lumivale-muted)]">
+          JPG, PNG, or WEBP, up to 5MB. Displayed as a circle beside the client name. Upload a new image to replace the saved one.
+        </p>
+        {testimonial?.imageUrl ? (
+          <label className="mt-3 flex items-center gap-2 text-sm text-[var(--lumivale-ink)]">
+            <input type="checkbox" name="removeImage" checked={removeImage} disabled={!!imageFile} onChange={(event) => setRemoveImage(event.target.checked)} />
+            Remove saved image
+          </label>
+        ) : null}
       </div>
 
       <TextArea label="Quote" name="quote" required defaultValue={testimonial?.quote} rows={5} />

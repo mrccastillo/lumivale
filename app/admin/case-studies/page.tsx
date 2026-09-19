@@ -34,12 +34,10 @@ export default async function AdminCaseStudiesPage({
     (currentPage - 1) * PAGE_SIZE,
     currentPage * PAGE_SIZE,
   );
-  const publishedCount = studies.filter((study) => study.status === "published").length;
-  const draftCount = studies.filter((study) => study.status === "draft").length;
 
   return (
     <section className="mx-auto flex w-full max-w-7xl flex-col gap-7">
-      <section className="overflow-hidden rounded-lg border border-[var(--lumivale-admin-panel-soft)] bg-[linear-gradient(135deg,var(--lumivale-panel),var(--lumivale-ink))] shadow-[0_26px_80px_rgba(5,43,32,0.2)]">
+      <section data-admin-overview className="overflow-hidden rounded-lg border border-[var(--lumivale-admin-panel-soft)] bg-[linear-gradient(135deg,var(--lumivale-panel),var(--lumivale-ink))] shadow-[0_26px_80px_rgba(5,43,32,0.2)]">
         <div className="flex flex-col gap-6 p-6 sm:p-8 lg:flex-row lg:items-start lg:justify-between">
           <div className="max-w-2xl">
             <p className="text-xs font-semibold uppercase tracking-[0.34em] text-white/72">
@@ -68,17 +66,6 @@ export default async function AdminCaseStudiesPage({
               New Case Study
             </Link>
           </div>
-        </div>
-
-        <div className="grid gap-4 border-t border-white/10 bg-white/6 p-6 sm:grid-cols-2 sm:p-8 xl:grid-cols-4">
-          <MetricCard label="Matching stories" value={filteredStudies.length} note="Total results for current filters" />
-          <MetricCard label="Published" value={publishedCount} note="Visible on the public site" />
-          <MetricCard label="Drafts" value={draftCount} note="Hidden from public visitors" />
-          <MetricCard
-            label="Current mode"
-            value={mode === "create" ? "Create" : "Library"}
-            note={mode === "create" ? "Creating a story" : "Browsing stories"}
-          />
         </div>
       </section>
 
@@ -336,26 +323,6 @@ function CaseStudyCard({ study }: { study: CaseStudy }) {
           ) : null}
         </div>
       </div>
-    </article>
-  );
-}
-
-function MetricCard({
-  label,
-  note,
-  value,
-}: {
-  label: string;
-  note: string;
-  value: number | string;
-}) {
-  return (
-    <article className="rounded-lg border border-white/12 bg-white/6 p-5 backdrop-blur-sm">
-      <p className="text-xs font-semibold uppercase tracking-[0.24em] text-white/68">
-        {label}
-      </p>
-      <p className="mt-3 text-3xl font-semibold text-white">{value}</p>
-      <p className="mt-2 text-xs text-white/68">{note}</p>
     </article>
   );
 }

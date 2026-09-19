@@ -24,9 +24,6 @@ export default async function AdminTrustedClientsPage({
   const status = firstValue(params?.status);
   const error = firstValue(params?.error);
   const visibleClients = filterAndSortTrustedClients(clients, { query, sort });
-  const newestClient = [...clients].sort(
-    (left, right) => right.createdAt.getTime() - left.createdAt.getTime(),
-  )[0];
 
   return (
     <section className="mx-auto flex w-full max-w-6xl flex-col gap-6">
@@ -57,24 +54,6 @@ export default async function AdminTrustedClientsPage({
           {error}
         </p>
       ) : null}
-
-      <section className="grid gap-4 md:grid-cols-3">
-        <MetricCard
-          label="Total trusted clients"
-          value={clients.length}
-          note="All approved pricing emails"
-        />
-        <MetricCard
-          label="Visible results"
-          value={visibleClients.length}
-          note="Matches the current search"
-        />
-        <MetricCard
-          label="Newest approval"
-          value={newestClient ? formatShortDate(newestClient.createdAt) : "None"}
-          note={newestClient ? "Most recently approved email" : "No trusted clients yet"}
-        />
-      </section>
 
       <div className="grid gap-6 xl:grid-cols-[360px_minmax(0,1fr)]">
         <section className="rounded-[24px] border border-[var(--lumivale-admin-border)] bg-white p-6 shadow-[0_20px_60px_rgba(5,43,32,0.06)]">
@@ -252,26 +231,6 @@ function Field({
   );
 }
 
-function MetricCard({
-  label,
-  note,
-  value,
-}: {
-  label: string;
-  note: string;
-  value: number | string;
-}) {
-  return (
-    <article className="rounded-[20px] border border-[var(--lumivale-admin-border)] bg-white px-5 py-4 shadow-[0_16px_44px_rgba(5,43,32,0.05)]">
-      <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--lumivale-panel)]">
-        {label}
-      </p>
-      <p className="mt-3 text-2xl font-semibold text-[var(--lumivale-ink)]">{value}</p>
-      <p className="mt-2 text-xs text-[var(--lumivale-muted)]">{note}</p>
-    </article>
-  );
-}
-
 function filterAndSortTrustedClients(
   clients: TrustedClient[],
   {
@@ -309,14 +268,6 @@ function parseSort(value: string): TrustedClientSort {
   return SORT_OPTIONS.includes(value as TrustedClientSort)
     ? (value as TrustedClientSort)
     : "newest";
-}
-
-function formatShortDate(date: Date) {
-  return date.toLocaleDateString("en-US", {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-  });
 }
 
 function formatLongDate(date: Date) {

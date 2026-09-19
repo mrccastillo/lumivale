@@ -13,6 +13,10 @@ describe("admin service form uploads", () => {
     const fetchMock = vi.fn().mockResolvedValue({ url: "/admin/services/example/edit" });
     vi.stubGlobal("fetch", fetchMock);
     render(<ServiceForm />);
+    for (const name of ["title", "summary", "description", "highlights", "pricePreview", "heroDescription", "pricingLines"]) {
+      fireEvent.change(document.querySelector(`[name="${name}"]`)!, { target: { value: name === "pricingLines" ? "Monthly rate | $850" : "Service content" } });
+    }
+    fireEvent.click(screen.getByRole("tab", { name: /Examples$/ }));
     fireEvent.change(screen.getByLabelText("New platform"), { target: { value: "YouTube" } });
     fireEvent.click(screen.getByRole("button", { name: "Add platform" }));
     fireEvent.click(screen.getByRole("button", { name: "Add Example" }));
@@ -44,6 +48,7 @@ describe("admin service form uploads", () => {
     delete service.privateContent.examplePlatforms;
     service.privateContent.exampleCards = [{ title: "Saved example", tag: "Proof", summary: "Summary", exampleType: "link", imageUrl: "https://example.com/cover.png", previewUrl: "https://example.com/article" }];
     const { container } = render(<ServiceForm service={service} />);
+    fireEvent.click(screen.getByRole("tab", { name: /Examples$/ }));
     fireEvent.click(screen.getByRole("button", { name: "Edit" }));
     expect(screen.getByLabelText("Preview appearance")).toHaveValue("cover");
     expect(screen.getByRole("img")).toHaveAttribute("src", "https://example.com/cover.png");
@@ -57,6 +62,10 @@ describe("admin service form uploads", () => {
     const fetchMock = vi.fn().mockResolvedValue({ url: "/admin/services/new-service/edit" });
     vi.stubGlobal("fetch", fetchMock);
     render(<ServiceForm submitLabel="Create service" />);
+    for (const name of ["title", "summary", "description", "highlights", "pricePreview", "heroDescription", "pricingLines"]) {
+      fireEvent.change(document.querySelector(`[name="${name}"]`)!, { target: { value: name === "pricingLines" ? "Monthly rate | $850" : "Service content" } });
+    }
+    fireEvent.click(screen.getByRole("tab", { name: /Examples$/ }));
 
     fireEvent.change(screen.getByLabelText("New platform"), { target: { value: "YouTube" } });
     fireEvent.click(screen.getByRole("button", { name: "Add platform" }));
@@ -89,6 +98,7 @@ describe("admin service form uploads", () => {
     });
     fireEvent.click(within(dialog).getByRole("button", { name: "Add example" }));
 
+    fireEvent.click(screen.getByRole("tab", { name: /FAQs$/ }));
     fireEvent.click(screen.getByRole("button", { name: "Add FAQ" }));
     fireEvent.change(screen.getByLabelText("Question"), { target: { value: "How does this work?" } });
     fireEvent.change(screen.getByLabelText("Answer"), { target: { value: "We show examples." } });

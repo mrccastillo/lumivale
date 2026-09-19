@@ -1,79 +1,54 @@
-export default function AdminLoginPage({
-  searchParams,
-}: {
+import Link from "next/link";
+import { getSiteContentForSite } from "@/lib/site-content";
+import { LoginForm } from "./login-form";
+import styles from "./login.module.css";
+
+export default async function AdminLoginPage({ searchParams }: {
   searchParams: Promise<{ error?: string }> | { error?: string };
 }) {
-  void searchParams;
-
+  const { error } = await searchParams;
+  const content = await getSiteContentForSite();
   return (
-    <section className="relative min-h-screen overflow-hidden bg-[linear-gradient(180deg,#f7f8fb_0%,#f3f6f5_100%)] px-6 py-10 sm:px-8 sm:py-14">
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(20,201,131,0.16),transparent_36%),radial-gradient(circle_at_bottom_right,rgba(69,215,180,0.12),transparent_28%)]"
-      />
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-x-0 top-0 h-72 bg-[linear-gradient(180deg,rgba(255,255,255,0.72),rgba(255,255,255,0))]"
-      />
-
-      <div className="relative mx-auto flex min-h-[calc(100vh-5rem)] w-full max-w-md items-center">
-        <div className="w-full">
-          <div className="mb-7">
-            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--lumivale-accent)]">
-              Lumivale
-            </p>
-            <h1 className="mt-4 text-4xl font-semibold tracking-[-0.04em] text-[var(--lumivale-ink)] sm:text-[2.85rem]">
-              Admin Login
-            </h1>
+    <main className={styles.page}>
+      <aside className={styles.brandPanel} aria-label={content.brandName}>
+        <Link href="/" className={styles.brand} aria-label={`${content.brandName} home`}>
+          {content.logoUrl ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={content.logoUrl} alt="" className={styles.logoImage} />
+          ) : <span className={styles.letterMark} aria-hidden="true">{content.logoText}</span>}
+          <span>{content.brandName}</span>
+        </Link>
+        <div className={styles.brandCenter} aria-hidden="true">
+          <div className={styles.emblem}>
+            {content.logoUrl ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={content.logoUrl} alt="" className={styles.emblemImage} />
+            ) : <span className={styles.emblemLetter}>{content.logoText}</span>}
           </div>
-
-          <form
-            action="/api/admin/login"
-            method="post"
-            className="rounded-[28px] border border-[rgba(207,221,213,0.85)] bg-[rgba(255,255,255,0.82)] p-6 shadow-[0_32px_100px_rgba(5,43,32,0.10)] backdrop-blur-xl sm:p-8"
-          >
-            <div className="flex flex-col gap-5">
-              <Field label="Email" name="email" type="email" />
-              <Field label="Password" name="password" type="password" />
-            </div>
-
-            <button
-              type="submit"
-              className="mt-7 inline-flex min-h-12 items-center justify-center rounded-full bg-[var(--lumivale-accent)] px-7 text-sm font-semibold text-[#02110d] shadow-[0_10px_24px_rgba(20,201,131,0.24)] transition hover:bg-[var(--lumivale-accent-soft)]"
-            >
-              Log in
-            </button>
-          </form>
+          <span className={styles.centerLabel}>THE {content.brandName.toUpperCase()} WORKSPACE</span>
         </div>
-      </div>
-    </section>
-  );
-}
-
-function Field({
-  label,
-  name,
-  type,
-}: {
-  label: string;
-  name: string;
-  type: string;
-}) {
-  return (
-    <div>
-      <label
-        htmlFor={name}
-        className="mb-2.5 block text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--lumivale-admin-muted)]"
-      >
-        {label}
-      </label>
-      <input
-        id={name}
-        name={name}
-        type={type}
-        required
-        className="min-h-14 w-full rounded-[18px] border border-[rgba(207,221,213,0.92)] bg-[rgba(255,255,255,0.88)] px-4 py-3 text-[15px] text-[var(--lumivale-ink)] outline-none transition placeholder:text-[rgba(104,112,138,0.7)] focus:border-[var(--lumivale-accent)] focus:bg-white focus:shadow-[0_0_0_4px_rgba(20,201,131,0.10)]"
-      />
-    </div>
+        <div className={styles.brandBottom}>
+          <p>Light up your growth.</p>
+          <span>FOCUS. CLARITY. MOMENTUM.</span>
+        </div>
+        <div className={styles.wordmark} aria-hidden="true">{content.brandName.toLowerCase()}</div>
+      </aside>
+      <section className={styles.workspace} aria-labelledby="login-heading">
+        <header className={styles.topbar}>
+          <span className={styles.portalLabel}><span /> Staff portal</span>
+          <Link href="/" className={styles.backLink}><span aria-hidden="true">&#8592;</span> Back to website</Link>
+        </header>
+        <div className={styles.formArea}>
+          <div className={styles.formHeading}>
+            <p className={styles.eyebrow}>YOUR WORKSPACE</p>
+            <h1 id="login-heading">Admin Login</h1>
+            <p className={styles.description}>Sign in to manage your site and content.</p>
+          </div>
+          <LoginForm invalid={error === "invalid"} />
+          <p className={styles.accessNote}><svg width="13" height="15" viewBox="0 0 16 18" fill="none" aria-hidden="true"><rect x="2" y="7" width="12" height="9" rx="2" stroke="currentColor"/><path d="M5 7V5a3 3 0 0 1 6 0v2M8 10v3" stroke="currentColor"/></svg> Access for authorized team members.</p>
+        </div>
+        <footer className={styles.footer}><span>{content.brandName}</span><span>Content &amp; operations</span></footer>
+      </section>
+    </main>
   );
 }

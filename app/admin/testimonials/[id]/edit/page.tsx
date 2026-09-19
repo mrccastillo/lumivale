@@ -7,11 +7,14 @@ import { getTestimonialById } from "@/lib/testimonials";
 
 export default async function EditTestimonialPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ id: string }>;
+  searchParams: Promise<{ error?: string }>;
 }) {
   await requireAdminAccess();
   const { id } = await params;
+  const { error } = await searchParams;
   const db = await getMongoDb();
   const testimonial = await getTestimonialById(db, id);
 
@@ -31,7 +34,7 @@ export default async function EditTestimonialPage({
           </h1>
         </div>
       </div>
-      <TestimonialForm testimonial={testimonial} />
+      <TestimonialForm testimonial={testimonial} errorMessage={error} />
     </section>
   );
 }

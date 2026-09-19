@@ -1,8 +1,13 @@
 import { render, screen } from "@testing-library/react";
-import { describe, expect, test } from "vitest";
+import { describe, expect, test, vi } from "vitest";
 
 import CaseStudiesPage from "@/app/case-studies/page";
 import { getAllCaseStudies } from "@/lib/case-studies";
+
+vi.mock("@/lib/case-studies", async (importOriginal) => {
+  const original = await importOriginal<typeof import("@/lib/case-studies")>();
+  return { ...original, getPublishedCaseStudiesForSite: vi.fn(async () => original.defaultCaseStudies) };
+});
 
 describe("case studies page", () => {
   test("renders the measured impact card layout", async () => {

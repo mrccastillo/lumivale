@@ -7,6 +7,7 @@ export type Testimonial = {
   id: string;
   personName: string;
   personTitle: string;
+  imageUrl?: string;
   quote: string;
   sortOrder: number;
   status: TestimonialStatus;
@@ -19,6 +20,7 @@ export type Testimonial = {
 export type TestimonialInput = {
   personName: string;
   personTitle: string;
+  imageUrl?: string;
   quote: string;
   sortOrder: number;
   status: TestimonialStatus;
@@ -73,6 +75,7 @@ function normalizeInput(input: TestimonialInput): TestimonialInput {
   return {
     personName: input.personName.trim(),
     personTitle: input.personTitle.trim(),
+    imageUrl: input.imageUrl?.trim() ?? "",
     quote: input.quote.trim(),
     sortOrder: Number.isFinite(input.sortOrder) ? input.sortOrder : 0,
     status: input.status === "published" ? "published" : "draft",
@@ -93,8 +96,17 @@ function validateInput(input: TestimonialInput) {
 
 function toTestimonial(document: TestimonialDocument): Testimonial {
   return {
-    ...document,
     id: String(document._id),
+    personName: document.personName,
+    personTitle: document.personTitle,
+    imageUrl: document.imageUrl,
+    quote: document.quote,
+    sortOrder: document.sortOrder,
+    status: document.status,
+    type: document.type,
+    videoUrl: document.videoUrl,
+    createdAt: document.createdAt,
+    updatedAt: document.updatedAt,
   };
 }
 
@@ -124,6 +136,7 @@ export function parseTestimonialFormData(formData: FormData): TestimonialInput {
   return normalizeInput({
     personName: String(formData.get("personName") ?? ""),
     personTitle: String(formData.get("personTitle") ?? ""),
+    imageUrl: String(formData.get("imageUrl") ?? ""),
     quote: String(formData.get("quote") ?? ""),
     sortOrder: Number(formData.get("sortOrder") ?? 0),
     status: formData.get("status") === "published" ? "published" : "draft",
@@ -187,6 +200,7 @@ export async function updateTestimonial(
   const next = normalizeInput({
     personName: updates.personName ?? current.personName,
     personTitle: updates.personTitle ?? current.personTitle,
+    imageUrl: updates.imageUrl ?? current.imageUrl,
     quote: updates.quote ?? current.quote,
     sortOrder: updates.sortOrder ?? current.sortOrder,
     status: updates.status ?? current.status,

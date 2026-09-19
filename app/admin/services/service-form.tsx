@@ -7,6 +7,17 @@ import { ServiceFaqEditor } from "@/app/admin/services/service-faq-editor";
 import type { ServiceFaq } from "@/lib/service-faqs";
 import type { Service, ServiceExampleCard } from "@/lib/services";
 
+import styles from "../site-content/site-content-form.module.css";
+import serviceStyles from "./service-form.module.css";
+
+const editorSections = [
+  { id: "overview", label: "Overview", description: "Edit the public service copy, display order, and publishing status." },
+  { id: "faqs", label: "FAQs", description: "Answer common questions on this service's public page." },
+  { id: "pricing", label: "Private pricing", description: "Manage pricing and descriptions visible to approved clients." },
+  { id: "examples", label: "Examples", description: "Organize platforms and add examples, images, and videos for approved clients." },
+] as const;
+type EditorSection = (typeof editorSections)[number]["id"];
+
 const fieldClassName =
   "min-h-12 w-full rounded-[18px] border border-[var(--lumivale-line)] bg-white px-4 py-3 text-sm text-[var(--lumivale-ink)] outline-none transition focus:border-[var(--lumivale-accent)]";
 
@@ -59,6 +70,8 @@ export function ServiceForm({
   service?: Service;
   submitLabel?: string;
 }) {
+  const [activeSection, setActiveSection] = useState<EditorSection>("overview");
+  const [saveError, setSaveError] = useState("");
   const action = service ? `/api/admin/services/${service.slug}` : "/api/admin/services";
   const initialContent = service ? normalizeExamplePlatforms(service.privateContent) : null;
   const [platforms, setPlatforms] = useState<ExamplePlatform[]>(initialContent?.examplePlatforms ?? []);
@@ -72,7 +85,19 @@ export function ServiceForm({
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setFaqValidation(true);
-    if (faqs.some((faq) => !faq.question.trim() || !faq.answer.trim())) return;
+    if (faqs.some((faq) => !faq.question.trim() || !faq.answer.trim())) {
+      setActiveSection("faqs");
+      requestAnimationFrame(() => document.querySelector<HTMLElement>('#service-panel-faqs [aria-invalid="true"]')?.focus());
+      return;
+    }
+    const invalid = event.currentTarget.querySelector<HTMLInputElement | HTMLTextAreaElement>("input:invalid, textarea:invalid, select:invalid");
+    if (invalid) {
+      const panel = invalid.closest<HTMLElement>("[data-service-section]");
+      if (panel) setActiveSection(panel.dataset.serviceSection as EditorSection);
+      requestAnimationFrame(() => { invalid.focus(); invalid.reportValidity(); });
+      return;
+    }
+    setSaveError("");
     setIsSubmitting(true);
 
     const formData = new FormData(event.currentTarget);
@@ -88,21 +113,30 @@ export function ServiceForm({
       }
     });
 
+    try {
     const response = await fetch(action, {
       body: formData,
       method: "POST",
     });
 
     window.location.href = response.url || action;
+    } catch {
+      setSaveError("Could not save the service. Please try again. Your edits are still here.");
+      setIsSubmitting(false);
+    }
   }
 
+  function panel(id: EditorSection) {
+    return { id: `service-panel-${id}`, role: "tabpanel", "aria-labelledby": `service-tab-${id}`, "data-service-section": id, hidden: activeSection !== id, tabIndex: 0, className: styles.panel };
+  }
   return (
     <form
       action={action}
       method="post"
       encType="multipart/form-data"
       onSubmit={handleSubmit}
-      className="grid gap-6 rounded-[24px] border border-[var(--lumivale-line)] bg-white p-6 shadow-[0_20px_60px_rgba(42,47,82,0.06)] sm:p-7"
+      noValidate
+      className="min-w-0"
     >
       <input type="hidden" name="action" value="save" />
       <input type="hidden" name="serviceFaqs" value={JSON.stringify(faqs)} />
@@ -117,6 +151,24 @@ export function ServiceForm({
         </div>
       ) : null}
 
+      <div role="tablist" aria-label="Service sections" className={styles.tabs}>
+        {editorSections.map((section, index) => <button key={section.id} type="button" role="tab"
+          id={`service-tab-${section.id}`} aria-controls={`service-panel-${section.id}`} aria-selected={activeSection === section.id}
+          tabIndex={activeSection === section.id ? 0 : -1} onClick={() => setActiveSection(section.id)}
+          onKeyDown={(event) => {
+            let next = index;
+            if (event.key === "ArrowRight") next = (index + 1) % editorSections.length;
+            else if (event.key === "ArrowLeft") next = (index + editorSections.length - 1) % editorSections.length;
+            else if (event.key === "Home") next = 0;
+            else if (event.key === "End") next = editorSections.length - 1;
+            else return;
+            event.preventDefault(); setActiveSection(editorSections[next].id);
+            document.getElementById(`service-tab-${editorSections[next].id}`)?.focus();
+          }}><span className={styles.tabNumber}>0{index + 1}</span>{section.label}</button>)}
+      </div>
+      <div className={styles.sectionIntro}><span>EDIT SECTION</span><p>{editorSections.find((section) => section.id === activeSection)?.description}</p></div>
+      <section {...panel("overview")}>
+      <h2>Service overview</h2>
       <div className="grid gap-5 sm:grid-cols-[minmax(0,1fr)_140px_170px]">
         <Field label="Title" name="title" required defaultValue={service?.title} />
         <Field
@@ -163,9 +215,13 @@ export function ServiceForm({
         rows={4}
       />
 
-      <ServiceFaqEditor faqs={faqs} onChange={setFaqs} showValidation={faqValidation} />
+      </section>
+      <section {...panel("faqs")}>
+        <ServiceFaqEditor faqs={faqs} onChange={setFaqs} showValidation={faqValidation} />
+      </section>
 
-      <section className="grid gap-5 rounded-[20px] border border-[var(--lumivale-admin-border)] bg-[var(--lumivale-admin-surface)] p-5">
+      <section {...panel("pricing")}>
+        <h2>Private pricing</h2>
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[var(--lumivale-panel)]">
             Private Pricing
@@ -204,10 +260,14 @@ export function ServiceForm({
           rows={4}
         />
 
+      </section>
+      <section {...panel("examples")}>
         <ExamplesManager examples={examples} onChange={setExamples} platforms={platforms} onPlatformsChange={setPlatforms} />
       </section>
 
-      <div className="flex flex-wrap gap-3">
+      <div className={styles.saveBar}>
+        <div><p className={styles.saveState}>{isSubmitting ? "Saving service" : "Save your service"}</p><p className={styles.saveHint}>Changes in all four tabs are saved together.</p>{saveError ? <p role="alert" className="text-sm text-red-700">{saveError}</p> : null}</div>
+        <div className="flex flex-wrap gap-3">
         <button
           type="submit"
           disabled={isSubmitting}
@@ -223,6 +283,7 @@ export function ServiceForm({
             Cancel
           </a>
         ) : null}
+      </div>
       </div>
     </form>
   );
@@ -245,6 +306,8 @@ function ExamplesManager({
   const [draft, setDraft] = useState<ExampleDraft>(emptyExample);
   const [draftError, setDraftError] = useState("");
 
+  const [selectedPlatform, setSelectedPlatform] = useState(platforms[0]?.id ?? "");
+  const activePlatform = platforms.some((platform) => platform.id === selectedPlatform) ? selectedPlatform : platforms[0]?.id;
   const [platformName, setPlatformName] = useState("");
   const [platformError, setPlatformError] = useState("");
 
@@ -254,7 +317,9 @@ function ExamplesManager({
       setPlatformError("Use a unique platform name with 1 to 60 characters.");
       return;
     }
-    onPlatformsChange(id ? platforms.map((item) => item.id === id ? { ...item, name } : item) : [...platforms, { id: crypto.randomUUID(), name }]);
+    const platformId = id ?? crypto.randomUUID();
+    onPlatformsChange(id ? platforms.map((item) => item.id === id ? { ...item, name } : item) : [...platforms, { id: platformId, name }]);
+    setSelectedPlatform(platformId);
     setPlatformName("");
     setPlatformError("");
   }
@@ -333,15 +398,36 @@ function ExamplesManager({
       </div>
       {platformError ? <p role="alert" className="mt-2 text-sm text-red-700">{platformError}</p> : null}
       {!platforms.length ? <p className="mt-4 text-sm">Add a platform to start adding examples.</p> : null}
-      <div className="mt-4 grid gap-5">
+      {platforms.length > 0 ? <div role="tablist" aria-label="Example platforms" className={serviceStyles.platformChips}>
+        {platforms.map((platform, index) => <button key={platform.id} type="button" role="tab"
+          id={`platform-tab-${platform.id}`} aria-controls={`platform-panel-${platform.id}`}
+          aria-selected={activePlatform === platform.id} tabIndex={activePlatform === platform.id ? 0 : -1}
+          onClick={() => setSelectedPlatform(platform.id)}
+          onKeyDown={(event) => {
+            let next = index;
+            if (event.key === "ArrowRight") next = (index + 1) % platforms.length;
+            else if (event.key === "ArrowLeft") next = (index + platforms.length - 1) % platforms.length;
+            else if (event.key === "Home") next = 0;
+            else if (event.key === "End") next = platforms.length - 1;
+            else return;
+            event.preventDefault(); setSelectedPlatform(platforms[next].id);
+            document.getElementById(`platform-tab-${platforms[next].id}`)?.focus();
+          }}>{platform.name}<span aria-hidden="true" className={styles.tabNumber}>{examples.filter((example) => example.platformId === platform.id).length}</span></button>)}
+      </div> : null}
+      <div className="mt-4">
         {platforms.map((platform, platformIndex) => {
           const cards = examples.map((example, index) => ({ example, index })).filter(({ example }) => example.platformId === platform.id);
-          return <section key={platform.id} aria-label={`${platform.name} examples`} className="min-w-0 rounded-2xl border border-[var(--lumivale-admin-border)] p-4">
+          return <div key={platform.id} role="tabpanel" id={`platform-panel-${platform.id}`} aria-labelledby={`platform-tab-${platform.id}`} hidden={activePlatform !== platform.id} tabIndex={0}><section aria-label={`${platform.name} examples`} className="min-w-0 rounded-2xl border border-[var(--lumivale-admin-border)] p-4">
             <PlatformName platform={platform} onSave={(name) => savePlatform(platform.id, name)} />
             <div className="my-4 flex flex-wrap gap-2 text-sm">
               <button type="button" disabled={platformIndex === 0} className="rounded-lg border px-3 py-2 disabled:opacity-40" onClick={() => movePlatform(platformIndex, -1)}>Move up</button>
               <button type="button" disabled={platformIndex === platforms.length - 1} className="rounded-lg border px-3 py-2 disabled:opacity-40" onClick={() => movePlatform(platformIndex, 1)}>Move down</button>
-              <button type="button" disabled={cards.length > 0} title={cards.length ? "Move or remove the examples in this platform first." : undefined} className="rounded-lg border px-3 py-2 disabled:opacity-40" onClick={() => onPlatformsChange(platforms.filter((item) => item.id !== platform.id))}>Remove platform</button>
+              <button type="button" disabled={cards.length > 0} title={cards.length ? "Move or remove the examples in this platform first." : undefined} className="rounded-lg border px-3 py-2 disabled:opacity-40" onClick={() => {
+                const remaining = platforms.filter((item) => item.id !== platform.id);
+                const next = remaining[Math.min(platformIndex, remaining.length - 1)]?.id ?? "";
+                onPlatformsChange(remaining); setSelectedPlatform(next);
+                requestAnimationFrame(() => document.getElementById(`platform-tab-${next}`)?.focus());
+              }}>Remove platform</button>
               <button type="button" className="rounded-lg bg-[var(--lumivale-panel)] px-4 py-2 font-semibold text-white" onClick={() => openAddModal(platform.id)}>Add Example</button>
             </div>
             {cards.length > 0 ? <p className="mb-3 text-xs text-[var(--lumivale-muted)]">Move or remove all examples before removing this platform.</p> : <p className="text-sm text-[var(--lumivale-muted)]">No examples yet. This platform is hidden from visitors.</p>}
@@ -388,7 +474,7 @@ function ExamplesManager({
               </div>
             </article>
             ))}</div>
-          </section>;
+          </section></div>;
         })}
       </div>
 

@@ -11,6 +11,8 @@ import {
   AdminNav,
 } from "@/app/admin/admin-nav";
 
+import styles from "./workspace.module.css";
+
 const pageTitles: Record<string, string> = {
   "/admin/site-content": "Site Content",
   "/admin/blogs": "Blogs",
@@ -39,31 +41,24 @@ export function AdminWorkspace({ children, content = defaultSiteContent }: { chi
   return (
     <div
       data-testid="admin-workspace-shell"
-      className={`min-h-screen bg-[#f7f8fb] text-[var(--lumivale-ink)] ${shellOffsetClass}`}
+      className={`${styles.shell} ${shellOffsetClass}`}
     >
       <AdminNav
         content={content}
         isDesktopExpanded={isDesktopExpanded}
         onDesktopToggle={() => setIsDesktopExpanded((expanded) => !expanded)}
       />
-      <header
-        aria-label="Admin header"
-        className="sticky top-0 z-30 border-b border-[var(--lumivale-line)] bg-white/92 px-4 py-3 backdrop-blur-xl sm:px-6 md:px-8"
-      >
-        <div className="flex items-center justify-between gap-4">
-          <div>
-            <p className="text-base font-semibold text-[var(--lumivale-ink)]">{title}</p>
-            <p className="text-xs text-[var(--lumivale-muted)]">{content.brandName} staff portal</p>
-          </div>
-          <div className="flex items-center gap-2 rounded-full border border-[var(--lumivale-line)] bg-white px-3 py-2 text-sm font-semibold text-[var(--lumivale-ink)]">
-            <span className="grid size-8 place-items-center rounded-full bg-[#31586a] text-white">
-              A
-            </span>
-            <span className="hidden sm:inline">Admin</span>
-          </div>
+      <header aria-label="Admin header" className={styles.header}>
+        <div>
+          <p className={styles.headerTitle}>{title}</p>
+          <p className={styles.headerSubtitle}>{content.brandName} staff portal</p>
+        </div>
+        <div className={styles.identity}>
+          <span className={styles.avatar}>A</span>
+          <span className="hidden sm:inline">Admin</span>
         </div>
       </header>
-      <main className="px-4 py-8 sm:px-6 md:px-8">{children}</main>
+      <main className={styles.content}>{children}</main>
     </div>
   );
 }

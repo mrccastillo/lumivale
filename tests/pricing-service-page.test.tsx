@@ -60,13 +60,13 @@ describe("private pricing service page", () => {
       expect(screen.getAllByText(line.value)).toHaveLength(1);
       expect(screen.queryByText(`${line.label}:`)).not.toBeInTheDocument();
     });
-    expect(screen.getByText("EXAMPLES")).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "The work in action." })).toBeInTheDocument();
     expect(screen.queryByText("Private detail")).not.toBeInTheDocument();
     expect(screen.queryByText("Example channel")).not.toBeInTheDocument();
     expect(screen.queryByText(/Placeholder visual panel/)).not.toBeInTheDocument();
     expect(screen.getAllByText(service.privateContent.examplePlatform).length).toBeGreaterThan(0);
     service.privateContent.exampleCards.forEach((card) => {
-      expect(screen.getByRole("heading", { level: 2, name: card.title })).toBeInTheDocument();
+      expect(screen.getByRole("heading", { level: 3, name: card.title })).toBeInTheDocument();
       expect(screen.getByText(card.summary)).toBeInTheDocument();
     });
 
@@ -78,8 +78,8 @@ describe("private pricing service page", () => {
       "href",
       `/pricing/${service.slug}`,
     );
-    expect(screen.getByRole("link", { name: "Home" })).toHaveAttribute("href", "/pricing");
-    expect(container.querySelector("[data-nav-surface='dark']")).toBeTruthy();
+    expect(screen.getByRole("link", { name: /All pricing/ })).toHaveAttribute("href", "/pricing");
+
     expect(container.querySelector("[data-nav-surface='light']")).toBeTruthy();
   });
 

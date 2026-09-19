@@ -133,8 +133,8 @@ vi.mock("@/lib/hero-clients", () => ({
 }));
 
 describe("admin pages", () => {
-  test("renders the admin login form", () => {
-    render(<AdminLoginPage searchParams={Promise.resolve({})} />);
+  test("renders the admin login form", async () => {
+    render(await AdminLoginPage({ searchParams: Promise.resolve({}) }));
 
     expect(
       screen.getByRole("heading", { name: "Admin Login", level: 1 }),

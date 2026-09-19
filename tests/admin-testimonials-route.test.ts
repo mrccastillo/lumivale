@@ -21,6 +21,10 @@ vi.mock("@/app/api/admin/testimonials/upload-video", () => ({
   uploadTestimonialVideo: uploadTestimonialVideoMock,
 }));
 
+vi.mock("@/app/api/admin/testimonials/upload-image", () => ({
+  uploadTestimonialImage: vi.fn().mockResolvedValue("https://example.com/logo.png"),
+}));
+
 vi.mock("@/lib/testimonials", () => ({
   createTestimonial: createTestimonialMock,
   parseTestimonialFormData: parseTestimonialFormDataMock,
@@ -69,6 +73,7 @@ describe("admin testimonials create route", () => {
       "test-db",
       expect.objectContaining({
         videoUrl: "https://res.cloudinary.com/demo/video/upload/video-1.mp4",
+        imageUrl: "https://example.com/logo.png",
       }),
     );
   });

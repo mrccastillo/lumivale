@@ -12,6 +12,8 @@ const updateCaseStudyMock = vi.hoisted(() => vi.fn());
 const deleteCaseStudyMock = vi.hoisted(() => vi.fn());
 const parseCaseStudyFormDataMock = vi.hoisted(() => vi.fn());
 
+vi.mock("next/cache", () => ({ revalidatePath: vi.fn() }));
+
 vi.mock("@/lib/admin-auth", () => ({
   requireAdminAccess: requireAdminAccessMock,
 }));

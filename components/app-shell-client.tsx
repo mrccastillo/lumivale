@@ -25,7 +25,7 @@ export function AppShellClient({
       <main data-nav-surface="light" className="flex-1">
         {children}
       </main>
-      {footer}
+      {pathname !== "/" ? footer : null}
     </div>
   );
 }

@@ -1,9 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { defaultSiteContent, type SiteContent } from "@/lib/site-content-defaults";
+
+import styles from "./site-navbar.module.css";
 
 type NavSurface = "dark" | "light";
 type SiteNavbarLink = {
@@ -26,9 +28,11 @@ export function SiteNavbarClient({
 }: SiteNavbarClientProps) {
   const pathname = usePathname() || "/";
   const isPricingActive = pathname === "/pricing" || pathname.startsWith("/pricing/");
+  const [activeSection, setActiveSection] = useState("/");
   const [surface, setSurface] = useState<NavSurface>("dark");
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const menuButton = useRef<HTMLButtonElement>(null);
   const isLight = surface === "light";
   const sampleY = 56;
   const closeMenu = () => setIsMenuOpen(false);
@@ -69,61 +73,103 @@ export function SiteNavbarClient({
     return () => window.clearTimeout(updateTimeout);
   }, [pathname]);
 
-  const shellClass = isLight
-    ? "border-[var(--lumivale-line)] bg-white text-[var(--lumivale-ink)]"
-    : isScrolled
-      ? "border-white/10 bg-[#031410]/68 text-white shadow-[0_16px_42px_rgba(0,0,0,0.22)] backdrop-blur-xl"
-      : "border-transparent bg-transparent text-white";
-  const logoChipClass = isLight
-    ? "bg-[var(--lumivale-ink)] text-[var(--lumivale-accent-soft)]"
-    : "bg-[var(--lumivale-accent-soft)]/14 text-[var(--lumivale-accent-soft)] ring-1 ring-white/10";
-  const navListClass = isLight ? "text-[var(--lumivale-muted)]" : "text-[#c7e7d7]";
-  const navItemBase = isLight
-    ? "hover:text-[var(--lumivale-ink)]"
-    : "hover:text-white";
-  const navItemActive = isLight
-    ? "text-[var(--lumivale-ink)]"
-    : "text-white";
-  const mobileButtonClass = isLight
-    ? "border-[var(--lumivale-line)] bg-white text-[var(--lumivale-ink)]"
-    : "border-white/12 bg-white/10 text-white";
-  const mobilePanelClass = isLight
-    ? "border-[var(--lumivale-line)] bg-white text-[var(--lumivale-ink)] shadow-[0_18px_45px_rgba(42,47,82,0.12)]"
-    : "border-white/10 bg-[#031410]/92 text-white shadow-[0_22px_54px_rgba(0,0,0,0.32)] backdrop-blur-xl";
-  const mobileLinkClass = isLight
-    ? "border-[var(--lumivale-line)] text-[var(--lumivale-muted)] hover:text-[var(--lumivale-ink)]"
-    : "border-white/10 text-[#c7e7d7] hover:text-white";
+  useEffect(() => {
+    if (!isMenuOpen) return;
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setIsMenuOpen(false);
+        menuButton.current?.focus();
+      }
+    };
+    const onResize = () => {
+      if (window.innerWidth >= 1100) setIsMenuOpen(false);
+    };
+    window.addEventListener("keydown", onKeyDown);
+    window.addEventListener("resize", onResize);
+    return () => {
+      window.removeEventListener("keydown", onKeyDown);
+      window.removeEventListener("resize", onResize);
+    };
+  }, [isMenuOpen]);
+
+  useEffect(() => {
+    if (pathname !== "/") return;
+    const updateActiveSection = () => {
+      const threshold = 120;
+      let active = "/";
+      publicLinks.forEach((link) => {
+        if (!link.href.startsWith("/#")) return;
+        const section = document.getElementById(link.href.slice(2));
+        if (section && section.getBoundingClientRect().top <= threshold) active = link.href;
+      });
+      setActiveSection(active);
+    };
+    const frame = requestAnimationFrame(updateActiveSection);
+    window.addEventListener("scroll", updateActiveSection, { passive: true });
+    window.addEventListener("resize", updateActiveSection);
+    return () => {
+      cancelAnimationFrame(frame);
+      window.removeEventListener("scroll", updateActiveSection);
+      window.removeEventListener("resize", updateActiveSection);
+    };
+  }, [pathname, publicLinks]);
+
+  const isLinkActive = (href: string) => pathname === "/"
+    ? activeSection === href
+    : !href.includes("#") && href !== "/" && (pathname === href || pathname.startsWith(`${href}/`));
+  const sectionHref = (href: string) => href === "/" ? "/#hero" : href;
+  const navigateSection = (event: { preventDefault: () => void }, href: string) => {
+    closeMenu();
+    if (pathname !== "/" || !sectionHref(href).startsWith("/#")) return;
+    event.preventDefault();
+    window.history.pushState(null, "", sectionHref(href));
+    window.dispatchEvent(new Event("homepage:navigate"));
+  };
+
+  const shellClass = isLight ? styles.light : styles.dark;
+  const logoChipClass = styles.mark;
+  const navListClass = styles.links;
+  const navItemBase = styles.link;
+  const navItemActive = styles.active;
+  const mobileButtonClass = styles.menuButton;
+  const mobilePanelClass = styles.mobilePanel;
+  const mobileLinkClass = styles.mobileLink;
 
   return (
-    <header className={`fixed inset-x-0 top-0 z-50 border-b transition-colors duration-300 ${shellClass}`}>
+    <header data-surface={surface} data-scrolled={isScrolled} className={`${styles.header} ${shellClass}`}>
       <div
-        className="mx-auto flex w-full max-w-7xl items-center justify-between gap-4 px-4 py-4 sm:px-6 sm:py-5"
+        className={styles.inner}
       >
         <Link
-          href="/"
+          href="/#hero"
+          scroll={false}
+          onNavigate={(event) => navigateSection(event, "/")}
           onClick={closeMenu}
-          className="flex items-center gap-2.5 text-base font-semibold sm:gap-3 sm:text-lg"
+          className={styles.brand}
         >
           {content.logoUrl ? (
             // eslint-disable-next-line @next/next/no-img-element
-            <img src={content.logoUrl} alt="" className="size-7 shrink-0 object-contain sm:size-8" />
+            <img src={content.logoUrl} alt="" className={styles.logo} />
           ) : (
-            <span aria-hidden="true" className={`grid size-7 place-items-center rounded-full text-xs sm:size-8 sm:text-sm ${logoChipClass}`}>
+            <span aria-hidden="true" className={logoChipClass}>
               {content.logoText}
             </span>
           )}
           {content.brandName}
         </Link>
 
-        <nav aria-label="Primary" className="hidden md:block">
-          <ul className={`flex items-center gap-8 text-sm font-medium ${navListClass}`}>
+        <nav aria-label="Primary" className={styles.desktopNav}>
+          <ul className={navListClass}>
             {publicLinks.map((link) => {
-              const isActive = pathname === link.href;
+              const isActive = isLinkActive(link.href);
 
               return (
                 <li key={link.href}>
                   <Link
-                    href={link.href}
+                    href={sectionHref(link.href)}
+                    scroll={link.href !== "/" && !link.href.startsWith("/#")}
+                    onNavigate={(event) => navigateSection(event, link.href)}
+                    aria-current={isActive ? "page" : undefined}
                     className={`transition ${
                       isActive ? navItemActive : ""
                     } ${navItemBase}`}
@@ -137,6 +183,7 @@ export function SiteNavbarClient({
               <li>
                 <Link
                   href="/pricing"
+                  aria-current={isPricingActive ? "page" : undefined}
                   className={`transition ${
                     isPricingActive ? navItemActive : ""
                   } ${navItemBase}`}
@@ -152,18 +199,19 @@ export function SiteNavbarClient({
           href={calendlyUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="hidden items-center rounded-full bg-[var(--lumivale-accent)] px-5 py-2.5 text-sm font-semibold text-[#010807] shadow-[0_14px_34px_rgba(20,201,131,0.22)] transition hover:bg-[var(--lumivale-accent-soft)] md:inline-flex"
+          className={`${styles.cta} ${styles.desktopCta}`}
         >
-          Contact Us
+          Contact Us <span aria-hidden="true">&#8599;</span>
         </a>
 
         <button
+          ref={menuButton}
           type="button"
           aria-controls="mobile-menu"
           aria-expanded={isMenuOpen}
           aria-label={isMenuOpen ? "Close menu" : "Open menu"}
           onClick={() => setIsMenuOpen((open) => !open)}
-          className={`grid size-10 place-items-center rounded-full border transition md:hidden ${mobileButtonClass}`}
+          className={mobileButtonClass}
         >
           <span aria-hidden="true" className="flex w-4 flex-col gap-1">
             <span
@@ -189,17 +237,20 @@ export function SiteNavbarClient({
         <nav
           id="mobile-menu"
           aria-label="Mobile"
-          className={`mx-4 mb-4 rounded-lg border p-3 md:hidden ${mobilePanelClass}`}
+          className={mobilePanelClass}
         >
           <div className="flex flex-col">
             {publicLinks.map((link) => {
-              const isActive = pathname === link.href;
+              const isActive = isLinkActive(link.href);
 
               return (
                 <Link
                   key={link.href}
-                  href={link.href}
+                  href={sectionHref(link.href)}
+                    scroll={link.href !== "/" && !link.href.startsWith("/#")}
+                    onNavigate={(event) => navigateSection(event, link.href)}
                   onClick={closeMenu}
+                  aria-current={isActive ? "page" : undefined}
                   className={`border-b px-3 py-3 text-sm font-medium transition last:border-b-0 ${
                     isActive ? navItemActive : ""
                   } ${mobileLinkClass}`}
@@ -225,9 +276,9 @@ export function SiteNavbarClient({
             target="_blank"
             rel="noopener noreferrer"
             onClick={closeMenu}
-            className="mt-3 flex items-center justify-center rounded-full bg-[var(--lumivale-accent)] px-5 py-2.5 text-sm font-semibold text-[#010807] shadow-[0_12px_28px_rgba(20,201,131,0.24)] transition hover:bg-[var(--lumivale-accent-soft)]"
+            className={styles.cta}
           >
-            Book a call
+            Book a call <span aria-hidden="true">&#8599;</span>
           </a>
         </nav>
       ) : null}

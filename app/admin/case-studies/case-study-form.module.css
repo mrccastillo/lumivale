@@ -1,0 +1,45 @@
+.steps { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px; }
+.steps button { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; padding: 14px; border: 1px solid #d6dcd1; border-radius: 6px; text-align: left; background: #f4f5ed; color: #526459; cursor: pointer; }
+.steps button > span { display: grid; place-items: center; height: 25px; width: 25px; border-radius: 50%; background: #e5eadb; font-size: 11px; flex-shrink: 0; }
+.steps strong { font-size: 12px; font-weight: 550; }
+.steps button[aria-current="step"] { background: #142d23; color: #f4f5ed; border-color: #142d23; }
+.steps button[aria-current="step"] > span { background: #c0f275; color: #142d23; }
+.steps small { width: 100%; font-size: 11px; color: #b04932; }
+.steps button[aria-current="step"] small { color: #ffd4b6; }
+.steps button:focus-visible { outline: 2px solid #739e36; outline-offset: 3px; }
+.stepIntro { padding: 12px 0 0; }
+.stepIntro > p:first-child { font-size: 10px; text-transform: uppercase; letter-spacing: .12em; }
+.stepIntro h2 { font-size: 25px; margin: 8px 0; }
+.stepIntro p { font-size: 13px; color: #657169; }
+.stepActions { display: flex; justify-content: space-between; align-items: center; gap: 14px; }
+.stepActions p { font-size: 12px; color: #657169; }
+.storyToolbar { display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+.storyToolbar p { font-size: 13px; color: #657169; max-width: 480px; }
+.storyToolbar button { flex-shrink: 0; }
+.sectionPicker { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; padding: 16px; background: #eef1e7; border-radius: 6px; }
+.sectionPicker button { text-align: left; padding: 15px; border: 1px solid #d6dcd1; background: #fcfcf8; border-radius: 5px; cursor: pointer; }
+.sectionPicker button:hover { border-color: #739e36; }
+.sectionPicker strong { display: block; font-size: 13px; font-weight: 600; }
+.sectionPicker span { display: block; margin-top: 6px; font-size: 12px; line-height: 1.5; color: #657169; }
+.sectionPicker button:disabled { opacity: .4; cursor: not-allowed; }
+.storyWorkspace { display: grid; grid-template-columns: 230px minmax(0, 1fr); align-items: start; gap: 24px; }
+.outline { position: sticky; top: 100px; min-width: 0; }
+.outline > p { display: flex; justify-content: space-between; gap: 8px; font-size: 12px; font-weight: 600; margin-bottom: 12px; }
+.outline > p > span { color: #657169; font-weight: 400; }
+.outline nav { display: flex; flex-direction: column; gap: 5px; max-height: 60vh; overflow-y: auto; padding: 3px; }
+.outline button { display: flex; gap: 10px; padding: 12px 10px; text-align: left; color: #526459; border: 1px solid transparent; border-radius: 5px; background: transparent; cursor: pointer; }
+.outline button > span:first-child { flex: 0 0 18px; white-space: nowrap; font-size: 10px; padding-top: 2px; }
+.outline strong { display: block; font-size: 12px; font-weight: 550; line-height: 1.5; overflow-wrap: anywhere; }
+.outline small { display: block; font-size: 10px; margin-top: 4px; opacity: .75; }
+.outline button:hover { background: #edf0e5; }
+.outline button[aria-pressed="true"] { background: #e6eddc; border-color: #bdcda9; color: #142d23; }
+.sectionEditors { min-width: 0; }
+.sectionEditor { min-width: 0; border-left: 1px solid #d6dcd1; padding-left: 24px; }
+.sectionEditor > * + * { margin-top: 20px; }
+.sectionEditor h3 { font-size: 14px; }
+.storyEmpty { padding: 40px 20px; text-align: center; background: #f4f5ed; border: 1px dashed #bdcda9; border-radius: 6px; }
+.storyEmpty h3 { font-size: 17px; margin-bottom: 8px; }
+.storyEmpty p { font-size: 13px; color: #657169; }
+@media(max-width: 1100px) { .storyWorkspace { grid-template-columns: 180px minmax(0, 1fr); gap: 16px; } .sectionEditor { padding-left: 16px; } .sectionPicker { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media(max-width: 700px) { .storyWorkspace { display: block; } .outline { position: static; margin-bottom: 20px; } .outline nav { flex-direction: row; max-height: none; overflow-x: auto; } .outline button { flex: 0 0 180px; } .outline strong { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; } .sectionEditor { border-left: 0; border-top: 1px solid #d6dcd1; padding: 20px 0 0; } .storyToolbar { align-items: start; } .sectionPicker { grid-template-columns: 1fr; } }
+@media(max-width: 800px) { .steps { display: flex; overflow-x: auto; padding: 3px 3px 8px; } .steps button { flex: 0 0 auto; } .stepActions { flex-wrap: wrap; } .stepActions p { display: none; } }

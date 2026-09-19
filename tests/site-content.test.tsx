@@ -55,15 +55,21 @@ test("rejects unsafe destinations and missing required content", () => {
   expect(() => parseSiteContent({ ...defaultSiteContent, heroButtonUrl: "javascript:alert(1)" })).toThrow("HTTP");
   expect(() => parseSiteContent({ ...defaultSiteContent, logoUrl: "data:image/png;base64,abc" })).toThrow("HTTP");
   expect(() => parseSiteContent({ ...defaultSiteContent, brandName: " " })).toThrow("Complete");
+  expect(() => parseSiteContent({ ...defaultSiteContent, resultsHeading: " " })).toThrow("Complete");
+  expect(() => parseSiteContent({ ...defaultSiteContent, resultsMetric1Value: "1".repeat(25) })).toThrow("24 characters");
+  expect(() => parseSiteContent({ ...defaultSiteContent, footerCtaButtonUrl: "javascript:alert(1)" })).toThrow("HTTP");
+  expect(() => parseSiteContent({ ...defaultSiteContent, footerHomeUrl: "//example.com" })).toThrow("HTTP");
+  expect(() => parseSiteContent({ ...defaultSiteContent, footerEmail: "invalid" })).toThrow("email");
+  expect(parseSiteContent({ ...defaultSiteContent, footerHomeUrl: "/services" }).footerHomeUrl).toBe("/services");
 });
 
 test("authenticated saves upload the logo and refresh public routes", async () => {
-  const response = await POST(request({ heroHeading: "New heading" }, new File(["image"], "logo.png", { type: "image/png" })));
+  const response = await POST(request({ heroHeading: "New heading", footerTagline: "New tagline", footerCtaHeading: "Grow with us", resultsMetric1Value: "250K+", resultsMetric1Label: "People reached" }, new File(["image"], "logo.png", { type: "image/png" })));
   expect(response.status).toBe(200);
   expect(mocks.auth).toHaveBeenCalledOnce();
   expect(mocks.upload).toHaveBeenCalledWith(expect.any(File), { folder: "lumivale/branding", resourceType: "image" });
   expect(updateOne).toHaveBeenCalledWith({ _id: "main" }, { $set: expect.objectContaining({
-    heroHeading: "New heading", logoUrl: "https://example.com/uploaded.png",
+    heroHeading: "New heading", logoUrl: "https://example.com/uploaded.png", footerTagline: "New tagline", footerCtaHeading: "Grow with us", resultsMetric1Value: "250K+", resultsMetric1Label: "People reached",
   }) }, { upsert: true });
   expect(mocks.revalidate).toHaveBeenCalledWith("/", "layout");
 });
@@ -97,7 +103,7 @@ test("failed persistence reports failure", async () => {
 test("navbar uses the saved name and logo, with a letter fallback", () => {
   const props = { calendlyUrl: defaultSiteContent.heroButtonUrl, hasTrustedAccess: false, publicLinks: [] };
   const { container, rerender } = render(<SiteNavbarClient {...props} content={{ ...defaultSiteContent, brandName: "New Brand", logoUrl: "https://example.com/logo.png" }} />);
-  expect(screen.getByRole("link", { name: "New Brand" })).toHaveAttribute("href", "/");
+  expect(screen.getByRole("link", { name: "New Brand" })).toHaveAttribute("href", "/#hero");
   expect(container.querySelector("img")).toHaveAttribute("src", "https://example.com/logo.png");
   rerender(<SiteNavbarClient {...props} content={{ ...defaultSiteContent, logoText: "N" }} />);
   expect(container.querySelector("img")).toBeNull();
@@ -109,11 +115,19 @@ test("admin edits and logo removal are submitted and remain visible after save",
   vi.stubGlobal("fetch", fetchMock);
   render(<SiteContentForm initialContent={{ ...defaultSiteContent, logoUrl: "https://example.com/old.png" }} />);
   fireEvent.change(screen.getByLabelText("Brand name"), { target: { value: "New Brand" } });
+  fireEvent.change(screen.getByLabelText("Result 1 value"), { target: { value: "250K+" } });
+  fireEvent.change(screen.getByLabelText("Result 1 label"), { target: { value: "People reached" } });
+  fireEvent.change(screen.getByLabelText("Footer headline"), { target: { value: "Grow with us" } });
+  fireEvent.change(screen.getByLabelText("Contact email"), { target: { value: "hello@example.com" } });
   fireEvent.click(screen.getByRole("button", { name: "Remove logo" }));
   fireEvent.click(screen.getByRole("button", { name: "Save changes" }));
   await waitFor(() => expect(screen.getByRole("status")).toHaveTextContent("saved"));
   const data = fetchMock.mock.calls[0][1].body as FormData;
   expect(data.get("brandName")).toBe("New Brand");
+  expect(data.get("resultsMetric1Value")).toBe("250K+");
+  expect(data.get("resultsMetric1Label")).toBe("People reached");
+  expect(data.get("footerCtaHeading")).toBe("Grow with us");
+  expect(data.get("footerEmail")).toBe("hello@example.com");
   expect(data.get("logoUrl")).toBe("");
   expect(mocks.refresh).toHaveBeenCalledOnce();
 });
@@ -125,4 +139,56 @@ test("admin keeps edits when saving fails", async () => {
   fireEvent.click(screen.getByRole("button", { name: "Save changes" }));
   await waitFor(() => expect(screen.getByRole("alert")).toHaveTextContent("Upload failed"));
   expect(screen.getByLabelText("Headline")).toHaveValue("Keep my edit");
+});
+
+
+test("section tabs preserve edits and support keyboard navigation", () => {
+  render(<SiteContentForm initialContent={defaultSiteContent} />);
+  fireEvent.change(screen.getByLabelText("Brand name"), { target: { value: "Updated brand" } });
+  const branding = screen.getByRole("tab", { name: /Branding/ });
+  fireEvent.keyDown(branding, { key: "ArrowRight" });
+  expect(screen.getByRole("tabpanel")).toHaveAttribute("id", "panel-hero");
+  expect(screen.getByRole("tab", { name: /Homepage hero/ })).toHaveFocus();
+  fireEvent.change(screen.getByLabelText("Headline"), { target: { value: "Updated headline" } });
+  fireEvent.click(branding);
+  expect(screen.getByLabelText("Brand name")).toHaveValue("Updated brand");
+  expect(screen.getByText("Unsaved changes")).toBeInTheDocument();
+  fireEvent.click(screen.getByRole("tab", { name: /Homepage hero/ }));
+  expect(screen.getByLabelText("Headline")).toHaveValue("Updated headline");
+});
+
+test("saving reveals invalid fields in a hidden tab before submitting", async () => {
+  const fetchMock = vi.fn();
+  vi.stubGlobal("fetch", fetchMock);
+  render(<SiteContentForm initialContent={defaultSiteContent} />);
+  fireEvent.click(screen.getByRole("tab", { name: /Homepage hero/ }));
+  fireEvent.change(screen.getByLabelText("Headline"), { target: { value: "" } });
+  fireEvent.click(screen.getByRole("tab", { name: /Branding/ }));
+  fireEvent.click(screen.getByRole("button", { name: "Save changes" }));
+  expect(screen.getByRole("tabpanel")).toHaveAttribute("id", "panel-hero");
+  await waitFor(() => expect(screen.getByLabelText("Headline")).toHaveFocus());
+  expect(fetchMock).not.toHaveBeenCalled();
+});
+
+
+test("About edits and portraits persist through the authenticated settings API", async () => {
+  const data = await request({ aboutHeading: "Meet our team", aboutFounder1Name: "Alex" }).formData();
+  data.set("founder1File", new File(["portrait"], "portrait.jpg", { type: "image/jpeg" }));
+  const response = await POST({ formData: async () => data } as Request);
+  expect(response.status).toBe(200);
+  expect(updateOne).toHaveBeenCalledWith({ _id: "main" }, { $set: expect.objectContaining({ aboutHeading: "Meet our team", aboutFounder1Name: "Alex", aboutFounder1Image: "https://example.com/uploaded.png" }) }, { upsert: true });
+  expect(() => parseSiteContent({ ...defaultSiteContent, aboutFounder1Image: "javascript:alert(1)" })).toThrow("HTTP");
+});
+
+test("About tab saves edited copy and founder details", async () => {
+  const fetchMock = vi.fn().mockResolvedValue({ ok: true, json: async () => ({ content: { ...defaultSiteContent, aboutHeading: "Our story", aboutFounder1Name: "Alex" } }) });
+  vi.stubGlobal("fetch", fetchMock);
+  render(<SiteContentForm initialContent={defaultSiteContent} />);
+  fireEvent.click(screen.getByRole("tab", { name: /About Us/ }));
+  fireEvent.change(screen.getByLabelText("About headline"), { target: { value: "Our story" } });
+  fireEvent.change(screen.getByLabelText("Founder 1 name"), { target: { value: "Alex" } });
+  fireEvent.click(screen.getByRole("button", { name: "Save changes" }));
+  await waitFor(() => expect(screen.getByRole("status")).toHaveTextContent("saved"));
+  expect(fetchMock.mock.calls[0][1].body.get("aboutHeading")).toBe("Our story");
+  expect(fetchMock.mock.calls[0][1].body.get("aboutFounder1Name")).toBe("Alex");
 });

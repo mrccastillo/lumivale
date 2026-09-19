@@ -25,9 +25,6 @@ export default async function AdminUsersPage({
   const sort = parseSort(firstValue(params?.sort));
   const range = parseRange(firstValue(params?.range));
   const visibleUsers = filterAndSortUsers(users, { query, range, sort });
-  const newestUser = [...users].sort(
-    (left, right) => right.createdAt.getTime() - left.createdAt.getTime(),
-  )[0];
 
   return (
     <section className="mx-auto flex w-full max-w-6xl flex-col gap-6">
@@ -41,20 +38,6 @@ export default async function AdminUsersPage({
           a quieter workspace built for everyday operations.
         </p>
       </header>
-
-      <section className="grid gap-4 md:grid-cols-3">
-        <MetricCard label="Total admins" value={users.length} note="All active admin accounts" />
-        <MetricCard
-          label="Visible results"
-          value={visibleUsers.length}
-          note="Matches the current search and range"
-        />
-        <MetricCard
-          label="Newest account"
-          value={newestUser ? formatShortDate(newestUser.createdAt) : "None"}
-          note={newestUser ? "Most recently created admin" : "No admins yet"}
-        />
-      </section>
 
       <div className="grid gap-6 xl:grid-cols-[360px_minmax(0,1fr)]">
         <section className="rounded-[24px] border border-[var(--lumivale-admin-border)] bg-white p-6 shadow-[0_20px_60px_rgba(5,43,32,0.06)]">
@@ -240,26 +223,6 @@ function Field({
   );
 }
 
-function MetricCard({
-  label,
-  note,
-  value,
-}: {
-  label: string;
-  note: string;
-  value: number | string;
-}) {
-  return (
-    <article className="rounded-[20px] border border-[var(--lumivale-admin-border)] bg-white px-5 py-4 shadow-[0_16px_44px_rgba(5,43,32,0.05)]">
-      <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--lumivale-panel)]">
-        {label}
-      </p>
-      <p className="mt-3 text-2xl font-semibold text-[var(--lumivale-ink)]">{value}</p>
-      <p className="mt-2 text-xs text-[var(--lumivale-muted)]">{note}</p>
-    </article>
-  );
-}
-
 function filterAndSortUsers(
   users: AdminUser[],
   {
@@ -310,14 +273,6 @@ function parseSort(value: string): UserSort {
 
 function parseRange(value: string): UserRange {
   return RANGE_OPTIONS.includes(value as UserRange) ? (value as UserRange) : "all";
-}
-
-function formatShortDate(date: Date) {
-  return date.toLocaleDateString("en-US", {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-  });
 }
 
 function formatLongDate(date: Date) {

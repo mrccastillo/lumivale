@@ -2,8 +2,10 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { defaultSiteContent, type SiteContent } from "@/lib/site-content-defaults";
+
+import styles from "./workspace.module.css";
 
 const adminLinks = [
   { href: "/admin/site-content", icon: ServicesIcon, label: "Site Content" },
@@ -33,160 +35,54 @@ type IconProps = {
 export function AdminNav({ content = defaultSiteContent, isDesktopExpanded, onDesktopToggle }: AdminNavProps) {
   const pathname = usePathname() || "/admin/blogs";
   const [isMobileOpen, setIsMobileOpen] = useState(false);
-
-  return (
-    <nav
-      aria-label="Admin navigation"
-      className={`pointer-events-none fixed left-0 top-0 z-40 h-screen border-r border-transparent transition-[width] duration-200 md:pointer-events-auto md:flex md:flex-col md:border-[var(--lumivale-line)] md:bg-white md:px-3 md:py-4 md:shadow-[12px_0_44px_rgba(42,47,82,0.06)] ${
-        isDesktopExpanded ? "w-[17.5rem]" : "w-[5.5rem]"
-      }`}
-    >
-      <div
-        className={`hidden px-1 md:flex ${
-          isDesktopExpanded ? "items-center justify-between gap-3" : "justify-center"
-        }`}
-      >
-        {isDesktopExpanded ? (
-          <Link
-            href="/admin/blogs"
-            className="flex min-w-0 items-center gap-3 font-semibold text-[var(--lumivale-ink)]"
-          >
-            <span
-              aria-hidden="true"
-              className="grid size-9 shrink-0 place-items-center rounded-lg bg-[var(--lumivale-ink)] text-[var(--lumivale-accent-soft)]"
-            >
-              {content.logoUrl ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img src={content.logoUrl} alt="" className="size-9 rounded-lg object-contain" />
-              ) : (
-                <span className="text-sm">{content.logoText}</span>
-              )}
-            </span>
-            <span className="truncate">
-              <span className="block text-xs font-semibold uppercase tracking-[0.16em] text-[var(--lumivale-accent)]">
-                {content.brandName}
-              </span>
-              <span className="block text-sm">Admin Portal</span>
-            </span>
-          </Link>
-        ) : null}
-        <button
-          type="button"
-          aria-expanded={isDesktopExpanded}
-          aria-label={isDesktopExpanded ? "Collapse navigation" : "Expand navigation"}
-          onClick={onDesktopToggle}
-          className="grid size-8 place-items-center rounded-lg border border-[var(--lumivale-line)] text-[var(--lumivale-muted)] transition hover:border-[var(--lumivale-accent)] hover:text-[var(--lumivale-ink)]"
-        >
-          <ChevronIcon direction={isDesktopExpanded ? "left" : "right"} className="size-4" />
-        </button>
-      </div>
-
-      <div className="mt-8 hidden flex-1 flex-col gap-1 md:flex">
-        {adminLinks.map((link) => {
-          const isActive = pathname === link.href || pathname.startsWith(`${link.href}/`);
-          const Icon = link.icon;
-
-          return (
-            <Link
-              key={link.href}
-              href={link.href}
-              aria-label={link.label}
-              title={isDesktopExpanded ? undefined : link.label}
-              className={`flex items-center rounded-lg px-3 py-3 text-sm font-semibold transition ${
-                isActive
-                  ? "bg-[#eafaf2] text-[var(--lumivale-ink)]"
-                  : "text-[var(--lumivale-muted)] hover:bg-[#f7f8fb] hover:text-[var(--lumivale-ink)]"
-              } ${isDesktopExpanded ? "gap-3" : "justify-center"}`}
-            >
-              <span
-                aria-hidden="true"
-                className={`grid size-7 shrink-0 place-items-center rounded-md ring-1 ${
-                  isActive
-                    ? "bg-white text-[var(--lumivale-ink)] ring-[#d9ede3]"
-                    : "bg-white/70 text-[var(--lumivale-muted)] ring-[var(--lumivale-line)]"
-                }`}
-              >
-                <Icon className="size-4" />
-              </span>
-              {isDesktopExpanded ? <span>{link.label}</span> : null}
-            </Link>
-          );
-        })}
-      </div>
-
-      <form action="/api/admin/logout" method="post" className="mt-auto hidden md:block">
-        <button
-          type="submit"
-          aria-label="Logout"
-          title={isDesktopExpanded ? undefined : "Logout"}
-          className={`flex w-full items-center rounded-lg px-3 py-3 text-left text-sm font-semibold text-red-600 transition hover:bg-red-50 ${
-            isDesktopExpanded ? "gap-3" : "justify-center"
-          }`}
-        >
-          <span
-            aria-hidden="true"
-            className="grid size-7 shrink-0 place-items-center rounded-md bg-red-50"
-          >
-            <LogoutIcon className="size-4" />
-          </span>
-          {isDesktopExpanded ? <span>Logout</span> : null}
-        </button>
-      </form>
-
-      <button
-        type="button"
-        aria-controls="admin-mobile-menu"
-        aria-expanded={isMobileOpen}
-        aria-label={isMobileOpen ? "Close admin menu" : "Open admin menu"}
-        onClick={() => setIsMobileOpen((open) => !open)}
-        className="pointer-events-auto fixed left-4 top-4 z-50 grid size-10 place-items-center rounded-full border border-[var(--lumivale-line)] bg-white text-[var(--lumivale-ink)] shadow-[0_12px_30px_rgba(42,47,82,0.12)] md:hidden"
-      >
-        <span aria-hidden="true" className="flex w-4 flex-col gap-1">
-          <span
-            className={`h-0.5 rounded-full bg-current transition ${
-              isMobileOpen ? "translate-y-1.5 rotate-45" : ""
-            }`}
-          />
-          <span
-            className={`h-0.5 rounded-full bg-current transition ${
-              isMobileOpen ? "opacity-0" : ""
-            }`}
-          />
-          <span
-            className={`h-0.5 rounded-full bg-current transition ${
-              isMobileOpen ? "-translate-y-1.5 -rotate-45" : ""
-            }`}
-          />
+  const mobileToggle = useRef<HTMLButtonElement>(null);
+  const links = (mobile = false) => adminLinks.map((link) => {
+    const Icon = link.icon;
+    const active = pathname === link.href || pathname.startsWith(`${link.href}/`);
+    return <Link key={link.href} href={link.href} aria-label={link.label}
+      aria-current={active ? "page" : undefined}
+      title={!mobile && !isDesktopExpanded ? link.label : undefined}
+      onClick={mobile ? () => setIsMobileOpen(false) : undefined} className={styles.navLink}>
+      <span aria-hidden="true" className={styles.navIcon}><Icon className="size-4" /></span>
+      {mobile || isDesktopExpanded ? <span>{link.label}</span> : null}
+    </Link>;
+  });
+  const logout = (mobile = false) => <form action="/api/admin/logout" method="post" className={styles.logoutForm}>
+    <button type="submit" aria-label="Logout" title={!mobile && !isDesktopExpanded ? "Logout" : undefined} className={styles.logout}>
+      <span aria-hidden="true" className={styles.navIcon}><LogoutIcon className="size-4" /></span>
+      {mobile || isDesktopExpanded ? <span>Logout</span> : null}
+    </button>
+  </form>;
+  return <nav aria-label="Admin navigation"
+    onKeyDown={(event) => { if (event.key === "Escape" && isMobileOpen) { setIsMobileOpen(false); mobileToggle.current?.focus(); } }}
+    className={`left-0 top-0 h-screen ${styles.sidebar} ${isDesktopExpanded ? styles.sidebarExpanded : styles.sidebarCollapsed}`}>
+    <div className={styles.navTop}>
+      {isDesktopExpanded ? <Link href="/admin/blogs" className={styles.brand}>
+        <span aria-hidden="true" className={styles.brandMark}>
+          {content.logoUrl ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={content.logoUrl} alt="" />
+          ) : content.logoText}
         </span>
+        <span><span className={styles.brandName}>{content.brandName}</span><span className={styles.brandCaption}>Admin Portal</span></span>
+      </Link> : null}
+      <button type="button" aria-expanded={isDesktopExpanded}
+        aria-label={isDesktopExpanded ? "Collapse navigation" : "Expand navigation"}
+        onClick={onDesktopToggle} className={styles.collapse}>
+        <ChevronIcon direction={isDesktopExpanded ? "left" : "right"} className="size-4" />
       </button>
-
-      {isMobileOpen ? (
-        <div
-          id="admin-mobile-menu"
-          className="pointer-events-auto fixed inset-x-4 top-16 z-50 grid gap-2 rounded-lg border border-[var(--lumivale-line)] bg-white p-2 shadow-[0_18px_45px_rgba(42,47,82,0.12)] md:hidden"
-        >
-          {adminLinks.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              onClick={() => setIsMobileOpen(false)}
-              className="rounded-lg px-4 py-3 text-sm font-semibold text-[var(--lumivale-ink)] transition hover:bg-[#f7f8fb]"
-            >
-              {link.label}
-            </Link>
-          ))}
-          <form action="/api/admin/logout" method="post">
-            <button
-              type="submit"
-              className="w-full rounded-lg px-4 py-3 text-left text-sm font-semibold text-red-600 transition hover:bg-red-50"
-            >
-              Logout
-            </button>
-          </form>
-        </div>
-      ) : null}
-    </nav>
-  );
+    </div>
+    <div className={styles.navLinks}>{links()}</div>
+    {logout()}
+    <button ref={mobileToggle} type="button" aria-controls="admin-mobile-menu" aria-expanded={isMobileOpen}
+      aria-label={isMobileOpen ? "Close admin menu" : "Open admin menu"}
+      onClick={() => setIsMobileOpen((open) => !open)} className={styles.mobileToggle}>
+      <svg aria-hidden="true" width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" strokeWidth="1.5">
+        <path d={isMobileOpen ? "M4 4l10 10M14 4L4 14" : "M2 5h14M2 9h14M2 13h14"} />
+      </svg>
+    </button>
+    {isMobileOpen ? <div id="admin-mobile-menu" className={styles.mobileMenu}>{links(true)}{logout(true)}</div> : null}
+  </nav>;
 }
 
 function BlogsIcon({ className }: IconProps) {

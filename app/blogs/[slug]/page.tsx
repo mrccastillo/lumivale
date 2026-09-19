@@ -1,3 +1,4 @@
+import styles from "./article.module.css";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import ReactMarkdown from "react-markdown";
@@ -128,168 +129,50 @@ export default async function BlogDetailPage({
   const relatedPosts = await getRelatedPosts(post.slug);
 
   return (
-    <article className="mx-auto w-full max-w-7xl px-6 pb-[54px] pt-32">
-      <div className="grid gap-12 lg:grid-cols-[260px_minmax(0,1fr)] lg:gap-16">
-        <aside className="hidden lg:block">
-          {tableOfContents.length ? (
-            <div className="sticky top-28 rounded-[22px] border border-[var(--lumivale-line)] bg-white p-5 shadow-[0_18px_44px_rgba(42,47,82,0.06)]">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--lumivale-accent)]">
-                Table of Contents
-              </p>
-              <nav className="mt-4">
-                <ul className="space-y-3 text-sm text-[var(--lumivale-muted)]">
-                  {tableOfContents.map((item) => (
-                    <li key={item.id}>
-                      <a
-                        href={`#${item.id}`}
-                        className={`block transition hover:text-[var(--lumivale-accent)] ${
-                          item.level === 3 ? "pl-4 text-[13px]" : ""
-                        }`}
-                      >
-                        {item.title}
-                      </a>
-                    </li>
-                  ))}
-                </ul>
-              </nav>
-            </div>
-          ) : null}
-        </aside>
-
-        <div className="flex min-w-0 flex-col gap-8">
-          <header className="space-y-4">
-            <Link
-              href="/blogs"
-              className="text-sm font-semibold uppercase text-[var(--lumivale-accent)] transition hover:text-[var(--lumivale-ink)]"
-            >
-              Blogs
-            </Link>
-            <p className="text-sm font-semibold text-[var(--lumivale-muted)]">{post.category} · {post.readTime}</p>
-            <h1 className="max-w-4xl text-3xl font-medium text-stone-900 sm:text-5xl sm:leading-[1.06]">
-              {post.title}
-            </h1>
-            <p className="max-w-3xl text-base leading-8 text-stone-600">{post.excerpt}</p>
-          </header>
-
-          {post.coverImageUrl ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={post.coverImageUrl}
-              alt={post.coverAlt || post.title}
-              className="aspect-[16/9] w-full rounded-[20px] border border-[var(--lumivale-line)] object-cover"
-            />
-          ) : (
-            <div
-              aria-label={`${post.category} placeholder image`}
-              className="grid aspect-[16/9] place-items-center rounded-[20px] border border-[var(--lumivale-line)] bg-[linear-gradient(135deg,#eafaf2_0%,#f7f8fb_52%,#ffffff_100%)]"
-            >
-              <span className="rounded-full bg-white/80 px-5 py-2 text-sm font-semibold text-[var(--lumivale-accent)] shadow-[0_10px_30px_rgba(42,47,82,0.08)]">
-                {post.category}
-              </span>
-            </div>
-          )}
-
-          <section className="max-w-none text-stone-700">
-            <ReactMarkdown
-              remarkPlugins={[remarkGfm]}
-              components={{
-                h2: ({ children }) => {
-                  const title = String(children).trim();
-
-                  return (
-                    <h2
-                      id={getHeadingId(title, 2, tableOfContents, usedHeadingIndexes)}
-                      className="mt-10 text-[1.9rem] font-semibold leading-tight text-stone-900 first:mt-0"
-                    >
-                      {children}
-                    </h2>
-                  );
-                },
-                h3: ({ children }) => {
-                  const title = String(children).trim();
-
-                  return (
-                    <h3
-                      id={getHeadingId(title, 3, tableOfContents, usedHeadingIndexes)}
-                      className="mt-7 text-[1.25rem] font-semibold leading-tight text-stone-900"
-                    >
-                      {children}
-                    </h3>
-                  );
-                },
-                p: ({ children }) => (
-                  <p className="mt-4 text-[1.02rem] leading-8 text-stone-700">{children}</p>
-                ),
-                ul: ({ children }) => (
-                  <ul className="mt-5 list-disc space-y-2 pl-6 text-[1.02rem] leading-8 text-stone-700">
-                    {children}
-                  </ul>
-                ),
-                ol: ({ children }) => (
-                  <ol className="mt-5 list-decimal space-y-2 pl-6 text-[1.02rem] leading-8 text-stone-700">
-                    {children}
-                  </ol>
-                ),
-                li: ({ children }) => <li className="pl-1">{children}</li>,
-              }}
-            >
-              {post.body}
-            </ReactMarkdown>
-          </section>
-
-          {relatedPosts.length ? (
-            <section className="pt-6">
-              <div className="flex items-center gap-3">
-                <span className="inline-block size-2.5 rounded-full bg-[var(--lumivale-accent)]" />
-                <h2 className="text-2xl font-semibold text-[var(--lumivale-ink)]">
-                  Related Articles
-                </h2>
-              </div>
-
-              <div className="mt-6 grid gap-5 lg:grid-cols-3">
-                {relatedPosts.map((relatedPost) => (
-                  <Link
-                    key={relatedPost.slug}
-                    href={`/blogs/${relatedPost.slug}`}
-                    className="group overflow-hidden rounded-[20px] border border-[var(--lumivale-line)] bg-white shadow-[0_18px_54px_rgba(42,47,82,0.06)] transition hover:-translate-y-1 hover:border-[var(--lumivale-accent)] hover:shadow-[0_24px_70px_rgba(42,47,82,0.1)]"
-                  >
-                    {relatedPost.coverImageUrl ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img
-                        src={relatedPost.coverImageUrl}
-                        alt={relatedPost.coverAlt || relatedPost.title}
-                        className="aspect-[16/9] w-full object-cover"
-                      />
-                    ) : (
-                      <div className="grid aspect-[16/9] place-items-center bg-[linear-gradient(135deg,#eafaf2_0%,#f7f8fb_52%,#ffffff_100%)]">
-                        <span className="rounded-full bg-white/85 px-4 py-2 text-sm font-semibold text-[var(--lumivale-accent)] shadow-[0_10px_30px_rgba(42,47,82,0.08)]">
-                          {relatedPost.category}
-                        </span>
-                      </div>
-                    )}
-
-                    <div className="flex h-full flex-col p-5">
-                      <p className="text-xs font-semibold uppercase tracking-[0.08em] text-[var(--lumivale-muted)]">
-                        Our Blog
-                      </p>
-                      <h3 className="mt-3 text-[1.18rem] font-semibold leading-tight text-[var(--lumivale-ink)] transition group-hover:text-[var(--lumivale-accent)]">
-                        {relatedPost.title}
-                      </h3>
-                      <p className="mt-3 text-sm leading-7 text-[var(--lumivale-muted)]">
-                        {relatedPost.excerpt}
-                      </p>
-                      <div className="mt-auto flex items-center justify-between pt-5 text-xs text-[var(--lumivale-muted)]">
-                        <span>{relatedPost.category}</span>
-                        <span>{relatedPost.readTime}</span>
-                      </div>
-                    </div>
-                  </Link>
-                ))}
-              </div>
-            </section>
-          ) : null}
-        </div>
+    <article className={styles.page} data-nav-surface="light">
+      <header className={`${styles.wrap} ${styles.header}`}>
+        <Link href="/blogs" className={styles.back}>&larr; All articles</Link>
+        <div className={styles.meta}><span>{post.category}</span><span>{post.readTime}</span></div>
+        <h1>{post.title}</h1>
+        <p className={styles.excerpt}>{post.excerpt}</p>
+      </header>
+      <div className={styles.wrap}>
+        {post.coverImageUrl ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={post.coverImageUrl} alt={post.coverAlt || post.title} className={styles.cover} />
+        ) : <div className={styles.artwork} aria-label={`${post.category} placeholder image`}>
+          <span className={styles.artLabel}>Lumivale / Perspectives</span><strong>{post.category}</strong><span className={styles.artFoot}>Ideas for clearer growth <span aria-hidden="true">&#8599;</span></span>
+        </div>}
       </div>
+      <div className={`${styles.wrap} ${styles.readingLayout}`}>
+        <aside className={styles.sidebar}>
+          {tableOfContents.length ? <details className={styles.toc} open>
+            <summary>Table of Contents</summary>
+            <nav aria-label="Table of contents"><ul>{tableOfContents.map((item) => <li key={item.id} className={item.level === 3 ? styles.subheading : undefined}><a href={`#${item.id}`}>{item.title}</a></li>)}</ul></nav>
+          </details> : null}
+        </aside>
+        <section className={styles.body} aria-label="Article content">
+          <ReactMarkdown remarkPlugins={[remarkGfm]} components={{
+            h2: ({ children }) => <h2 id={getHeadingId(String(children).trim(), 2, tableOfContents, usedHeadingIndexes)}>{children}</h2>,
+            h3: ({ children }) => <h3 id={getHeadingId(String(children).trim(), 3, tableOfContents, usedHeadingIndexes)}>{children}</h3>,
+            table: ({ children }) => <div className={styles.tableWrap}><table>{children}</table></div>,
+          }}>{post.body}</ReactMarkdown>
+          <div className={styles.articleEnd}><span>Lumivale / Perspectives</span><Link href="/blogs">Back to all articles <span aria-hidden="true">&#8599;</span></Link></div>
+        </section>
+      </div>
+      {relatedPosts.length ? <section className={styles.related} aria-labelledby="related-title">
+        <div className={styles.wrap}>
+          <div className={styles.relatedHead}><h2 id="related-title">Related Articles</h2><Link href="/blogs">Explore the journal <span aria-hidden="true">&#8599;</span></Link></div>
+          <div className={styles.relatedGrid}>{relatedPosts.map((relatedPost) => <Link key={relatedPost.slug} href={`/blogs/${relatedPost.slug}`} className={styles.relatedPost}>
+            {relatedPost.coverImageUrl ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={relatedPost.coverImageUrl} alt={relatedPost.coverAlt || relatedPost.title} loading="lazy" />
+            ) : <div className={styles.relatedArtwork}><span>Lumivale / Perspectives</span><strong>{relatedPost.category}</strong></div>}
+            <div className={styles.meta}><span>{relatedPost.category}</span><span>{relatedPost.readTime}</span></div>
+            <h3>{relatedPost.title}</h3><p>{relatedPost.excerpt}</p><span className={styles.readMore}>Read article <span aria-hidden="true">&#8599;</span></span>
+          </Link>)}</div>
+        </div>
+      </section> : null}
     </article>
   );
 }

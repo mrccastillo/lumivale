@@ -1,6 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, test, vi } from "vitest";
 
+import styles from "@/components/public-listing.module.css";
 import { getAllServices } from "@/lib/services";
 
 const hasTrustedClientAccessMock = vi.hoisted(() => vi.fn());
@@ -61,7 +62,7 @@ describe("pricing page", () => {
       expect(link).toHaveAttribute("href", `/pricing/${services[index]?.slug}`);
     });
     expect(screen.queryByText(/Placeholder/i)).not.toBeInTheDocument();
-    expect(container.querySelector("section")).toHaveClass("pt-32", "pb-[54px]");
+    expect(container.querySelector("section")).toHaveClass(styles.pricing);
     expect(container.querySelector("section")).not.toHaveClass("py-[54px]");
   });
 

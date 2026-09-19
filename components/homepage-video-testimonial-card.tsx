@@ -6,6 +6,7 @@ type HomepageVideoTestimonialCardProps = {
   testimonial: {
     personName: string;
     personTitle: string;
+    imageUrl?: string;
     quote: string;
     videoUrl: string;
     placeholder?: boolean;
@@ -51,11 +52,17 @@ export function HomepageVideoTestimonialCard({
         {showOverlay ? (
           <div className="pointer-events-none absolute inset-x-0 bottom-0 bg-[linear-gradient(180deg,transparent,rgba(0,0,0,0.82))] p-4">
             <div className="flex items-end justify-between gap-3">
-              <div>
+              <div className="flex items-center gap-3">
+                {testimonial.imageUrl ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={testimonial.imageUrl} alt="" loading="lazy" className="size-10 shrink-0 rounded-full object-cover" />
+                ) : null}
+                <div>
                 <p className="text-[1.05rem] font-semibold text-white">{testimonial.personName}</p>
                 {testimonial.personTitle ? (
                   <p className="mt-1 text-sm text-white/78">{testimonial.personTitle}</p>
                 ) : null}
+                </div>
               </div>
               <span className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-white text-base text-black shadow-[0_10px_20px_rgba(0,0,0,0.22)]">
                 &gt;

@@ -1,6 +1,7 @@
 import { render, screen } from "@testing-library/react";
-import { describe, expect, test, vi } from "vitest";
+import { afterAll, beforeAll, describe, expect, test, vi } from "vitest";
 
+import styles from "@/components/public-listing.module.css";
 import BlogsPage from "@/app/blogs/page";
 import { getPublicBlogPosts } from "@/lib/blogs";
 import { getMongoDb } from "@/lib/mongodb";
@@ -31,16 +32,19 @@ vi.mock("@/lib/blogs", () => ({
   ]),
 }));
 
+beforeAll(() => { vi.stubGlobal("ResizeObserver", class { observe() {} disconnect() {} }); });
+afterAll(() => vi.unstubAllGlobals());
+
 describe("blogs page", () => {
   test("renders published MongoDB article cards", async () => {
     const { container } = render(await BlogsPage());
-    const headerSection = container.querySelector("section");
+    const headerSection = container.querySelector("header");
 
     expect(
       screen.getByRole("heading", { name: "Blogs", level: 1 }),
     ).toBeInTheDocument();
     expect(container.querySelector("section")).not.toHaveTextContent("Insights");
-    expect(headerSection).toHaveClass("bg-white", "py-16", "pt-32");
+    expect(headerSection).toHaveClass(styles.hero);
     expect(headerSection).not.toHaveClass("pt-24", "pb-14", "py-20");
     expect(headerSection).not.toHaveAttribute("data-nav-surface", "dark");
     expect(headerSection?.className).not.toContain("linear-gradient");
@@ -49,7 +53,7 @@ describe("blogs page", () => {
         "Gain valuable insight from our team on relevant industry news, emerging trends, and practical marketing strategies to help you stay ahead.",
       ),
     ).toBeInTheDocument();
-    expect(screen.getByRole("heading", { name: "Published Post", level: 2 })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Published Post", level: 3 })).toBeInTheDocument();
     expect(screen.getAllByText("CMS").length).toBeGreaterThanOrEqual(1);
     expect(screen.getByRole("img", { name: "Published post cover" })).toHaveAttribute(
       "src",
@@ -62,12 +66,11 @@ describe("blogs page", () => {
       ).toHaveAttribute("href", `/blogs/${post.slug}`);
     }
 
-    expect(container.querySelectorAll("section")[1]).toHaveClass("py-12");
+    expect(container.querySelector("section")).toHaveClass(styles.journal);
     expect(screen.getByRole("link", { name: "Read Published Post" })).toHaveClass(
-      "min-h-[320px]",
-      "overflow-hidden",
+      styles.featured,
     );
-    expect(container.querySelectorAll("article")[0]).toHaveClass("p-4", "sm:p-5");
+    expect(container.querySelectorAll("article")[0]).toHaveClass(styles.postCopy);
     expect(container).not.toHaveTextContent(/premium service brands/i);
     expect(container).not.toHaveTextContent(/website strategy/i);
   });
@@ -82,19 +85,19 @@ describe("blogs page", () => {
     expect(
       screen.getByRole("heading", {
         name: "How comment campaigns can create warmer inbound attention.",
-        level: 2,
+        level: 3,
       }),
     ).toBeInTheDocument();
     expect(
       screen.getByRole("heading", {
         name: "What a practical UGC publishing cadence looks like for early teams.",
-        level: 2,
+        level: 3,
       }),
     ).toBeInTheDocument();
     expect(
       screen.getByRole("heading", {
         name: "Keeping outreach simple without losing consistency or intent.",
-        level: 2,
+        level: 3,
       }),
     ).toBeInTheDocument();
     expect(container).toHaveTextContent("Placeholder article");

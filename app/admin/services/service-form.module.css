@@ -1,0 +1,29 @@
+.platformChips {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-top: 20px;
+}
+
+.platformChips button {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  flex: 0 1 auto;
+  max-width: 100%;
+  min-height: 36px;
+  padding: 8px 16px;
+  border: 1px solid #cdd5c5;
+  border-radius: 999px;
+  background: #fcfdf9;
+  color: #56634f;
+  font-size: 12px;
+  font-weight: 550;
+  cursor: pointer;
+  transition: background .18s, color .18s, border-color .18s;
+}
+
+.platformChips button:hover { background: #e9ede2; border-color: #9aaa8d; }
+.platformChips button[aria-selected="true"] { background: #122b22; border-color: #122b22; color: #f4f5ed; }
+.platformChips button[aria-selected="true"] span { color: #c0f275; opacity: 1; }

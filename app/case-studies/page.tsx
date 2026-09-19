@@ -19,7 +19,7 @@ export default async function CaseStudiesPage() {
         </div>
 
         <div className="mt-14">
-          <CaseStudyCards caseStudies={caseStudies} />
+          {caseStudies.length ? <CaseStudyCards caseStudies={caseStudies} /> : <p className="text-center text-[var(--lumivale-muted)]">Case studies are currently unavailable. Please check back soon.</p>}
         </div>
       </div>
     </section>

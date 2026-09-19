@@ -1,0 +1,56 @@
+.page { min-height: 100svh; display: grid; grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr); background: #f4f5ed; color: #122b22; font-family: "DM Sans", sans-serif; -webkit-font-smoothing: antialiased; }
+.page :is(a, button, input):focus-visible { outline: 3px solid #759b49; outline-offset: 4px; }
+.page ::selection { color: #122b22; background: #c0f275; }
+.brandPanel { background: #122b22; color: #f4f5ed; position: relative; overflow: hidden; display: flex; flex-direction: column; padding: 44px 48px 0; min-height: 100svh; }
+.brand { display: inline-flex; align-items: center; gap: 10px; font-family: "Manrope", sans-serif; font-size: 25px; font-weight: 650; letter-spacing: -1.2px; align-self: start; }
+.brand > svg { width: 25px; height: 29px; color: #c0f275; }
+.logoImage { width: 32px; height: 32px; object-fit: contain; flex-shrink: 0; }
+.letterMark { color: #c0f275; min-width: 25px; font-size: 27px; letter-spacing: -.04em; }
+.emblemImage { width: 128px; height: 128px; object-fit: contain; }
+.emblemLetter { font: 500 90px/1 "Manrope", sans-serif; letter-spacing: -.06em; }
+.brandCenter { flex: 1; min-height: 260px; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 60px 0 70px; }
+.emblem { position: relative; width: 200px; height: 200px; display: grid; place-items: center; color: #c0f275; animation: arrive 1.1s ease both; }
+.emblem::before, .emblem::after { content: ""; position: absolute; inset: -25px; border: 1px solid #c0f27522; border-radius: 50%; }
+.emblem::after { inset: -62px; border-color: #c0f2750d; }
+.emblem svg { width: 128px; height: 128px; }
+.centerLabel { font-size: 9px; letter-spacing: .22em; color: #a6b99d; margin-top: 62px; }
+.brandBottom { display: flex; align-items: end; justify-content: space-between; gap: 24px; border-top: 1px solid #f4f5ed24; padding-top: 26px; }
+.brandBottom p { font-family: "Manrope", sans-serif; font-size: 22px; letter-spacing: -.7px; max-width: 150px; line-height: 1.3; }
+.brandBottom > span { max-width: 105px; font-size: 8px; letter-spacing: .15em; line-height: 1.8; color: #a6b99d; }
+.wordmark { font: 500 10.4vw/.9 "Manrope", sans-serif; letter-spacing: -.09em; color: #c0f275; margin: 36px -30px -.8vw; text-align: center; user-select: none; }
+.workspace { min-width: 0; display: flex; flex-direction: column; padding: 44px 56px 30px; }
+.topbar { display: flex; justify-content: space-between; gap: 20px; font-size: 11px; color: #657169; }
+.portalLabel { display: flex; gap: 8px; align-items: center; }
+.portalLabel > span { width: 5px; height: 5px; border-radius: 50%; background: #6a8749; }
+.backLink { display: inline-flex; align-items: center; gap: 10px; min-height: 30px; margin-top: -7px; transition: color .2s; }
+.backLink:hover { color: #122b22; }
+.backLink > span { transition: transform .2s; }
+.backLink:hover > span { transform: translateX(-3px); }
+.formArea { width: 100%; max-width: 390px; margin: auto; padding: 70px 0; animation: arrive .7s .08s both; }
+.eyebrow { font-size: 10px; font-weight: 600; letter-spacing: .16em; color: #657169; margin-bottom: 17px; }
+.formHeading h1 { font-family: "Manrope", sans-serif; font-size: clamp(36px, 3.4vw, 48px); font-weight: 500; line-height: 1.12; letter-spacing: -.06em; }
+.description { font-size: 13px; color: #657169; line-height: 1.7; margin-top: 17px; }
+.form { margin-top: 36px; }
+.field + .field { margin-top: 24px; }
+.field label { display: block; font-size: 12px; font-weight: 550; margin-bottom: 10px; }
+.field input { width: 100%; min-width: 0; height: 54px; padding: 0 16px; background: #fcfdf8; border: 1px solid #cbd2c4; border-radius: 5px; color: #122b22; font: 400 14px "DM Sans", sans-serif; transition: border-color .2s, box-shadow .2s; }
+.field input::placeholder { color: #7a8377; }
+.field input:focus { outline: none; border-color: #657e4c; box-shadow: 0 0 0 3px #a5c48424; }
+.field input:autofill { box-shadow: 0 0 0 100px #edf1e6 inset; -webkit-text-fill-color: #122b22; }
+.passwordField { position: relative; }
+.passwordField input { padding-right: 54px; }
+.visibility { position: absolute; right: 5px; top: 5px; width: 44px; height: 44px; display: grid; place-items: center; color: #657169; border: 0; border-radius: 3px; background: transparent; cursor: pointer; transition: color .2s, background .2s; }
+.visibility:hover { color: #122b22; background: #e9ede2; }
+.submit { width: 100%; min-height: 52px; margin-top: 30px; padding: 0 18px; display: flex; justify-content: space-between; align-items: center; color: #122b22; background: #c0f275; border: 1px solid #b0df67; border-radius: 5px; font-size: 13px; font-weight: 600; cursor: pointer; transition: background .2s, transform .2s; }
+.submit:hover { background: #cafa87; transform: translateY(-1px); }
+.submit > span { font-size: 20px; transition: transform .2s; }
+.submit:hover > span { transform: translate(2px, -2px); }
+.accessNote { display: flex; align-items: center; justify-content: center; gap: 8px; color: #657169; font-size: 10px; line-height: 1.5; margin-top: 23px; }
+.accessNote svg { flex-shrink: 0; }
+.footer { display: flex; justify-content: space-between; gap: 20px; padding-top: 22px; border-top: 1px solid #d6dcd1; font-size: 10px; color: #657169; }
+.error { padding: 13px 15px; margin-bottom: 24px; border-left: 2px solid #9c4936; background: #f3e9df; color: #813e2d; font-size: 12px; line-height: 1.7; }
+@keyframes arrive { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+@media(min-width: 1700px) { .brandPanel { padding: 56px 64px 0; }.workspace { padding: 56px 72px 36px; }.formArea { max-width: 420px; } }
+@media(max-width: 1000px) { .brandPanel { padding: 32px 30px 0; }.workspace { padding: 32px; }.brandBottom { display: block; }.brandBottom > span { display: block; margin-top: 16px; max-width: none; }.emblem { width: 155px; height: 155px; }.emblem svg { width: 110px; }.emblem::after { inset: -40px; }.wordmark { margin-inline: -15px; } }
+@media(max-width: 700px) { .page { display: flex; flex-direction: column; }.brandPanel { min-height: auto; padding: 25px 25px; flex-direction: row; align-items: center; justify-content: space-between; }.brand { font-size: 23px; }.brandCenter, .brandBottom, .wordmark { display: none; }.brandPanel::after { content: "STAFF PORTAL"; color: #a6b99d; font-size: 8px; letter-spacing: .16em; }.workspace { flex: 1; padding: 26px 25px 22px; }.topbar { justify-content: flex-end; }.portalLabel { display: none; }.formArea { padding: 45px 0 58px; max-width: 390px; }.formHeading h1 { font-size: 40px; }.field input { font-size: 16px; }.footer { font-size: 9px; } }
+@media(prefers-reduced-motion: reduce) { .page *, .page *::before, .page *::after { animation: none !important; transition: none !important; }.page a:hover > span, .submit:hover, .submit:hover > span { transform: none; } }

@@ -62,7 +62,7 @@ export default async function AdminHeroClientsPage({
       </section>
 
       <div className="grid gap-6 xl:grid-cols-[380px_minmax(0,1fr)]">
-        <section className="rounded-[24px] border border-[var(--lumivale-admin-border)] bg-white p-6 shadow-[0_20px_60px_rgba(5,43,32,0.06)]">
+        <section className="min-w-0 rounded-[24px] border border-[var(--lumivale-admin-border)] bg-white p-6 shadow-[0_20px_60px_rgba(5,43,32,0.06)]">
           <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--lumivale-panel)]">
             Add Logo
           </p>
@@ -76,7 +76,7 @@ export default async function AdminHeroClientsPage({
           <HeroClientForm />
         </section>
 
-        <section className="rounded-[24px] border border-[var(--lumivale-admin-border)] bg-white p-6 shadow-[0_20px_60px_rgba(5,43,32,0.06)]">
+        <section className="min-w-0 rounded-[24px] border border-[var(--lumivale-admin-border)] bg-white p-6 shadow-[0_20px_60px_rgba(5,43,32,0.06)]">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
             <div>
               <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--lumivale-panel)]">
@@ -156,7 +156,7 @@ function MetricCard({
   value: number | string;
 }) {
   return (
-    <article className="rounded-[20px] border border-[var(--lumivale-admin-border)] bg-white px-5 py-4 shadow-[0_16px_44px_rgba(5,43,32,0.05)]">
+    <article data-admin-metric className="rounded-[20px] border border-[var(--lumivale-admin-border)] bg-white px-5 py-4 shadow-[0_16px_44px_rgba(5,43,32,0.05)]">
       <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--lumivale-panel)]">
         {label}
       </p>
