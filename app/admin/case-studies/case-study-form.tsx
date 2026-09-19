@@ -20,6 +20,23 @@ import {
 import { CaseStudyStory } from "@/components/case-study-story";
 import { StoryRichEditor } from "./story-rich-editor";
 import { StoryImagePicker } from "./story-image-picker";
+import styles from "./case-study-form.module.css";
+
+const steps = [
+  { title: "Overview", description: "Introduce the story and its headline." },
+  { title: "Client & images", description: "Add client context, a cover image, and a logo." },
+  { title: "Results", description: "Choose the outcomes you want to highlight." },
+  { title: "Story", description: "Build the story with text, images, and evidence." },
+  { title: "Finish", description: "Add a closing call to action, then preview and save." },
+];
+
+function stepForError(key: string) {
+  if (/^(client|industry|timeframe|budget|channels|cover|logo)/.test(key)) return 1;
+  if (key.startsWith("metrics")) return 2;
+  if (key.startsWith("sections")) return 3;
+  if (key.startsWith("cta")) return 4;
+  return 0;
+}
 
 const fieldClass =
   "mt-2 w-full rounded-lg border border-[var(--lumivale-line)] bg-white px-3 py-2.5 text-sm font-normal outline-none focus:border-[var(--lumivale-accent)]";
@@ -56,6 +73,26 @@ export function CaseStudyForm({
   const [pending, setPending] = useState(0);
   const [preview, setPreview] = useState<"none" | "wide" | "narrow">("none");
   const router = useRouter();
+  const [step, setStep] = useState(0);
+  const [selectedSection, setSelectedSection] = useState("");
+  const [addingSection, setAddingSection] = useState(false);
+  const activeSection = content.sections?.some((item) => item.id === selectedSection)
+    ? selectedSection : content.sections?.[0]?.id;
+
+  const stepHeading = useRef<HTMLHeadingElement>(null);
+  function goToStep(next: number) {
+    setStep(next);
+    requestAnimationFrame(() => stepHeading.current?.focus());
+  }
+  function showErrors(nextErrors: Record<string, string>) {
+    setErrors(nextErrors);
+    const first = Object.keys(nextErrors)[0];
+    if (first) {
+      goToStep(stepForError(first));
+      const sectionError = first.match(/^sections\.(\d+)/);
+      if (sectionError) setSelectedSection(content.sections?.[Number(sectionError[1])]?.id ?? "");
+    }
+  }
   const dirty = JSON.stringify(content) !== saved;
   const dirtyRef = useRef(dirty);
   useEffect(() => {
@@ -143,7 +180,7 @@ export function CaseStudyForm({
     try {
       input = parseStoryInput(content);
     } catch (cause) {
-      if (cause instanceof StoryValidationError) setErrors(cause.errors);
+      if (cause instanceof StoryValidationError) showErrors(cause.errors);
       setError("Check the highlighted fields before saving.");
       return;
     }
@@ -161,7 +198,7 @@ export function CaseStudyForm({
       );
       const result = await response.json();
       if (!response.ok) {
-        setErrors(result.errors ?? {});
+        showErrors(result.errors ?? {});
         throw new Error(result.error || "Could not save case study.");
       }
       const next = asStoryInput(result.study);
@@ -192,6 +229,21 @@ export function CaseStudyForm({
           disabled={saving}
           className="min-w-0 space-y-6 disabled:opacity-70"
         >
+          <nav aria-label="Case study steps" className={styles.steps}>
+            {steps.map((item, index) => (
+              <button key={item.title} type="button" aria-current={step === index ? "step" : undefined}
+                aria-controls={`story-step-${index}`} onClick={() => goToStep(index)}>
+                <span>{index + 1}</span>{" "}<strong>{item.title}</strong>
+                {Object.keys(errors).some((key) => stepForError(key) === index) && <small>Needs attention</small>}
+              </button>
+            ))}
+          </nav>
+          <div className={styles.stepIntro}>
+            <p>Step {step + 1} of {steps.length}</p>
+            <h2 ref={stepHeading} tabIndex={-1}>{steps[step].title}</h2>
+            <p>{steps[step].description}</p>
+          </div>
+          <div id="story-step-0" hidden={step !== 0}>
           <Panel title="Story details">
             <div className="grid gap-5 sm:grid-cols-2">
               <Field
@@ -264,6 +316,10 @@ export function CaseStudyForm({
               error={errors.summary}
               onChange={(value) => update("summary", value)}
             />
+          </Panel>
+          </div>
+          <div id="story-step-1" hidden={step !== 1}>
+          <Panel title="Client & images">
             <div className="grid gap-5 sm:grid-cols-2">
               {field("clientName", "Client name (optional)")}
               {field("clientUrl", "Client website (optional)", false, 2000)}
@@ -294,6 +350,8 @@ export function CaseStudyForm({
             <Errors errors={errors} prefix="cover" />
             <Errors errors={errors} prefix="logo" />
           </Panel>
+          </div>
+          <div id="story-step-2" hidden={step !== 2}>
           <Panel title="Results">
             <p className="text-sm text-[var(--lumivale-muted)]">
               Add verified results as a value and a short label. Up to eight
@@ -385,23 +443,72 @@ export function CaseStudyForm({
               Add metric
             </button>
           </Panel>
+          </div>
+          <div id="story-step-3" hidden={step !== 3}>
           <Panel title="Story sections">
-            <p className="text-sm text-[var(--lumivale-muted)]">
-              Build the story in reading order. Add text, evidence, comparisons,
-              and quotes.
-            </p>
+            <div className={styles.storyToolbar}>
+              <p>Select a section to edit. The outline follows the order of your story.</p>
+              <button type="button" className={buttonClass} aria-expanded={addingSection}
+                aria-controls="section-picker" onClick={() => setAddingSection(!addingSection)}>
+                {addingSection ? "Close section picker" : "Add section"}
+              </button>
+            </div>
+            {addingSection && <div id="section-picker" className={styles.sectionPicker}>
+              {(Object.keys(sectionNames) as StorySection["type"][]).map((type) => (
+                <button key={type} type="button" aria-label={`Add ${sectionNames[type].toLowerCase()}`}
+                  disabled={(content.sections?.length ?? 0) >= 30}
+                  onClick={() => {
+                    const section = newSection(type);
+                    update("sections", [...(content.sections ?? []), section]);
+                    setSelectedSection(section.id);
+                    setAddingSection(false);
+                  }}>
+                  <strong>+ {sectionNames[type]}</strong>
+                  <span>{{
+                    narrative: "Explain the challenge, approach, or outcome.",
+                    imageText: "Place an image beside supporting text.",
+                    image: "Show a report or full-width evidence.",
+                    gallery: "Group several related images together.",
+                    comparison: "Compare the situation before and after.",
+                    quote: "Feature feedback from your client.",
+                  }[type]}</span>
+                </button>
+              ))}
+            </div>}
+            {errors.sections && <p role="alert" className="text-sm text-red-700">{errors.sections}</p>}
+            {!content.sections?.length && <div className={styles.storyEmpty}>
+              <h3>Your story starts here</h3>
+              <p>Add a section above to start with text, an image, or a client quote.</p>
+            </div>}
+            {!!content.sections?.length && <div className={styles.storyWorkspace}>
+              <aside className={styles.outline}>
+                <p>Story outline <span>{content.sections.length} sections</span></p>
+                <nav aria-label="Story outline">
+                  {content.sections.map((item, index) => (
+                    <button key={item.id} type="button" aria-pressed={activeSection === item.id}
+                      aria-controls={`story-editor-${item.id}`} onClick={() => setSelectedSection(item.id)}>
+                      <span>{String(index + 1).padStart(2, "0")}</span>
+                      <span><strong>{"heading" in item && item.heading ? item.heading : item.type === "quote" && item.personName ? item.personName : sectionNames[item.type]}</strong>
+                      <small>{sectionNames[item.type]}{Object.keys(errors).some((key) => key.startsWith(`sections.${index}.`)) ? " ? Needs attention" : ""}</small></span>
+                    </button>
+                  ))}
+                </nav>
+              </aside>
+              <div className={styles.sectionEditors}>
             {(content.sections ?? []).map((section, index) => (
               <section
                 key={section.id}
+                id={`story-editor-${section.id}`}
+                hidden={activeSection !== section.id}
                 aria-label={`Section ${index + 1}: ${sectionNames[section.type]}`}
-                className="space-y-5 rounded-xl border border-[var(--lumivale-line)] p-4 sm:p-5"
+                className={styles.sectionEditor}
               >
                 <div className="flex flex-wrap items-center justify-between gap-3">
                   <h3 className="font-semibold">
                     {String(index + 1).padStart(2, "0")} /{" "}
                     {sectionNames[section.type]}
                   </h3>
-                  <div className="flex gap-2">
+                  <div className="flex flex-wrap gap-2">
                     <button
                       type="button"
                       className={buttonClass}
@@ -431,14 +538,11 @@ export function CaseStudyForm({
                     <button
                       type="button"
                       className={buttonClass}
-                      onClick={() =>
-                        update(
-                          "sections",
-                          content.sections?.filter(
-                            (item) => item.id !== section.id,
-                          ),
-                        )
-                      }
+                      onClick={() => {
+                        const remaining = content.sections?.filter((item) => item.id !== section.id) ?? [];
+                        update("sections", remaining);
+                        setSelectedSection(remaining[Math.min(index, remaining.length - 1)]?.id ?? "");
+                      }}
                     >
                       Remove section
                     </button>
@@ -452,30 +556,11 @@ export function CaseStudyForm({
                 <Errors errors={errors} prefix={`sections.${index}`} />
               </section>
             ))}
-            {errors.sections && (
-              <p className="text-sm text-red-700">{errors.sections}</p>
-            )}
-            <div className="flex flex-wrap gap-2">
-              {(Object.keys(sectionNames) as StorySection["type"][]).map(
-                (type) => (
-                  <button
-                    key={type}
-                    type="button"
-                    className={buttonClass}
-                    disabled={(content.sections?.length ?? 0) >= 30}
-                    onClick={() =>
-                      update("sections", [
-                        ...(content.sections ?? []),
-                        newSection(type),
-                      ])
-                    }
-                  >
-                    Add {sectionNames[type].toLowerCase()}
-                  </button>
-                ),
-              )}
-            </div>
+              </div>
+            </div>}
           </Panel>
+          </div>
+          <div id="story-step-4" hidden={step !== 4}>
           <Panel title="Closing call to action">
             <label className="flex items-center gap-2 text-sm">
               <input
@@ -520,6 +605,13 @@ export function CaseStudyForm({
               </>
             )}
           </Panel>
+          </div>
+          <div className={styles.stepActions}>
+            <button type="button" className={buttonClass} disabled={step === 0} onClick={() => goToStep(step - 1)}>Previous step</button>
+            <p>All steps are saved together.</p>
+            {step < steps.length - 1 ? <button type="button" className={buttonClass} onClick={() => goToStep(step + 1)}>Next: {steps[step + 1].title}</button> :
+              <button type="button" className={buttonClass} onClick={() => setPreview("wide")}>Review story</button>}
+          </div>
           <div className="sticky bottom-3 z-20 flex flex-wrap items-center gap-3 rounded-xl border border-[var(--lumivale-line)] bg-white/95 p-4 shadow-lg backdrop-blur">
             <button
               type="submit"

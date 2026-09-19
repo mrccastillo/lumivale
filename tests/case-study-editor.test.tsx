@@ -87,17 +87,21 @@ test("stable sections and evidence survive reorder and removal", async () => {
     }));
   vi.stubGlobal("fetch", fetch);
   render(<CaseStudyForm study={{ ...defaultCaseStudies[0], ...input }} />);
+  fireEvent.click(screen.getByRole("button", { name: "4 Story" }));
+  fireEvent.click(within(screen.getByRole("navigation", { name: "Story outline" })).getByRole("button", { name: /Second/ }));
   fireEvent.click(
     within(screen.getByRole("region", { name: "Section 2: Text" })).getByRole(
       "button",
       { name: "Move up" },
     ),
   );
+  fireEvent.click(within(screen.getByRole("navigation", { name: "Story outline" })).getByRole("button", { name: /First/ }));
   expect(
     within(
       screen.getByRole("region", { name: "Section 2: Image + text" }),
     ).getByLabelText("Alternative text"),
   ).toHaveValue("Proof A");
+  fireEvent.click(within(screen.getByRole("navigation", { name: "Story outline" })).getByRole("button", { name: /Second/ }));
   fireEvent.click(
     within(screen.getByRole("region", { name: "Section 1: Text" })).getByRole(
       "button",
@@ -114,15 +118,19 @@ test("stable sections and evidence survive reorder and removal", async () => {
 
 test("all section types can be added and incomplete publishing identifies fields", () => {
   render(<CaseStudyForm />);
+  fireEvent.click(screen.getByRole("button", { name: "4 Story" }));
   for (const name of [
     "Add image + text",
     "Add full-width image",
     "Add image gallery",
     "Add before / after",
     "Add client quote",
-  ])
+  ]) {
+    fireEvent.click(screen.getByRole("button", { name: "Add section", exact: true }));
     fireEvent.click(screen.getByRole("button", { name }));
+  }
   expect(screen.getByLabelText("Quote")).toBeInTheDocument();
+  fireEvent.click(within(screen.getByRole("navigation", { name: "Story outline" })).getByRole("button", { name: /Image gallery/ }));
   expect(
     screen.getByRole("button", { name: "Add gallery image" }),
   ).toBeInTheDocument();
@@ -187,4 +195,37 @@ test("failed image upload preserves old image and cancellation ignores stale com
   });
   expect(onChange).toHaveBeenCalledExactlyOnceWith(undefined);
   expect(onPending.mock.calls.map((call) => call[0])).toEqual([1, -1, 1, -1]);
+});
+
+test("step navigation preserves input and validation returns to the failing step", async () => {
+  render(<CaseStudyForm />);
+  fireEvent.change(screen.getByLabelText("Title"), { target: { value: "A complete story" } });
+  fireEvent.click(screen.getByRole("button", { name: "Next: Client & images" }));
+  expect(screen.getByLabelText("Title")).not.toBeVisible();
+  fireEvent.change(screen.getByLabelText("Client name (optional)"), { target: { value: "Acme" } });
+  fireEvent.click(screen.getByRole("button", { name: "1 Overview" }));
+  expect(screen.getByLabelText("Title")).toHaveValue("A complete story");
+  fireEvent.click(screen.getByRole("button", { name: "2 Client & images" }));
+  expect(screen.getByLabelText("Client name (optional)")).toHaveValue("Acme");
+  fireEvent.change(screen.getByLabelText("Title"), { target: { value: "" } });
+  fireEvent.click(screen.getByRole("button", { name: "Create case study" }));
+  await waitFor(() => expect(screen.getByRole("textbox", { name: /^Title/ })).toBeVisible());
+  expect(screen.getByRole("button", { name: /1 Overview/ })).toHaveAttribute("aria-current", "step");
+});
+
+test("editing one section at a time preserves content when switching", () => {
+  const input = asStoryInput(defaultCaseStudies[0]);
+  input.sections = [
+    { id: "one", type: "narrative", heading: "First section", body: paragraph("First body") },
+    { id: "two", type: "narrative", heading: "Second section", body: paragraph("Second body") },
+  ];
+  render(<CaseStudyForm study={{ ...defaultCaseStudies[0], ...input }} />);
+  fireEvent.click(screen.getByRole("button", { name: "4 Story" }));
+  expect(screen.getAllByRole("region", { name: /^Section / })).toHaveLength(1);
+  fireEvent.change(within(screen.getByRole("region", { name: "Section 1: Text" })).getByLabelText("Section heading"), { target: { value: "Updated first" } });
+  const outline = screen.getByRole("navigation", { name: "Story outline" });
+  fireEvent.click(within(outline).getByRole("button", { name: /Second section/ }));
+  expect(screen.getAllByRole("region", { name: /^Section / })).toHaveLength(1);
+  fireEvent.click(within(outline).getByRole("button", { name: /Updated first/ }));
+  expect(within(screen.getByRole("region", { name: "Section 1: Text" })).getByLabelText("Section heading")).toHaveValue("Updated first");
 });
