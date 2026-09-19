@@ -4,7 +4,6 @@ import { notFound } from "next/navigation";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
-import { getPlaceholderBlogPostBySlug, placeholderBlogPosts, type PlaceholderBlogPost } from "@/lib/blog-placeholders";
 import { getPublicBlogPostBySlug, getPublicBlogPosts, type BlogPost } from "@/lib/blogs";
 import { getMongoDb } from "@/lib/mongodb";
 
@@ -75,33 +74,17 @@ async function getRelatedPosts(currentSlug: string) {
     const db = await getMongoDb();
     const posts = await getPublicBlogPosts(db);
 
-    if (Array.isArray(posts) && posts.length > 0) {
-      const relatedPublished = posts.filter((post) => post.slug !== currentSlug).slice(0, 3);
-
-      if (relatedPublished.length === 3) {
-        return relatedPublished;
-      }
-
-      const placeholderFill = placeholderBlogPosts
-        .filter((post) => post.slug !== currentSlug)
-        .filter((post) => !relatedPublished.some((published) => published.slug === post.slug))
-        .slice(0, 3 - relatedPublished.length);
-
-      return [...relatedPublished, ...placeholderFill];
-    }
+    return posts.filter((post) => post.slug !== currentSlug).slice(0, 3);
   } catch (error) {
     console.error("Unable to load related blog posts", error);
   }
 
-  return placeholderBlogPosts.filter((post) => post.slug !== currentSlug).slice(0, 3);
+  return [];
 }
 
-export async function generateStaticParams() {
-  const db = await getMongoDb();
-  const posts = await getPublicBlogPosts(db);
-
-  return posts.map((post) => ({ slug: post.slug }));
-}
+// The shared navigation reads request cookies for trusted pricing access.
+// Render at request time, including slugs created after deployment.
+export const dynamic = "force-dynamic";
 
 export default async function BlogDetailPage({
   params,
@@ -109,7 +92,7 @@ export default async function BlogDetailPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  let post: (BlogPost | PlaceholderBlogPost) | null = null;
+  let post: BlogPost | null = null;
 
   try {
     const db = await getMongoDb();
@@ -117,8 +100,6 @@ export default async function BlogDetailPage({
   } catch (error) {
     console.error("Unable to load blog detail page", error);
   }
-
-  post ??= getPlaceholderBlogPostBySlug(slug);
 
   if (!post) {
     notFound();

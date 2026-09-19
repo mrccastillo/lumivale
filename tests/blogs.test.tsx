@@ -2,7 +2,7 @@ import { render, screen } from "@testing-library/react";
 import { describe, expect, test, vi } from "vitest";
 
 import BlogDetailPage, {
-  generateStaticParams,
+  dynamic,
 } from "@/app/blogs/[slug]/page";
 import { getPublicBlogPostBySlug, getPublicBlogPosts } from "@/lib/blogs";
 
@@ -11,7 +11,7 @@ vi.mock("@/lib/mongodb", () => ({
 }));
 
 vi.mock("@/lib/blogs", () => ({
-  getPublicBlogPosts: vi.fn(),
+  getPublicBlogPosts: vi.fn().mockResolvedValue([]),
   getPublicBlogPostBySlug: vi.fn(),
 }));
 
@@ -34,12 +34,8 @@ const publishedPost = {
 };
 
 describe("blog data and detail pages", () => {
-  test("generates static params for every published blog post", async () => {
-    vi.mocked(getPublicBlogPosts).mockResolvedValue([publishedPost]);
-
-    const params = await generateStaticParams();
-
-    expect(params).toEqual([{ slug: "published-post" }]);
+  test("renders articles dynamically for cookie-aware navigation and new slugs", () => {
+    expect(dynamic).toBe("force-dynamic");
   });
 
   test("renders the full blog detail page from MongoDB content", async () => {
@@ -90,6 +86,18 @@ describe("blog data and detail pages", () => {
     expect(container.querySelector("#launch-notes")).toHaveTextContent("Launch notes");
     expect(container.querySelector("#setup-checklist")).toHaveTextContent("Setup checklist");
     expect(container.querySelector("#launch-notes-2")).toHaveTextContent("Launch notes");
+  });
+
+  test("does not serve hardcoded placeholder slugs absent from the database", async () => {
+    vi.mocked(getPublicBlogPostBySlug).mockResolvedValue(null);
+    await expect(BlogDetailPage({ params: Promise.resolve({ slug: "comment-campaigns-warmer-inbound-attention" }) })).rejects.toThrow();
+  });
+
+  test("does not fill related articles with placeholder content", async () => {
+    vi.mocked(getPublicBlogPostBySlug).mockResolvedValue(publishedPost);
+    vi.mocked(getPublicBlogPosts).mockResolvedValue([]);
+    render(await BlogDetailPage({ params: Promise.resolve({ slug: publishedPost.slug }) }));
+    expect(screen.queryByRole("heading", { name: "Related Articles" })).not.toBeInTheDocument();
   });
 
   test("rejects unknown blog slugs", async () => {

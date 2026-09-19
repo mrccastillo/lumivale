@@ -1,14 +1,12 @@
 import Link from "next/link";
 import { BlogCarousel } from "@/components/blog-carousel";
-import { placeholderBlogPosts } from "@/lib/blog-placeholders";
 import { getPublicBlogPosts } from "@/lib/blogs";
 import { getMongoDb } from "@/lib/mongodb";
 import styles from "@/components/public-listing.module.css";
 
 export default async function BlogsPage() {
   const posts = await getBlogsPagePosts();
-  const hasPosts = posts.length > 0;
-  const displayedPosts = hasPosts ? posts : placeholderBlogPosts;
+
   return (
     <div className={styles.page} data-nav-surface="light">
       <header className={`${styles.wrap} ${styles.hero}`}>
@@ -23,8 +21,8 @@ export default async function BlogsPage() {
           <p className={styles.eyebrow}>Latest thinking</p>
           <h2>Practical industry insights to accelerate your growth</h2>
         </div>
-        <BlogCarousel>
-          {displayedPosts.map((post, index) => {
+        {posts?.length ? <BlogCarousel>
+          {posts.map((post, index) => {
             const image = "coverImageUrl" in post ? post.coverImageUrl : undefined;
             return <Link key={post.slug} href={`/blogs/${post.slug}`} aria-label={`Read ${post.title}`}
               className={`${styles.post} ${index === 0 ? styles.featured : ""}`}>
@@ -34,7 +32,7 @@ export default async function BlogsPage() {
                   <img src={image} alt={("coverAlt" in post && post.coverAlt) || post.title} loading={index === 0 ? "eager" : "lazy"} />
                 ) : (
                   <div className={styles.postArtwork} aria-label={`${post.category} placeholder image`}>
-                    <span className={styles.artLabel}>{hasPosts ? post.category : "Placeholder"}</span>
+                    <span className={styles.artLabel}>{post.category}</span>
                     <strong aria-hidden="true">{post.category}</strong>
                     <span className={styles.artFoot} aria-hidden="true">Lumivale / Perspectives <span>&#8599;</span></span>
                   </div>
@@ -48,7 +46,10 @@ export default async function BlogsPage() {
               </article>
             </Link>;
           })}
-        </BlogCarousel>
+        </BlogCarousel> : <div className="border-t border-[#cdd6c5] py-12">
+          <h3 className="text-2xl">{posts === null ? "Articles are temporarily unavailable." : "New perspectives are on the way."}</h3>
+          <p className="mt-4 text-sm text-[#657169]">{posts === null ? "Please try again shortly." : "Check back soon for our latest articles."}</p>
+        </div>}
       </section>
     </div>
   );
@@ -58,10 +59,10 @@ async function getBlogsPagePosts() {
   try {
     const db = await getMongoDb();
 
-    return getPublicBlogPosts(db);
+    return await getPublicBlogPosts(db);
   } catch (error) {
     console.error("Unable to load blog posts", error);
 
-    return [];
+    return null;
   }
 }
