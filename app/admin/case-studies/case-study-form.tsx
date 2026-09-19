@@ -601,7 +601,7 @@ export function CaseStudyForm({
           <div
             className={`mx-auto overflow-hidden rounded-xl border border-[var(--lumivale-line)] ${preview === "narrow" ? "max-w-[390px]" : "w-full"}`}
           >
-            <CaseStudyStory study={content} />
+            <div data-preserve-preview><CaseStudyStory study={content} /></div>
           </div>
         </section>
       )}

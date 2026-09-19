@@ -36,7 +36,7 @@ export default async function AdminBlogsPage({ searchParams }: AdminBlogsPagePro
 
   return (
     <section className="mx-auto flex w-full max-w-7xl flex-col gap-7">
-      <section className="overflow-hidden rounded-lg border border-[var(--lumivale-admin-panel-soft)] bg-[linear-gradient(135deg,var(--lumivale-panel),var(--lumivale-ink))] shadow-[0_26px_80px_rgba(5,43,32,0.2)]">
+      <section data-admin-overview className="overflow-hidden rounded-lg border border-[var(--lumivale-admin-panel-soft)] bg-[linear-gradient(135deg,var(--lumivale-panel),var(--lumivale-ink))] shadow-[0_26px_80px_rgba(5,43,32,0.2)]">
         <div className="flex flex-col gap-6 p-6 sm:p-8 lg:flex-row lg:items-start lg:justify-between">
           <div className="max-w-2xl">
             <p className="text-xs font-semibold uppercase tracking-[0.34em] text-white/72">
@@ -326,7 +326,7 @@ function MetricCard({
   value: number | string;
 }) {
   return (
-    <article className="rounded-lg border border-white/12 bg-white/6 p-5 backdrop-blur-sm">
+    <article data-admin-metric className="rounded-lg border border-white/12 bg-white/6 p-5 backdrop-blur-sm">
       <p className="text-xs font-semibold uppercase tracking-[0.24em] text-white/68">
         {label}
       </p>
