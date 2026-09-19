@@ -20,14 +20,10 @@ describe("site footer", () => {
       "href",
       "https://www.linkedin.com/company/lumivale-agency/",
     );
-    expect(screen.getByRole("link", { name: "Admin login" })).toHaveAttribute(
-      "href",
-      "/admin/login",
+    expect(screen.getByRole("link", { name: "Book a call" })).toHaveAttribute(
+      "href", defaultSiteContent.footerCtaButtonUrl,
     );
-    expect(screen.getByRole("link", { name: "Admin login" })).toHaveClass(
-      "opacity-35",
-    );
-    expect(screen.queryByRole("link", { name: "Book a call" })).not.toBeInTheDocument();
+    expect(container.querySelectorAll("footer")).toHaveLength(1);
     expect(container).not.toHaveTextContent(/Premium websites/i);
     expect(container).not.toHaveTextContent(/SaaS-grade/i);
   });

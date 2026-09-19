@@ -9,6 +9,20 @@ export function HeroScrollPin({ children }: { children: ReactNode }) {
     let disposed = false;
     let revert: (() => void) | undefined;
 
+    let ready = false;
+    let scrollToSection: ((target: HTMLElement, immediate: boolean) => void) | undefined;
+    const navigateToHash = (immediate = false) => {
+      if (!ready || disposed) return;
+      const target = document.getElementById(window.location.hash.slice(1));
+      if (!target) return;
+      if (scrollToSection) scrollToSection(target, immediate);
+      else if (target.id === "hero") window.scrollTo({ top: 0, behavior: immediate ? "instant" : "smooth" });
+      else target.scrollIntoView({ behavior: immediate ? "instant" : "smooth", block: "start" });
+    };
+    const onNavigate = () => navigateToHash(window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+    window.addEventListener("homepage:navigate", onNavigate);
+    window.addEventListener("hashchange", onNavigate);
+
     async function setup() {
       const [{ gsap }, { ScrollTrigger }, { default: Lenis }] = await Promise.all([
         import("gsap"),
@@ -27,10 +41,13 @@ export function HeroScrollPin({ children }: { children: ReactNode }) {
           lerp: .1,
           smoothWheel: true,
           syncTouch: false,
-          anchors: true,
+          anchors: false,
           allowNestedScroll: true,
           autoToggle: true,
         });
+        scrollToSection = (target, immediate) => {
+          smoothScroll.scrollTo(target.id === "hero" ? 0 : target, { immediate, force: true });
+        };
         const tick = (seconds: number) => smoothScroll.raf(seconds * 1000);
         smoothScroll.on("scroll", ScrollTrigger.update);
         gsap.ticker.add(tick);
@@ -93,17 +110,25 @@ export function HeroScrollPin({ children }: { children: ReactNode }) {
           gsap.ticker.remove(tick);
           smoothScroll.off("scroll", ScrollTrigger.update);
           smoothScroll.destroy();
+          scrollToSection = undefined;
         };
       });
       revert = () => media.revert();
-      // Font loading can change the hero height after the initial measurement.
-      document.fonts?.ready.then(() => {
-        if (!disposed) ScrollTrigger.refresh();
-      });
+      // Resolve route anchors only after fonts, pinning, and smooth scrolling are ready.
+      await document.fonts?.ready;
+      if (disposed) return;
+      ScrollTrigger.refresh();
+      ready = true;
+      navigateToHash(true);
     }
 
     void setup();
-    return () => { disposed = true; revert?.(); };
+    return () => {
+      disposed = true;
+      window.removeEventListener("homepage:navigate", onNavigate);
+      window.removeEventListener("hashchange", onNavigate);
+      revert?.();
+    };
   }, []);
 
   return <div ref={hero} data-hero-scroll-pin className="relative z-0">{children}</div>;

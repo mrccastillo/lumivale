@@ -85,6 +85,30 @@ describe("site navbar", () => {
     );
   });
 
+  test("tracks the visible homepage section in both menus and includes FAQ", async () => {
+    hasTrustedClientAccessMock.mockResolvedValue(false);
+    pathnameMock.mockReturnValue("/");
+    const { SiteNavbar } = await import("@/components/site-navbar");
+    const section = document.createElement("section");
+    section.id = "services";
+    let top = 500;
+    vi.spyOn(section, "getBoundingClientRect").mockImplementation(() => ({ top, bottom: top + 600 } as DOMRect));
+    document.body.appendChild(section);
+    render(await SiteNavbar());
+    expect(screen.getByRole("link", { name: "FAQ" })).toHaveAttribute("href", "/#faqs");
+    expect(screen.getByRole("link", { name: "Home", exact: true })).toHaveAttribute("aria-current", "page");
+    top = 90;
+    fireEvent.scroll(window);
+    expect(screen.getByRole("link", { name: "Services" })).toHaveAttribute("aria-current", "page");
+    expect(screen.getByRole("link", { name: "Home", exact: true })).not.toHaveAttribute("aria-current");
+    fireEvent.click(screen.getByRole("button", { name: "Open menu" }));
+    expect(within(screen.getByRole("navigation", { name: "Mobile" })).getByRole("link", { name: "Services" })).toHaveAttribute("aria-current", "page");
+    top = 500;
+    fireEvent.scroll(window);
+    expect(within(screen.getByRole("navigation", { name: "Primary" })).getByRole("link", { name: "Home", exact: true })).toHaveAttribute("aria-current", "page");
+    section.remove();
+  });
+
   test("opens a mobile menu with navigation links and a book a call CTA", async () => {
     hasTrustedClientAccessMock.mockResolvedValue(false);
     pathnameMock.mockReturnValue("/");

@@ -103,7 +103,7 @@ test("failed persistence reports failure", async () => {
 test("navbar uses the saved name and logo, with a letter fallback", () => {
   const props = { calendlyUrl: defaultSiteContent.heroButtonUrl, hasTrustedAccess: false, publicLinks: [] };
   const { container, rerender } = render(<SiteNavbarClient {...props} content={{ ...defaultSiteContent, brandName: "New Brand", logoUrl: "https://example.com/logo.png" }} />);
-  expect(screen.getByRole("link", { name: "New Brand" })).toHaveAttribute("href", "/");
+  expect(screen.getByRole("link", { name: "New Brand" })).toHaveAttribute("href", "/#hero");
   expect(container.querySelector("img")).toHaveAttribute("src", "https://example.com/logo.png");
   rerender(<SiteNavbarClient {...props} content={{ ...defaultSiteContent, logoText: "N" }} />);
   expect(container.querySelector("img")).toBeNull();
@@ -168,4 +168,27 @@ test("saving reveals invalid fields in a hidden tab before submitting", async ()
   expect(screen.getByRole("tabpanel")).toHaveAttribute("id", "panel-hero");
   await waitFor(() => expect(screen.getByLabelText("Headline")).toHaveFocus());
   expect(fetchMock).not.toHaveBeenCalled();
+});
+
+
+test("About edits and portraits persist through the authenticated settings API", async () => {
+  const data = await request({ aboutHeading: "Meet our team", aboutFounder1Name: "Alex" }).formData();
+  data.set("founder1File", new File(["portrait"], "portrait.jpg", { type: "image/jpeg" }));
+  const response = await POST({ formData: async () => data } as Request);
+  expect(response.status).toBe(200);
+  expect(updateOne).toHaveBeenCalledWith({ _id: "main" }, { $set: expect.objectContaining({ aboutHeading: "Meet our team", aboutFounder1Name: "Alex", aboutFounder1Image: "https://example.com/uploaded.png" }) }, { upsert: true });
+  expect(() => parseSiteContent({ ...defaultSiteContent, aboutFounder1Image: "javascript:alert(1)" })).toThrow("HTTP");
+});
+
+test("About tab saves edited copy and founder details", async () => {
+  const fetchMock = vi.fn().mockResolvedValue({ ok: true, json: async () => ({ content: { ...defaultSiteContent, aboutHeading: "Our story", aboutFounder1Name: "Alex" } }) });
+  vi.stubGlobal("fetch", fetchMock);
+  render(<SiteContentForm initialContent={defaultSiteContent} />);
+  fireEvent.click(screen.getByRole("tab", { name: /About Us/ }));
+  fireEvent.change(screen.getByLabelText("About headline"), { target: { value: "Our story" } });
+  fireEvent.change(screen.getByLabelText("Founder 1 name"), { target: { value: "Alex" } });
+  fireEvent.click(screen.getByRole("button", { name: "Save changes" }));
+  await waitFor(() => expect(screen.getByRole("status")).toHaveTextContent("saved"));
+  expect(fetchMock.mock.calls[0][1].body.get("aboutHeading")).toBe("Our story");
+  expect(fetchMock.mock.calls[0][1].body.get("aboutFounder1Name")).toBe("Alex");
 });

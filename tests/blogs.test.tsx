@@ -61,7 +61,7 @@ describe("blog data and detail pages", () => {
     expect(screen.getByText(publishedPost.excerpt)).toBeInTheDocument();
     expect(screen.getByRole("heading", { level: 2, name: "Launch notes" })).toBeInTheDocument();
     expect(screen.getByText("Markdown body content.")).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "Blogs" })).toHaveAttribute("href", "/blogs");
+    expect(screen.getByRole("link", { name: /All articles/ })).toHaveAttribute("href", "/blogs");
   });
 
   test("builds the table of contents from article headings", async () => {

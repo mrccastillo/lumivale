@@ -349,7 +349,7 @@ export default async function Home() {
           <Reveal data-testid="faqs-reveal" className={`${styles.wrap} ${styles.faqLayout}`}>
             <div data-scroll-reveal><h2>FAQ</h2><p className={styles.description}>Everything you need to know about Lumivale and how we help grow your customer channels.</p></div>
             <div className={styles.faqList}>
-              {faqs.map((faq, index) => <details data-scroll-reveal key={faq.question} open={index === 0}>
+              {faqs.map((faq, index) => <details name="homepage-faq" data-scroll-reveal key={faq.question} open={index === 0}>
                 <summary>{faq.question}<span aria-hidden="true">+</span></summary><p>{faq.answer}</p>
               </details>)}
             </div>

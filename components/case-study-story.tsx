@@ -1,6 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 import { Fragment, type ReactNode } from "react";
 import Link from "next/link";
+import styles from "./case-study-story.module.css";
 import {
   safeImageUrl,
   safeStoryUrl,
@@ -65,7 +66,7 @@ export function StoryRichText({ node }: { node: RichNode }) {
     }
   }
   return (
-    <div className="space-y-4 break-words text-[1rem] leading-8 text-[#506259]">
+    <div className={styles.prose}>
       {render(node)}
     </div>
   );
@@ -83,8 +84,8 @@ export function StoryFigure({
     "/image/upload/f_auto,q_auto,w_1400,c_limit/",
   );
   return (
-    <figure className="min-w-0 space-y-3">
-      <div className="overflow-hidden rounded-xl border border-[#dce7e0] bg-[#edf3ef]">
+    <figure className={styles.figure}>
+      <div className={styles.imageFrame}>
         <img
           src={inlineUrl}
           alt={image.alt}
@@ -95,7 +96,7 @@ export function StoryFigure({
         />
       </div>
       {(image.caption || evidence) && (
-        <figcaption className="flex flex-wrap items-start justify-between gap-2 text-xs leading-5 text-[#61796c]">
+        <figcaption className={styles.caption}>
           {image.caption && <span>{image.caption}</span>}
           {evidence && (
             <a
@@ -116,28 +117,28 @@ export function StoryFigure({
 function Section({ section }: { section: StorySection }) {
   const heading =
     "heading" in section && section.heading ? (
-      <h2 className="mb-6 text-2xl font-medium leading-tight tracking-tight text-[#10281e] @min-[700px]:text-3xl">
+      <h2 className={styles.sectionHeading}>
         {section.heading}
       </h2>
     ) : null;
   switch (section.type) {
     case "narrative":
       return (
-        <section className="mx-auto max-w-3xl">
+        <section className={styles.narrative}>
           {heading}
           <StoryRichText node={section.body} />
         </section>
       );
     case "imageText":
       return (
-        <section className="grid items-center gap-8 @min-[700px]:grid-cols-2 @min-[700px]:gap-12">
+        <section className={styles.imageText}>
           <div>
             {heading}
             <StoryRichText node={section.body} />
           </div>
           <div
             className={
-              section.side === "left" ? "@min-[700px]:order-first" : ""
+              section.side === "left" ? styles.imageFirst : ""
             }
           >
             <StoryFigure image={section.image} />
@@ -146,7 +147,7 @@ function Section({ section }: { section: StorySection }) {
       );
     case "image":
       return (
-        <section>
+        <section className={styles.visualSection}>
           {heading}
           <StoryFigure image={section.image} />
           {section.sourceUrl && safeStoryUrl(section.sourceUrl) && (
@@ -163,9 +164,9 @@ function Section({ section }: { section: StorySection }) {
       );
     case "gallery":
       return (
-        <section>
+        <section className={styles.visualSection}>
           {heading}
-          <div className="grid gap-6 @min-[700px]:grid-cols-2">
+          <div className={styles.gallery}>
             {section.images.map((image) => (
               <StoryFigure key={image.id} image={image} />
             ))}
@@ -174,16 +175,16 @@ function Section({ section }: { section: StorySection }) {
       );
     case "comparison":
       return (
-        <section>
+        <section className={styles.visualSection}>
           {heading}
-          <div className="grid gap-8 border-y border-[#dce7e0] py-8 @min-[700px]:grid-cols-2">
+          <div className={styles.comparison}>
             <div>
               <h3 className="mb-4 text-xs font-semibold uppercase tracking-[0.18em] text-[#61796c]">
                 {section.beforeLabel}
               </h3>
               <StoryRichText node={section.before} />
             </div>
-            <div className="border-t border-[#dce7e0] pt-8 @min-[700px]:border-l @min-[700px]:border-t-0 @min-[700px]:pl-8 @min-[700px]:pt-0">
+            <div className={styles.after}>
               <h3 className="mb-4 text-xs font-semibold uppercase tracking-[0.18em] text-emerald-700">
                 {section.afterLabel}
               </h3>
@@ -194,8 +195,8 @@ function Section({ section }: { section: StorySection }) {
       );
     case "quote":
       return (
-        <figure className="mx-auto max-w-3xl border-l-2 border-emerald-500 pl-6 @min-[700px]:pl-10">
-          <blockquote className="whitespace-pre-line text-2xl font-medium leading-relaxed tracking-tight text-[#10281e]">
+        <figure className={styles.quote}>
+          <blockquote className={styles.quoteText}>
             “{section.quote}”
           </blockquote>
           <figcaption className="mt-6 flex items-center gap-3">
@@ -230,109 +231,68 @@ export function CaseStudyStory({ study }: { study: StoryInput }) {
     ["Budget", study.budget],
   ].filter(([, value]) => value);
   return (
-    <article className="@container overflow-hidden bg-[#fafcfb] text-[#10281e]">
-      <header
-        data-nav-surface="dark"
-        className="bg-[#031410] px-6 pb-14 pt-28 text-white @min-[700px]:px-10 @min-[700px]:pb-20 @min-[700px]:pt-36"
-      >
-        <div className="mx-auto max-w-6xl">
-          <Link
-            href="/case-studies"
-            className="text-sm text-[#9fbbae] transition hover:text-white"
-          >
-            ← All case studies
-          </Link>
-          <p className="mt-10 text-xs font-semibold uppercase tracking-[0.2em] text-[#25d699]">
-            Case study{study.category ? ` / ${study.category}` : ""}
-          </p>
+    <article className={styles.story} data-nav-surface="light">
+      <header className={styles.hero}>
+        <div className={styles.wrap}>
+          <div className={styles.topline}>
+            <Link href="/case-studies" className={styles.back}>&larr; All case studies</Link>
+            <p className={styles.category}>Case study{study.category ? ` / ${study.category}` : ""}</p>
+          </div>
           {(study.logo || study.clientName) && (
-            <div className="mt-6 flex items-center gap-3">
+            <div className={styles.client}>
               {study.logo && safeImageUrl(study.logo.url) && (
-                <img
-                  src={study.logo.url}
-                  alt={study.logo.alt}
-                  width={48}
-                  height={48}
-                  className="size-12 rounded-lg object-contain"
-                />
+                <img src={study.logo.url} alt={study.logo.alt} width={44} height={44} className={styles.logo} />
               )}
-              {study.clientName &&
-                (study.clientUrl && safeStoryUrl(study.clientUrl) ? (
-                  <a
-                    href={study.clientUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="font-medium underline underline-offset-4"
-                  >
-                    {study.clientName} ↗
-                  </a>
-                ) : (
-                  <p className="font-medium">{study.clientName}</p>
-                ))}
+              {study.clientName && (study.clientUrl && safeStoryUrl(study.clientUrl) ? (
+                <a href={study.clientUrl} target="_blank" rel="noopener noreferrer">{study.clientName} <span aria-hidden="true">&#8599;</span></a>
+              ) : <p>{study.clientName}</p>)}
             </div>
           )}
-          <h1 className="mt-5 max-w-4xl break-words text-4xl font-medium leading-[1.12] tracking-tight @min-[700px]:text-6xl">
-            {study.headline || study.title}
-          </h1>
-          {study.summary && (
-            <p className="mt-6 max-w-2xl text-base leading-8 text-[#b0c9bc] @min-[700px]:text-lg">
-              {study.summary}
-            </p>
-          )}
+          <h1>{study.headline || study.title}</h1>
+          {study.summary && <p className={styles.summary}>{study.summary}</p>}
+          {study.cover && <div className={styles.cover}><StoryFigure image={study.cover} evidence={false} /></div>}
           {contexts.length > 0 && (
-            <dl className="mt-10 flex flex-wrap gap-x-12 gap-y-6 border-t border-white/15 pt-7">
+            <dl className={styles.contexts}>
               {contexts.map(([label, value]) => (
-                <div key={label}>
-                  <dt className="text-xs uppercase tracking-wider text-[#91ab9d]">
-                    {label}
-                  </dt>
-                  <dd className="mt-2 max-w-xs text-sm">{value}</dd>
-                </div>
-              ))}
-            </dl>
-          )}
-          {study.metrics.length > 0 && (
-            <dl className="mt-10 grid grid-cols-2 gap-7 border-t border-white/15 pt-8 @min-[700px]:grid-cols-4">
-              {study.metrics.map((metric, index) => (
-                <div key={metric.id ?? index}>
-                  <dd className="break-words text-3xl font-medium tracking-tight text-[#8fe7bc] @min-[700px]:text-4xl">
-                    {metric.value}
-                  </dd>
-                  <dt className="mt-2 text-sm leading-6 text-[#b0c9bc]">
-                    {metric.label}
-                  </dt>
-                </div>
+                <div key={label}><dt>{label}</dt><dd>{value}</dd></div>
               ))}
             </dl>
           )}
         </div>
       </header>
-      <div className="mx-auto max-w-6xl space-y-16 px-6 py-14 @min-[700px]:space-y-24 @min-[700px]:px-10 @min-[700px]:py-20">
-        {study.cover && <StoryFigure image={study.cover} evidence={false} />}
-        {storySections(study).map((section) => (
-          <Section key={section.id} section={section} />
-        ))}
+      {study.metrics.length > 0 && (
+        <section className={styles.results} aria-label="Campaign results" data-nav-surface="dark">
+          <div className={styles.wrap}>
+            <p className={styles.resultsLabel}>The results</p>
+            <dl className={styles.metrics}>
+              {study.metrics.map((metric, index) => (
+                <div key={metric.id ?? index}><dd>{metric.value}</dd><dt>{metric.label}</dt></div>
+              ))}
+            </dl>
+          </div>
+        </section>
+      )}
+      <div className={`${styles.wrap} ${styles.body}`}>
+        {storySections(study).map((section) => <Section key={section.id} section={section} />)}
       </div>
       {study.cta && (
-        <section className="bg-[#eaf7ef] px-6 py-16 text-center">
-          <div className="mx-auto max-w-2xl">
-            <h2 className="text-3xl font-medium tracking-tight">
-              {study.cta.heading}
-            </h2>
-            {study.cta.text && (
-              <p className="mt-4 leading-7 text-[#506259]">{study.cta.text}</p>
-            )}
+        <section className={styles.cta} data-nav-surface="dark">
+          <div className={styles.wrap}>
+            <div><h2>{study.cta.heading}</h2>
+              {study.cta.text && <p>{study.cta.text}</p>}
+            </div>
             {safeStoryUrl(study.cta.buttonUrl) && (
-              <a
-                href={study.cta.buttonUrl}
-                className="mt-7 inline-flex rounded-full bg-[#0bc68a] px-7 py-3 text-sm font-semibold text-[#031410]"
-              >
-                {study.cta.buttonText}
+              <a href={study.cta.buttonUrl} className={styles.button}>
+                {study.cta.buttonText}<span aria-hidden="true">&#8599;</span>
               </a>
             )}
           </div>
         </section>
       )}
+      <div className={`${styles.wrap} ${styles.endNav}`}>
+        <span>Lumivale / Case studies</span>
+        <Link href="/case-studies">Explore more stories <span aria-hidden="true">&#8599;</span></Link>
+      </div>
     </article>
   );
 }

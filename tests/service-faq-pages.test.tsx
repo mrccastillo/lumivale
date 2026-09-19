@@ -19,7 +19,7 @@ test("renders only public fields, ordered native disclosures, and public navigat
   const nav = within(screen.getByRole("navigation", { name: "Lumivale Services" }));
   expect(nav.getAllByRole("link").map(link => link.getAttribute("href"))).toEqual(["/services/ugc-content-creation", "/services/comment-campaign"]);
   expect(nav.getByRole("link", { name: "Comment Campaign" })).toHaveAttribute("aria-current", "page");
-  expect(screen.getByRole("link", { name: "Home" })).toHaveAttribute("href", "/#services");
+  expect(screen.getByRole("link", { name: /All services/ })).toHaveAttribute("href", "/#services");
   expect(Array.from(container.querySelectorAll("summary")).map(row => row.textContent)).toEqual(["Second question?+", "First question?+"]);
   expect(container.querySelectorAll("details[open]")).toHaveLength(0);
   expect(container.querySelector("script")).toBeNull();
@@ -28,7 +28,7 @@ test("renders only public fields, ordered native disclosures, and public navigat
 test("empty FAQs do not fall back to homepage questions", async () => {
   mocks.service.mockResolvedValue({ ...getDefaultServices()[0], faqs: [] });
   render(await ServiceDetailPage({ params: Promise.resolve({ slug: "comment-campaign" }) }));
-  expect(screen.getByText("No FAQs available yet.")).toBeInTheDocument();
+  expect(screen.getByRole("heading", { name: "Have a question?" })).toBeInTheDocument();
   expect(screen.queryByText("Is this only for startups?")).toBeNull();
 });
 test("missing or unpublished service is not found", async () => {

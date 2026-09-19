@@ -5,7 +5,7 @@ import styles from "./homepage-concept.module.css";
 export function HomepageFooter({ content }: { content: SiteContent }) {
   const heading = content.footerCtaHeading;
   const lastSpace = heading.lastIndexOf(" ");
-  return <section id="conversion" data-nav-surface="dark" className={styles.closing}>
+  return <section id="conversion" data-nav-surface="dark" className={`${styles.scope} ${styles.closing}`}>
     <div className={styles.wrap}>
       <div data-testid="conversion-reveal" className={styles.closingTop}>
         <div><p className={styles.eyebrow}>{content.footerCtaPrompt}</p><h2>{lastSpace >= 0 ? heading.slice(0, lastSpace + 1) : ""}<span>{heading.slice(lastSpace + 1)}</span></h2></div>

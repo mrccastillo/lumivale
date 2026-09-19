@@ -1,5 +1,6 @@
 "use client";
 
+import styles from "./service-detail.module.css";
 import { useId, useRef, useState } from "react";
 import type { PrivateServiceContent } from "@/lib/services";
 import { normalizeExamplePlatforms } from "@/lib/service-example-platforms";
@@ -17,7 +18,7 @@ export function ServiceExamplePlatforms({ content }: { content: PrivateServiceCo
   if (!platforms.length) return <p className="text-sm text-[var(--lumivale-muted)]">No examples available yet.</p>;
 
   return <div className="min-w-0">
-    <div role="tablist" aria-label="Example platforms" className="flex flex-wrap gap-3">
+    <div role="tablist" aria-label="Example platforms" className={styles.platformTabs}>
       {platforms.map((platform, index) => <button
         key={platform.id}
         ref={(element) => { tabs.current[index] = element; }}
@@ -39,22 +40,21 @@ export function ServiceExamplePlatforms({ content }: { content: PrivateServiceCo
           event.preventDefault();
           tabs.current[next]?.focus();
         }}
-        className={`max-w-full break-words rounded-full border px-4 py-2 text-sm font-semibold transition focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--lumivale-panel)] ${selected === platform.id ? "border-[var(--lumivale-accent)] bg-[var(--lumivale-accent)] text-[#010807]" : "border-[var(--lumivale-line)] bg-[#f7f8fb] text-[var(--lumivale-ink)] hover:border-[var(--lumivale-accent)]"}`}
+        className={styles.platformTab}
       >{platform.name}</button>)}
     </div>
-    <p className="mt-3 text-sm text-[var(--lumivale-muted)]">Explore examples of this service in action.</p>
-    <div key={selected} role="tabpanel" tabIndex={0} id={`${prefix}-panel-${selected}`} aria-labelledby={`${prefix}-tab-${selected}`} className="mt-8 grid gap-5 focus-visible:outline-2 focus-visible:outline-offset-4 md:grid-cols-2 xl:grid-cols-3">
+    <div key={selected} role="tabpanel" tabIndex={0} id={`${prefix}-panel-${selected}`} aria-labelledby={`${prefix}-tab-${selected}`} className={styles.examples}>
       {normalized.exampleCards.filter((card) => card.platformId === selected).map((card) => (
               <article
                 key={card.id}
-                className="min-w-0 break-words rounded-[18px] border border-[var(--lumivale-line)] bg-[#fbfcff] p-4 sm:p-6 shadow-[0_18px_44px_rgba(42,47,82,0.06)]"
+                className={styles.example}
               >
-                <span className="inline-flex rounded-full border border-[var(--lumivale-line)] bg-white px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--lumivale-muted)]">
+                <span className={styles.eyebrow}>
                   {card.tag}
                 </span>
-                <h2 className="mt-5 text-xl font-semibold text-[var(--lumivale-ink)]">
+                <h3>
                   {card.title}
-                </h2>
+                </h3>
                 <p className="mt-3 text-sm leading-7 text-[var(--lumivale-muted)]">
                   {card.summary}
                 </p>

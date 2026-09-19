@@ -51,16 +51,14 @@ describe("services data and detail pages", () => {
         params: Promise.resolve({ slug: service.slug }),
       }),
     );
-    const headerSection = container.querySelector("section");
+
 
     expect(
       screen.getByRole("heading", { level: 1, name: service.title }),
     ).toBeInTheDocument();
-    expect(headerSection).toHaveClass("pt-24", "pb-16");
-    expect(headerSection).toHaveAttribute("data-nav-surface", "dark");
-    expect(headerSection?.className).toContain("linear-gradient");
-    expect(screen.getByRole("heading", { name: "FAQS" })).toBeInTheDocument();
-    expect(screen.getByText("No FAQs available yet.")).toBeInTheDocument();
+    expect(container.querySelector('[data-nav-surface="light"]')).toBeTruthy();
+    expect(screen.getByRole("heading", { name: /Your questions,/ })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Have a question?" })).toBeInTheDocument();
     expect(screen.queryByText("Highlights")).not.toBeInTheDocument();
     expect(screen.getByText(service.description)).toBeInTheDocument();
     expect(screen.queryByText("EXAMPLES")).not.toBeInTheDocument();

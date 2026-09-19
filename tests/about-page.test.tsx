@@ -1,42 +1,17 @@
 import { render, screen } from "@testing-library/react";
-import { describe, expect, test } from "vitest";
-
+import { expect, test, vi } from "vitest";
+import { defaultSiteContent } from "@/lib/site-content-defaults";
+import { getSiteContentForSite } from "@/lib/site-content";
 import AboutPage from "@/app/about/page";
+vi.mock("@/lib/site-content", () => ({ getSiteContentForSite: vi.fn() }));
 
-describe("about page", () => {
-  test("renders a clean single-section founder-focused About page", async () => {
-    const { container } = render(await AboutPage());
-    const sections = container.querySelectorAll("section");
-    const aboutSection = sections[0];
-
-    expect(
-      screen.getByRole("heading", { name: "Meet the founders", level: 1 }),
-    ).toBeInTheDocument();
-    expect(sections).toHaveLength(1);
-    expect(aboutSection).toHaveClass("bg-white", "pt-32", "py-16");
-    expect(aboutSection).not.toHaveAttribute("data-nav-surface", "dark");
-    expect(aboutSection?.className).not.toContain("linear-gradient");
-    expect(
-      screen.getByText(
-        "Lumivale is run by a small founding team that pairs strategy, creative execution, and outreach systems for early-stage teams.",
-      ),
-    ).toBeInTheDocument();
-    expect(screen.getAllByRole("heading", { name: "John Doe", level: 2 })).toHaveLength(3);
-    const founderPhotos = screen.getAllByAltText("John Doe portrait photo");
-    expect(founderPhotos).toHaveLength(3);
-    expect(
-      founderPhotos.every((photo) =>
-        photo.getAttribute("src")?.includes("about-placeholder.jpg"),
-      ),
-    ).toBe(true);
-    expect(screen.queryByText("What we support")).not.toBeInTheDocument();
-    expect(screen.queryByText("We keep it Simple.")).not.toBeInTheDocument();
-    expect(screen.queryByText("Make it Affordable.")).not.toBeInTheDocument();
-    expect(screen.queryByText("Ensure Excellence.")).not.toBeInTheDocument();
-    expect(screen.queryByRole("link", { name: "Book a call" })).not.toBeInTheDocument();
-    expect(screen.queryByRole("link", { name: "View case studies" })).not.toBeInTheDocument();
-    expect(container).not.toHaveTextContent(/premium website/i);
-    expect(container).not.toHaveTextContent(/SaaS-grade/i);
-    expect(container).not.toHaveTextContent(/website strategy/i);
-  });
+test("renders saved About content and visible founder biographies", async () => {
+  vi.mocked(getSiteContentForSite).mockResolvedValue({ ...defaultSiteContent, aboutHeading: "Our team", aboutFounder1Name: "Alex", aboutFounder2Name: "", aboutFounder3Name: "" });
+  render(await AboutPage());
+  expect(screen.getByRole("heading", { name: "Our team", level: 1 })).toBeInTheDocument();
+  expect(screen.getByRole("heading", { name: "Alex", level: 3 })).toBeInTheDocument();
+  expect(screen.getAllByRole("article")).toHaveLength(1);
+  expect(screen.getByText(defaultSiteContent.aboutFounder1Summary)).toBeVisible();
+  expect(screen.getByAltText("Alex portrait")).toHaveAttribute("src", defaultSiteContent.aboutFounder1Image);
+  expect(screen.getByRole("link", { name: /Explore our services/ })).toHaveAttribute("href", "/#services");
 });

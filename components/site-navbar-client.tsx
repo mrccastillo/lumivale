@@ -28,6 +28,7 @@ export function SiteNavbarClient({
 }: SiteNavbarClientProps) {
   const pathname = usePathname() || "/";
   const isPricingActive = pathname === "/pricing" || pathname.startsWith("/pricing/");
+  const [activeSection, setActiveSection] = useState("/");
   const [surface, setSurface] = useState<NavSurface>("dark");
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -91,6 +92,40 @@ export function SiteNavbarClient({
     };
   }, [isMenuOpen]);
 
+  useEffect(() => {
+    if (pathname !== "/") return;
+    const updateActiveSection = () => {
+      const threshold = 120;
+      let active = "/";
+      publicLinks.forEach((link) => {
+        if (!link.href.startsWith("/#")) return;
+        const section = document.getElementById(link.href.slice(2));
+        if (section && section.getBoundingClientRect().top <= threshold) active = link.href;
+      });
+      setActiveSection(active);
+    };
+    const frame = requestAnimationFrame(updateActiveSection);
+    window.addEventListener("scroll", updateActiveSection, { passive: true });
+    window.addEventListener("resize", updateActiveSection);
+    return () => {
+      cancelAnimationFrame(frame);
+      window.removeEventListener("scroll", updateActiveSection);
+      window.removeEventListener("resize", updateActiveSection);
+    };
+  }, [pathname, publicLinks]);
+
+  const isLinkActive = (href: string) => pathname === "/"
+    ? activeSection === href
+    : !href.includes("#") && href !== "/" && (pathname === href || pathname.startsWith(`${href}/`));
+  const sectionHref = (href: string) => href === "/" ? "/#hero" : href;
+  const navigateSection = (event: { preventDefault: () => void }, href: string) => {
+    closeMenu();
+    if (pathname !== "/" || !sectionHref(href).startsWith("/#")) return;
+    event.preventDefault();
+    window.history.pushState(null, "", sectionHref(href));
+    window.dispatchEvent(new Event("homepage:navigate"));
+  };
+
   const shellClass = isLight ? styles.light : styles.dark;
   const logoChipClass = styles.mark;
   const navListClass = styles.links;
@@ -106,7 +141,9 @@ export function SiteNavbarClient({
         className={styles.inner}
       >
         <Link
-          href="/"
+          href="/#hero"
+          scroll={false}
+          onNavigate={(event) => navigateSection(event, "/")}
           onClick={closeMenu}
           className={styles.brand}
         >
@@ -124,12 +161,14 @@ export function SiteNavbarClient({
         <nav aria-label="Primary" className={styles.desktopNav}>
           <ul className={navListClass}>
             {publicLinks.map((link) => {
-              const isActive = pathname === link.href;
+              const isActive = isLinkActive(link.href);
 
               return (
                 <li key={link.href}>
                   <Link
-                    href={link.href}
+                    href={sectionHref(link.href)}
+                    scroll={link.href !== "/" && !link.href.startsWith("/#")}
+                    onNavigate={(event) => navigateSection(event, link.href)}
                     aria-current={isActive ? "page" : undefined}
                     className={`transition ${
                       isActive ? navItemActive : ""
@@ -202,13 +241,16 @@ export function SiteNavbarClient({
         >
           <div className="flex flex-col">
             {publicLinks.map((link) => {
-              const isActive = pathname === link.href;
+              const isActive = isLinkActive(link.href);
 
               return (
                 <Link
                   key={link.href}
-                  href={link.href}
+                  href={sectionHref(link.href)}
+                    scroll={link.href !== "/" && !link.href.startsWith("/#")}
+                    onNavigate={(event) => navigateSection(event, link.href)}
                   onClick={closeMenu}
+                  aria-current={isActive ? "page" : undefined}
                   className={`border-b px-3 py-3 text-sm font-medium transition last:border-b-0 ${
                     isActive ? navItemActive : ""
                   } ${mobileLinkClass}`}

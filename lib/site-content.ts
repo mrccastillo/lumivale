@@ -16,9 +16,9 @@ export function parseSiteContent(input: Record<string, unknown>): SiteContent {
   if (!content.brandName || !content.logoText || !content.heroHeading || !content.heroDescription || !content.heroButtonText || !content.heroButtonUrl) {
     throw new Error("Complete the brand name, letter mark, headline, description, and button fields.");
   }
-  for (const key of ["logoUrl", "heroButtonUrl", "footerCtaButtonUrl", "footerLinkedinUrl", "footerHomeUrl", "footerAboutUrl", "footerBlogsUrl"] as const) {
+  for (const key of ["logoUrl", "heroButtonUrl", "footerCtaButtonUrl", "footerLinkedinUrl", "footerHomeUrl", "footerAboutUrl", "footerBlogsUrl", "aboutFounder1Image", "aboutFounder2Image", "aboutFounder3Image"] as const) {
     if (!content[key]) continue;
-    if (["footerHomeUrl", "footerAboutUrl", "footerBlogsUrl"].includes(key) && /^\/(?!\/)/.test(content[key]) && !/[\\\s]/.test(content[key])) continue;
+    if ((key.startsWith("aboutFounder") || ["footerHomeUrl", "footerAboutUrl", "footerBlogsUrl"].includes(key)) && /^\/(?!\/)/.test(content[key]) && !/[\\\s]/.test(content[key])) continue;
     let url: URL;
     try { url = new URL(content[key]); } catch { throw new Error(`${key} must be a valid HTTP or HTTPS URL.`); }
     if (!["http:", "https:"].includes(url.protocol)) throw new Error(`${key} must use HTTP or HTTPS.`);
@@ -27,6 +27,7 @@ export function parseSiteContent(input: Record<string, unknown>): SiteContent {
     throw new Error("Use a brand name and button label under 80 characters, a letter mark under 4, and a prompt under 100.");
   }
   for (const key of Object.keys(content) as (keyof SiteContent)[]) {
+    if (key.startsWith("about") && !key.startsWith("aboutFounder") && !content[key]) throw new Error(`Complete the ${key} field.`);
     if (key.startsWith("footer") && !content[key]) throw new Error(`Complete the ${key} field.`);
     if (key.startsWith("results")) {
       if (!content[key]) throw new Error(`Complete the ${key} field.`);

@@ -9,6 +9,7 @@ import styles from "./site-content-form.module.css";
 const sections = [
   { id: "branding", label: "Branding", description: "Manage the name and logo used across your website and staff portal." },
   { id: "hero", label: "Homepage hero", description: "Edit the first message visitors see and the action you want them to take." },
+  { id: "about", label: "About Us", description: "Edit the About page introduction, approach, and founder profiles." },
   { id: "results", label: "Results", description: "Update your results headline and the four metrics displayed on the homepage." },
   { id: "cta", label: "Footer CTA", description: "Customize the invitation and booking link above your homepage footer." },
   { id: "footer", label: "Footer", description: "Manage footer branding, navigation, contact details, and the bottom bar." },
@@ -19,6 +20,7 @@ export function SiteContentForm({ initialContent }: { initialContent: SiteConten
   const [content, setContent] = useState(initialContent);
   const [savedContent, setSavedContent] = useState(initialContent);
   const [activeSection, setActiveSection] = useState<SectionId>("branding");
+  const [founderFiles, setFounderFiles] = useState<Record<string, File>>({});
   const [logoFile, setLogoFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState("");
   const [saving, setSaving] = useState(false);
@@ -32,10 +34,13 @@ export function SiteContentForm({ initialContent }: { initialContent: SiteConten
 
   async function save(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    const form = event.currentTarget;
     const invalid = event.currentTarget.querySelector<HTMLInputElement | HTMLTextAreaElement>("input:invalid, textarea:invalid");
     if (invalid) {
       const panel = invalid.closest<HTMLElement>("[data-content-section]");
       if (panel) setActiveSection(panel.dataset.contentSection as SectionId);
+      const disclosure = invalid.closest("details");
+      if (disclosure) disclosure.open = true;
       requestAnimationFrame(() => { invalid.focus(); invalid.reportValidity(); });
       return;
     }
@@ -43,11 +48,13 @@ export function SiteContentForm({ initialContent }: { initialContent: SiteConten
     try {
       const data = new FormData();
       Object.entries(content).forEach(([key, value]) => data.set(key, value));
+      Object.entries(founderFiles).forEach(([key, file]) => data.set(key, file));
       if (logoFile) data.set("logoFile", logoFile);
       const response = await fetch("/api/admin/site-content", { method: "POST", body: data });
       const result = await response.json();
       if (!response.ok) throw new Error(result.error || "Could not save site content.");
-      setContent(result.content); setSavedContent(result.content); setLogoFile(null); setPreviewUrl("");
+      setContent(result.content); setSavedContent(result.content); setFounderFiles({});
+      form.querySelectorAll<HTMLInputElement>('[data-founder-upload]').forEach((input) => { input.value = ""; }); setLogoFile(null); setPreviewUrl("");
       if (fileInput.current) fileInput.current.value = "";
       setMessage("Site content saved. Your changes are now live.");
       router.refresh();
@@ -62,10 +69,10 @@ export function SiteContentForm({ initialContent }: { initialContent: SiteConten
       onChange: (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => setContent({ ...content, [key]: event.target.value }),
       className: "mt-2 w-full rounded-lg border border-[var(--lumivale-line)] bg-white px-3 py-2.5 text-sm font-normal outline-none focus:border-[var(--lumivale-accent)]",
     };
-    return <label className="block text-sm font-semibold" htmlFor={key}>{label}{key === "heroDescription" ? <textarea {...props} rows={4} /> : <input {...props} type={key === "footerEmail" ? "email" : ["heroButtonUrl", "logoUrl", "footerCtaButtonUrl", "footerLinkedinUrl"].includes(key) ? "url" : "text"} />}</label>;
+    return <label className="block text-sm font-semibold" htmlFor={key}>{label}{(key === "heroDescription" || key.endsWith("Description") || key.endsWith("Summary")) ? <textarea {...props} rows={4} /> : <input {...props} type={key === "footerEmail" ? "email" : ["heroButtonUrl", "logoUrl", "footerCtaButtonUrl", "footerLinkedinUrl"].includes(key) ? "url" : "text"} />}</label>;
   }
   const logo = logoFile ? previewUrl : content.logoUrl;
-  const dirty = logoFile !== null || JSON.stringify(content) !== JSON.stringify(savedContent);
+  const dirty = Object.keys(founderFiles).length > 0 || logoFile !== null || JSON.stringify(content) !== JSON.stringify(savedContent);
   const active = sections.find((section) => section.id === activeSection)!;
   function panel(id: SectionId) {
     return { id: `panel-${id}`, role: "tabpanel", "aria-labelledby": `tab-${id}`, "data-content-section": id, hidden: activeSection !== id, tabIndex: 0 };
@@ -116,6 +123,35 @@ export function SiteContentForm({ initialContent }: { initialContent: SiteConten
           {field("heroDescription", "Description", 2000)}
           <div className="grid gap-5 sm:grid-cols-2">{field("heroPrompt", "Call-to-action prompt (optional)", 100, true)}{field("heroButtonText", "Button text", 80)}</div>
           {field("heroButtonUrl", "Button destination URL", 500)}
+        </section>
+        <section {...panel("about")} className={styles.panel}>
+          <div className="flex items-center justify-between gap-4"><h2 className="text-xl font-semibold">About Us</h2><a href="/about" target="_blank" rel="noopener noreferrer" className="text-sm underline">View page &#8599;</a></div>
+          {field("aboutEyebrow", "Page label", 80)}
+          {field("aboutHeading", "About headline", 200)}
+          {field("aboutDescription", "About introduction", 500)}
+          <details className="rounded-lg border border-[var(--lumivale-line)] p-5">
+            <summary className="cursor-pointer font-semibold">Our approach</summary>
+            <div className="mt-5 grid gap-5">{field("aboutApproachHeading", "Approach heading", 200)}{field("aboutApproachDescription", "Approach description", 500)}</div>
+          </details>
+          {field("aboutTeamHeading", "Team heading", 200)}
+          {field("aboutTeamDescription", "Team introduction", 500)}
+          <p className="text-sm text-[var(--lumivale-muted)]">Open a profile to edit it. Leave its name empty to hide it from the page. Portraits are cropped vertically; use a 4:5 image.</p>
+          {([1, 2, 3] as const).map((index) => <details key={index} className="rounded-lg border border-[var(--lumivale-line)] p-5">
+            <summary className="cursor-pointer font-semibold">0{index} / {content[`aboutFounder${index}Name`] || "Hidden profile"} <span className="ml-2 text-xs font-normal text-[var(--lumivale-muted)]">{content[`aboutFounder${index}Role`]}</span></summary>
+            <div className="mt-5 grid gap-5">
+              {field(`aboutFounder${index}Name`, `Founder ${index} name`, 100, true)}
+              {field(`aboutFounder${index}Role`, `Founder ${index} role`, 150, true)}
+              {field(`aboutFounder${index}Summary`, `Founder ${index} biography`, 500, true)}
+              {field(`aboutFounder${index}Image`, `Founder ${index} image URL`, 500, true)}
+              <label className="text-sm font-semibold">Upload portrait for founder {index}<input data-founder-upload type="file" accept="image/png,image/jpeg,image/webp,image/gif" className="mt-2 block w-full text-sm" onChange={(event) => {
+                const file = event.target.files?.[0];
+                if (file && file.size > 5 * 1024 * 1024) { setError("Portrait must be 5MB or smaller."); event.target.value = ""; return; }
+                setError("");
+                setFounderFiles((current) => { const next = { ...current }; if (file) next[`founder${index}File`] = file; else delete next[`founder${index}File`]; return next; });
+              }} /></label>
+              <p className="text-xs text-[var(--lumivale-muted)]">PNG, JPG, WEBP, or GIF, up to 5MB. Uploading replaces the image URL when you save.</p>
+            </div>
+          </details>)}
         </section>
         <section {...panel("results")} className={styles.panel}>
           <h2 className="text-xl font-semibold">Homepage results</h2>
