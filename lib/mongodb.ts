@@ -1,6 +1,9 @@
 import { Db, MongoClient } from "mongodb";
 
-let clientPromise: Promise<MongoClient> | null = null;
+// Survives Next.js development module reloads. Each process owns one pool.
+const mongoGlobal = globalThis as typeof globalThis & {
+  lumivaleMongoClientPromise?: Promise<MongoClient>;
+};
 
 function getMongoConfig() {
   const uri = process.env.MONGODB_URI;
@@ -20,17 +23,25 @@ function getMongoConfig() {
 export async function getMongoClient() {
   const { uri } = getMongoConfig();
 
-  if (!clientPromise) {
-    const client = new MongoClient(uri);
-    clientPromise = client.connect().catch(async (error: unknown) => {
-      // A rejected promise must not poison every subsequent request until restart.
-      clientPromise = null;
+  if (!mongoGlobal.lumivaleMongoClientPromise) {
+    const client = new MongoClient(uri, {
+      maxPoolSize: 10,
+      minPoolSize: 0,
+      maxIdleTimeMS: 30_000,
+      waitQueueTimeoutMS: 10_000,
+    });
+    const pending = client.connect().catch(async (error: unknown) => {
       await client.close().catch(() => undefined);
+      // Failed connections remain retryable without clearing a newer pool.
+      if (mongoGlobal.lumivaleMongoClientPromise === pending) {
+        delete mongoGlobal.lumivaleMongoClientPromise;
+      }
       throw error;
     });
+    mongoGlobal.lumivaleMongoClientPromise = pending;
   }
 
-  return clientPromise;
+  return mongoGlobal.lumivaleMongoClientPromise;
 }
 
 export async function getMongoDb(): Promise<Db> {

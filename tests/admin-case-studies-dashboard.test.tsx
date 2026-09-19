@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, test, vi } from "vitest";
 
 import AdminCaseStudiesPage from "@/app/admin/case-studies/page";
@@ -49,9 +49,9 @@ describe("admin case studies dashboard", () => {
 
     expect(screen.getByRole("heading", { name: "Case Studies", level: 1 })).toBeInTheDocument();
     expect(screen.getByText("Story Management")).toBeInTheDocument();
-    expect(screen.getByText("Matching stories")).toBeInTheDocument();
+    expect(screen.getByText("Reorder case studies")).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Published" })).toBeInTheDocument();
-    expect(screen.getByText("Drafts")).toBeInTheDocument();
+    expect(screen.getByText("7 total case studies")).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "New Case Study" })).toHaveAttribute(
       "href",
       "/admin/case-studies?mode=create",
@@ -107,6 +107,7 @@ describe("admin case studies dashboard", () => {
     ).not.toBeInTheDocument();
     expect(screen.getByLabelText("Title")).toBeInTheDocument();
     expect(screen.getByLabelText("Case Study Link Ending")).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: /Results/ }));
     expect(screen.getByRole("button", { name: "Add metric" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Create Case Study" })).toBeInTheDocument();
   });

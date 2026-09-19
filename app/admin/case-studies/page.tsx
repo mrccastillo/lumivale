@@ -1,3 +1,4 @@
+import { CaseStudyOrder } from "./case-study-order";
 import Link from "next/link";
 
 import { CaseStudyForm } from "@/app/admin/case-studies/case-study-form";
@@ -147,6 +148,8 @@ export default async function AdminCaseStudiesPage({
             </div>
           </form>
 
+          <CaseStudyOrder key={studies.map((study) => `${study.slug}:${study.sortOrder}`).join("|")} studies={studies.map(({ slug, title, status }) => ({ slug, title, status }))} />
+
           <div className="mt-6 grid gap-5 lg:grid-cols-2">
             {pageStudies.length ? (
               pageStudies.map((study) => (
@@ -274,7 +277,7 @@ function CaseStudyCard({ study }: { study: CaseStudy }) {
         <h2 className="mt-4 text-xl font-semibold text-[var(--lumivale-ink)]">
           {study.title}
         </h2>
-        <p className="mt-2 text-xs font-semibold uppercase tracking-[0.16em] text-[var(--lumivale-panel)]">
+        <p className="mt-2 break-all text-xs font-semibold uppercase tracking-[0.16em] text-[var(--lumivale-panel)]">
           /case-studies/{study.slug}
         </p>
         <p className="mt-3 text-sm leading-7 text-[var(--lumivale-admin-muted)]">
