@@ -235,7 +235,7 @@ export function CaseStudyStory({ study }: { study: StoryInput }) {
       <header className={styles.hero}>
         <div className={styles.wrap}>
           <div className={styles.topline}>
-            <Link href="/case-studies" className={styles.back}>&larr; All case studies</Link>
+            <Link href="/#case-studies" scroll={false} className={styles.back}>&larr; All case studies</Link>
             <p className={styles.category}>Case study{study.category ? ` / ${study.category}` : ""}</p>
           </div>
           {(study.logo || study.clientName) && (
@@ -291,7 +291,7 @@ export function CaseStudyStory({ study }: { study: StoryInput }) {
       )}
       <div className={`${styles.wrap} ${styles.endNav}`}>
         <span>Lumivale / Case studies</span>
-        <Link href="/case-studies">Explore more stories <span aria-hidden="true">&#8599;</span></Link>
+        <Link href="/#case-studies" scroll={false}>Explore more stories <span aria-hidden="true">&#8599;</span></Link>
       </div>
     </article>
   );
