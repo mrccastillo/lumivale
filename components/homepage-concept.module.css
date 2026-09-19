@@ -123,7 +123,6 @@
 .footerContact > a { overflow-wrap: anywhere; }
 .closingBottom { display: flex; justify-content: space-between; align-items: center; gap: 30px; border-top: 1px solid #ffffff20; padding: 16px 0 12px; font-size: 11px; color: #bdc9b8; }
 .footerLinks { display: flex; gap: 24px; align-items: center; flex-wrap: wrap; }
-.footerUtility { text-decoration: underline; text-underline-offset: 5px; }
 .closing a:not(.button):hover { color: var(--daylight); }
 .footerNote { color: #bdc9b8; font-size: 11px; padding-bottom: 0; line-height: 1.6; }
 @media(max-width: 1000px) {

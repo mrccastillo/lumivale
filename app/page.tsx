@@ -6,6 +6,7 @@ import styles from "@/components/homepage-concept.module.css";
 import { HeroClientMarquee } from "@/components/hero-client-marquee";
 import { HeroGlowBlob } from "@/components/hero-glow-blob";
 import { HeroScrollPin } from "@/components/hero-scroll-pin";
+import { ResultCount } from "@/components/result-count";
 import { HomepageTestimonialsCarousel } from "@/components/homepage-testimonials-carousel";
 import { HomepageVideoTestimonialCard } from "@/components/homepage-video-testimonial-card";
 import { MotionGroup, MotionItem } from "@/components/motion-group";
@@ -265,22 +266,22 @@ export default async function Home() {
       </HeroScrollPin>
       <div className={styles.scope} data-homepage-concept data-nav-surface="light">
         <section id="proof" aria-labelledby="results-heading" className={`${styles.section} ${styles.resultsSection}`}>
-          <Reveal data-testid="proof-reveal" className={styles.wrap}>
+          <div data-testid="proof-reveal" className={styles.wrap}>
             <div className={styles.resultsHead} data-scroll-reveal>
               <p className={styles.eyebrow}>{content.resultsEyebrow}</p>
               <h2 id="results-heading">{content.resultsHeading}</h2>
             </div>
-            <MotionGroup className={styles.metrics} data-scroll-landscape>
+            <div className={styles.metrics} data-scroll-landscape>
               {([1, 2, 3, 4] as const).map((index) => (
-                <MotionItem key={index} className={styles.metric}>
+                <div key={index} className={styles.metric}>
                   <article>
-                    <p className={styles.metricValue}>{content[`resultsMetric${index}Value`]}</p>
+                    <p className={styles.metricValue}><ResultCount value={content[`resultsMetric${index}Value`]} /></p>
                     <p className={styles.metricLabel}>{content[`resultsMetric${index}Label`]}</p>
                   </article>
-                </MotionItem>
+                </div>
               ))}
-            </MotionGroup>
-          </Reveal>
+            </div>
+          </div>
         </section>
         {caseStudies.length > 0 && <section id="case-studies" className={`${styles.section} ${styles.work}`}>
           <div className={styles.wrap}>

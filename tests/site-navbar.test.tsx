@@ -1,6 +1,8 @@
 import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { afterEach, describe, expect, test, vi } from "vitest";
 
+import styles from "@/components/site-navbar.module.css";
+
 import { CALENDLY_URL } from "@/lib/site-config";
 
 vi.mock("@/lib/site-content", () => ({
@@ -76,11 +78,10 @@ describe("site navbar", () => {
       "noopener noreferrer",
     );
     expect(screen.getByRole("link", { name: "Contact Us" })).toHaveClass(
-      "hidden",
-      "md:inline-flex",
+      styles.desktopCta,
     );
     expect(screen.getByRole("button", { name: "Open menu" })).toHaveClass(
-      "md:hidden",
+      styles.menuButton,
     );
   });
 
@@ -153,8 +154,8 @@ describe("site navbar", () => {
     const { container } = render(await SiteNavbar());
     const header = container.querySelector("header");
 
-    expect(header).toHaveClass("bg-transparent");
-    expect(header).toHaveClass("border-transparent");
+    expect(header).toHaveAttribute("data-surface", "dark");
+    expect(header).toHaveAttribute("data-scrolled", "false");
   });
 
   test("renders dark scrolled sections with a glass background and bottom border", async () => {
@@ -172,13 +173,13 @@ describe("site navbar", () => {
     fireEvent.scroll(window);
 
     await waitFor(() => {
-      expect(header).toHaveClass("bg-[#031410]/68");
-      expect(header).toHaveClass("backdrop-blur-xl");
-      expect(header).toHaveClass("border-white/10");
+      expect(header).toHaveAttribute("data-surface", "dark");
+      expect(header).toHaveAttribute("data-scrolled", "true");
+      expect(header).toHaveClass(styles.dark);
     });
   });
 
-  test("keeps the solid white navbar treatment over light sections", async () => {
+  test("uses the ivory navbar treatment over light sections", async () => {
     hasTrustedClientAccessMock.mockResolvedValue(false);
     pathnameMock.mockReturnValue("/blogs");
     const { SiteNavbar } = await import("@/components/site-navbar");
@@ -208,9 +209,9 @@ describe("site navbar", () => {
     fireEvent.scroll(window);
 
     await waitFor(() => {
-      expect(header).toHaveClass("bg-white");
-      expect(header).toHaveClass("border-[var(--lumivale-line)]");
-      expect(header).not.toHaveClass("backdrop-blur-xl");
+      expect(header).toHaveAttribute("data-surface", "light");
+      expect(header).toHaveClass(styles.light);
+      expect(header).not.toHaveClass(styles.dark);
     });
   });
 
@@ -250,7 +251,7 @@ describe("site navbar", () => {
 
     render(await SiteNavbar());
 
-    expect(screen.getByRole("link", { name: "Pricing" })).toHaveClass("text-white");
+    expect(screen.getByRole("link", { name: "Pricing" })).toHaveAttribute("aria-current", "page");
   });
 
   test("updates navbar surface immediately after route changes without requiring scroll", async () => {
@@ -277,7 +278,7 @@ describe("site navbar", () => {
     const header = container.querySelector("header");
 
     await waitFor(() => {
-      expect(header).toHaveClass("bg-transparent");
+      expect(header).toHaveAttribute("data-surface", "dark");
     });
 
     homeSurface.remove();
@@ -301,9 +302,9 @@ describe("site navbar", () => {
     rerender(await SiteNavbar());
 
     await waitFor(() => {
-      expect(header).toHaveClass("bg-white");
-      expect(header).toHaveClass("border-[var(--lumivale-line)]");
-      expect(header).not.toHaveClass("bg-transparent");
+      expect(header).toHaveAttribute("data-surface", "light");
+      expect(header).toHaveClass(styles.light);
+      expect(header).not.toHaveClass(styles.dark);
     });
   });
 });

@@ -20,7 +20,15 @@ function getMongoConfig() {
 export async function getMongoClient() {
   const { uri } = getMongoConfig();
 
-  clientPromise ??= new MongoClient(uri).connect();
+  if (!clientPromise) {
+    const client = new MongoClient(uri);
+    clientPromise = client.connect().catch(async (error: unknown) => {
+      // A rejected promise must not poison every subsequent request until restart.
+      clientPromise = null;
+      await client.close().catch(() => undefined);
+      throw error;
+    });
+  }
 
   return clientPromise;
 }
