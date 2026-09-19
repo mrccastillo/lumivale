@@ -1,15 +1,18 @@
 import { ObjectId, type Filter } from "mongodb";
 
 import { getMongoDb } from "@/lib/mongodb";
+import { parseStoryInput, type StoryFields } from "@/lib/case-study-story";
+import { prepareCaseStudyIndex } from "@/scripts/case-study-index.mjs";
 
 export type CaseStudyMetric = {
+  id?: string;
   value: string;
   label: string;
 };
 
 export type CaseStudyStatus = "draft" | "published";
 
-export type CaseStudy = {
+export type CaseStudy = StoryFields & {
   id?: string;
   slug: string;
   title: string;
@@ -27,7 +30,7 @@ export type CaseStudy = {
   isDefault?: boolean;
 };
 
-export type CaseStudyInput = {
+export type CaseStudyInput = StoryFields & {
   slug: string;
   title: string;
   category: string;
@@ -46,7 +49,16 @@ type CaseStudyDocument = Omit<CaseStudy, "id" | "isDefault"> & {
 };
 
 type CaseStudyCollection = {
-  deleteOne(query: Filter<CaseStudyDocument> | Record<string, unknown>): Promise<{
+  createIndex?: (
+    keys: Record<string, number>,
+    options: Record<string, unknown>,
+  ) => Promise<unknown>;
+  aggregate?: (pipeline: Record<string, unknown>[]) => {
+    toArray(): Promise<unknown[]>;
+  };
+  deleteOne(
+    query: Filter<CaseStudyDocument> | Record<string, unknown>,
+  ): Promise<{
     deletedCount?: number;
   }>;
   find(query?: Filter<CaseStudyDocument> | Record<string, unknown>): {
@@ -70,10 +82,28 @@ type CaseStudyDb = {
 };
 
 const COLLECTION = "caseStudies";
+const indexPreparations = new WeakMap<CaseStudyDb, Promise<void>>();
+
+async function ensureSlugIndex(db: CaseStudyDb) {
+  const target = collection(db);
+  if (!target.createIndex || !target.aggregate) return;
+  let preparation = indexPreparations.get(db);
+  if (!preparation) {
+    preparation = prepareCaseStudyIndex(target).catch((error: unknown) => {
+      indexPreparations.delete(db);
+      throw error;
+    });
+    indexPreparations.set(db, preparation);
+  }
+  await preparation;
+}
 const DEFAULT_CREATED_AT = new Date("2026-05-01T00:00:00.000Z");
 
 function withDefaultMeta(
-  study: Omit<CaseStudy, "createdAt" | "isDefault" | "sortOrder" | "status" | "updatedAt">,
+  study: Omit<
+    CaseStudy,
+    "createdAt" | "isDefault" | "sortOrder" | "status" | "updatedAt"
+  >,
   sortOrder: number,
 ): CaseStudy {
   return {
@@ -174,6 +204,8 @@ function normalizeSlug(slug: string) {
 }
 
 function normalizeInput(input: CaseStudyInput): CaseStudyInput {
+  if (input.schemaVersion === 2)
+    return parseStoryInput(input, process.env.CLOUDINARY_CLOUD_NAME ?? "");
   return {
     category: input.category.trim(),
     challenge: input.challenge.trim(),
@@ -195,6 +227,7 @@ function normalizeInput(input: CaseStudyInput): CaseStudyInput {
 }
 
 function validateInput(input: CaseStudyInput) {
+  if (input.schemaVersion === 2) return;
   if (
     !input.slug ||
     !input.title ||
@@ -204,22 +237,28 @@ function validateInput(input: CaseStudyInput) {
     !input.challenge ||
     !input.solution
   ) {
-    throw new Error("Slug, title, category, headline, summary, challenge, and solution are required.");
+    throw new Error(
+      "Slug, title, category, headline, summary, challenge, and solution are required.",
+    );
   }
 
   if (!input.outcomes.length) {
     throw new Error("Add at least one outcome.");
   }
 
-  if (!input.metrics.length || input.metrics.some((metric) => !metric.value || !metric.label)) {
+  if (
+    !input.metrics.length ||
+    input.metrics.some((metric) => !metric.value || !metric.label)
+  ) {
     throw new Error("Add at least one complete metric.");
   }
 }
 
 function toCaseStudy(document: CaseStudyDocument): CaseStudy {
+  const { _id, ...fields } = document;
   return {
-    ...document,
-    id: String(document._id),
+    ...fields,
+    id: String(_id),
     isDefault: defaultCaseStudies.some((study) => study.slug === document.slug),
   };
 }
@@ -235,7 +274,9 @@ function sortCaseStudies(studies: CaseStudy[]) {
 }
 
 function mergeWithDefaults(documents: CaseStudyDocument[]) {
-  const merged = new Map(defaultCaseStudies.map((study) => [study.slug, study]));
+  const merged = new Map(
+    defaultCaseStudies.map((study) => [study.slug, study]),
+  );
 
   documents.map(toCaseStudy).forEach((study) => {
     const defaultStudy = merged.get(study.slug);
@@ -305,7 +346,10 @@ export function getCaseStudyBySlug(slug: string) {
 }
 
 export async function getAdminCaseStudies(db: CaseStudyDb) {
-  const studies = await collection(db).find({}).sort({ sortOrder: 1 }).toArray();
+  const studies = await collection(db)
+    .find({})
+    .sort({ sortOrder: 1 })
+    .toArray();
 
   return mergeWithDefaults(studies);
 }
@@ -325,10 +369,17 @@ export async function getAdminCaseStudyBySlug(db: CaseStudyDb, slug: string) {
     return defaultStudy ?? null;
   }
 
-  return mergeWithDefaults([document]).find((study) => study.slug === normalizedSlug) ?? null;
+  return (
+    mergeWithDefaults([document]).find(
+      (study) => study.slug === normalizedSlug,
+    ) ?? null
+  );
 }
 
-export async function getPublishedCaseStudyBySlug(db: CaseStudyDb, slug: string) {
+export async function getPublishedCaseStudyBySlug(
+  db: CaseStudyDb,
+  slug: string,
+) {
   const study = await getAdminCaseStudyBySlug(db, slug);
 
   return study?.status === "published" ? study : null;
@@ -342,7 +393,7 @@ export async function getPublishedCaseStudiesForSite() {
   } catch (error) {
     console.error("Unable to load case studies", error);
 
-    return defaultCaseStudies.filter((study) => study.status === "published");
+    return [];
   }
 }
 
@@ -354,9 +405,7 @@ export async function getPublishedCaseStudyBySlugForSite(slug: string) {
   } catch (error) {
     console.error("Unable to load case study", error);
 
-    const study = getCaseStudyBySlug(slug);
-
-    return study?.status === "published" ? study : null;
+    return null;
   }
 }
 
@@ -364,6 +413,7 @@ export async function createCaseStudy(db: CaseStudyDb, input: CaseStudyInput) {
   const normalized = normalizeInput(input);
 
   validateInput(normalized);
+  await ensureSlugIndex(db);
 
   if (
     defaultCaseStudies.some((study) => study.slug === normalized.slug) ||
@@ -399,6 +449,8 @@ export async function updateCaseStudy(
   }
 
   const next = normalizeInput({
+    ...current,
+    ...updates,
     category: updates.category ?? current.category,
     challenge: updates.challenge ?? current.challenge,
     headline: updates.headline ?? current.headline,
@@ -413,13 +465,16 @@ export async function updateCaseStudy(
   });
 
   validateInput(next);
+  await ensureSlugIndex(db);
 
   if (current.isDefault && next.slug !== current.slug) {
     throw new Error("Default case study slugs cannot be changed.");
   }
 
   if (next.slug !== current.slug) {
-    const slugBelongsToDefault = defaultCaseStudies.some((study) => study.slug === next.slug);
+    const slugBelongsToDefault = defaultCaseStudies.some(
+      (study) => study.slug === next.slug,
+    );
     const existing = await collection(db).findOne({ slug: next.slug });
 
     if (slugBelongsToDefault || (existing && existing.slug !== current.slug)) {
@@ -452,7 +507,9 @@ export async function deleteCaseStudy(db: CaseStudyDb, slug: string) {
   const normalizedSlug = normalizeSlug(slug);
 
   if (defaultCaseStudies.some((study) => study.slug === normalizedSlug)) {
-    throw new Error("Default case studies can be unpublished, but not deleted.");
+    throw new Error(
+      "Default case studies can be unpublished, but not deleted.",
+    );
   }
 
   const result = await collection(db).deleteOne({ slug: normalizedSlug });

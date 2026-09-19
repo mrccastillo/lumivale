@@ -1,4 +1,4 @@
-import { describe, expect, test } from "vitest";
+import { describe, expect, test, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 
 import {
@@ -6,8 +6,13 @@ import {
   getCaseStudyBySlug,
 } from "@/lib/case-studies";
 import CaseStudyDetailPage, {
-  generateStaticParams,
+  generateMetadata,
 } from "@/app/case-studies/[slug]/page";
+
+vi.mock("@/lib/case-studies", async (importOriginal) => {
+  const original = await importOriginal<typeof import("@/lib/case-studies")>();
+  return { ...original, getPublishedCaseStudyBySlugForSite: vi.fn(async (slug: string) => original.getCaseStudyBySlug(slug)) };
+});
 
 describe("case studies data", () => {
   test("lists seeded case studies for previews and index pages", () => {
@@ -30,12 +35,9 @@ describe("case studies data", () => {
     expect(getCaseStudyBySlug("missing-study")).toBeUndefined();
   });
 
-  test("generates static params for every seeded study", async () => {
-    const params = await generateStaticParams();
-
-    expect(params).toEqual(
-      getAllCaseStudies().map((study) => ({ slug: study.slug })),
-    );
+  test("generates metadata from the published story", async () => {
+    const study = getAllCaseStudies()[0];
+    expect(await generateMetadata({ params: Promise.resolve({ slug: study.slug }) })).toMatchObject({ title: `${study.headline} | Lumivale`, description: study.summary });
   });
 
   test("adds fixed-navbar clearance on case study detail pages", async () => {
@@ -52,8 +54,8 @@ describe("case studies data", () => {
     );
 
     expect(
-      screen.getByRole("heading", { level: 1, name: study.title }),
+      screen.getByRole("heading", { level: 1, name: study.headline }),
     ).toBeInTheDocument();
-    expect(container.querySelector("article")).toHaveClass("pt-32", "pb-[54px]");
+    expect(container.querySelector("header")).toHaveClass("pt-28");
   });
 });

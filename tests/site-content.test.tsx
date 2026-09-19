@@ -55,15 +55,21 @@ test("rejects unsafe destinations and missing required content", () => {
   expect(() => parseSiteContent({ ...defaultSiteContent, heroButtonUrl: "javascript:alert(1)" })).toThrow("HTTP");
   expect(() => parseSiteContent({ ...defaultSiteContent, logoUrl: "data:image/png;base64,abc" })).toThrow("HTTP");
   expect(() => parseSiteContent({ ...defaultSiteContent, brandName: " " })).toThrow("Complete");
+  expect(() => parseSiteContent({ ...defaultSiteContent, resultsHeading: " " })).toThrow("Complete");
+  expect(() => parseSiteContent({ ...defaultSiteContent, resultsMetric1Value: "1".repeat(25) })).toThrow("24 characters");
+  expect(() => parseSiteContent({ ...defaultSiteContent, footerCtaButtonUrl: "javascript:alert(1)" })).toThrow("HTTP");
+  expect(() => parseSiteContent({ ...defaultSiteContent, footerHomeUrl: "//example.com" })).toThrow("HTTP");
+  expect(() => parseSiteContent({ ...defaultSiteContent, footerEmail: "invalid" })).toThrow("email");
+  expect(parseSiteContent({ ...defaultSiteContent, footerHomeUrl: "/services" }).footerHomeUrl).toBe("/services");
 });
 
 test("authenticated saves upload the logo and refresh public routes", async () => {
-  const response = await POST(request({ heroHeading: "New heading" }, new File(["image"], "logo.png", { type: "image/png" })));
+  const response = await POST(request({ heroHeading: "New heading", footerTagline: "New tagline", footerCtaHeading: "Grow with us", resultsMetric1Value: "250K+", resultsMetric1Label: "People reached" }, new File(["image"], "logo.png", { type: "image/png" })));
   expect(response.status).toBe(200);
   expect(mocks.auth).toHaveBeenCalledOnce();
   expect(mocks.upload).toHaveBeenCalledWith(expect.any(File), { folder: "lumivale/branding", resourceType: "image" });
   expect(updateOne).toHaveBeenCalledWith({ _id: "main" }, { $set: expect.objectContaining({
-    heroHeading: "New heading", logoUrl: "https://example.com/uploaded.png",
+    heroHeading: "New heading", logoUrl: "https://example.com/uploaded.png", footerTagline: "New tagline", footerCtaHeading: "Grow with us", resultsMetric1Value: "250K+", resultsMetric1Label: "People reached",
   }) }, { upsert: true });
   expect(mocks.revalidate).toHaveBeenCalledWith("/", "layout");
 });
@@ -109,11 +115,19 @@ test("admin edits and logo removal are submitted and remain visible after save",
   vi.stubGlobal("fetch", fetchMock);
   render(<SiteContentForm initialContent={{ ...defaultSiteContent, logoUrl: "https://example.com/old.png" }} />);
   fireEvent.change(screen.getByLabelText("Brand name"), { target: { value: "New Brand" } });
+  fireEvent.change(screen.getByLabelText("Result 1 value"), { target: { value: "250K+" } });
+  fireEvent.change(screen.getByLabelText("Result 1 label"), { target: { value: "People reached" } });
+  fireEvent.change(screen.getByLabelText("Footer headline"), { target: { value: "Grow with us" } });
+  fireEvent.change(screen.getByLabelText("Contact email"), { target: { value: "hello@example.com" } });
   fireEvent.click(screen.getByRole("button", { name: "Remove logo" }));
   fireEvent.click(screen.getByRole("button", { name: "Save changes" }));
   await waitFor(() => expect(screen.getByRole("status")).toHaveTextContent("saved"));
   const data = fetchMock.mock.calls[0][1].body as FormData;
   expect(data.get("brandName")).toBe("New Brand");
+  expect(data.get("resultsMetric1Value")).toBe("250K+");
+  expect(data.get("resultsMetric1Label")).toBe("People reached");
+  expect(data.get("footerCtaHeading")).toBe("Grow with us");
+  expect(data.get("footerEmail")).toBe("hello@example.com");
   expect(data.get("logoUrl")).toBe("");
   expect(mocks.refresh).toHaveBeenCalledOnce();
 });

@@ -5,8 +5,8 @@ import { getSiteContentForSite } from "@/lib/site-content";
 
 const publicLinks = [
   { href: "/", label: "Home" },
-  { href: "/#services", label: "Services" },
   { href: "/#case-studies", label: "Case Studies" },
+  { href: "/#services", label: "Services" },
   { href: "/#testimonials", label: "Testimonials" },
   { href: "/about", label: "About Us" },
   { href: "/blogs", label: "Blogs" },

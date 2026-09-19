@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 
+import { uploadTestimonialImage } from "@/app/api/admin/testimonials/upload-image";
 import { uploadTestimonialVideo } from "@/app/api/admin/testimonials/upload-video";
 import { requireAdminAccess } from "@/lib/admin-auth";
 import { getMongoDb } from "@/lib/mongodb";
@@ -40,13 +41,20 @@ export async function POST(
     return redirectTo("/admin/testimonials");
   }
 
-  const input = parseTestimonialFormData(formData);
-  const videoUrl = await uploadTestimonialVideo(formData.get("videoFile") as File | null);
+  try {
+    const input = parseTestimonialFormData(formData);
+    const imageUrl = await uploadTestimonialImage(formData.get("imageFile"));
+    const videoUrl = await uploadTestimonialVideo(formData.get("videoFile") as File | null);
 
-  await updateTestimonial(db, id, {
-    ...input,
-    videoUrl: videoUrl || input.videoUrl,
-  });
+    await updateTestimonial(db, id, {
+      ...input,
+      imageUrl: imageUrl || (formData.get("removeImage") === "on" ? "" : input.imageUrl),
+      videoUrl: videoUrl || input.videoUrl,
+    });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Could not save testimonial.";
+    return redirectTo(`/admin/testimonials/${id}/edit?${new URLSearchParams({ error: message })}`);
+  }
 
   return redirectTo(`/admin/testimonials/${id}/edit`);
 }

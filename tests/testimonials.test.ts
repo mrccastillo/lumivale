@@ -14,6 +14,7 @@ describe("testimonial repository", () => {
     const db = createTestDb();
 
     const text = await createTestimonial(db, {
+      imageUrl: "https://example.com/logo.png",
       personName: "Maya Lee",
       personTitle: "Founder, Northstar",
       quote: "Lumivale made growth activity simpler to repeat.",
@@ -44,6 +45,12 @@ describe("testimonial repository", () => {
       expect.objectContaining({ id: video.id, sortOrder: 1 }),
       expect.objectContaining({ id: publishedText.id, sortOrder: 2 }),
     ]);
+
+    expect(publishedText.imageUrl).toBe("https://example.com/logo.png");
+    const replaced = await updateTestimonial(db, text.id, { imageUrl: "https://example.com/new.png" });
+    expect(replaced.imageUrl).toBe("https://example.com/new.png");
+    const removed = await updateTestimonial(db, text.id, { imageUrl: "" });
+    expect(removed.imageUrl).toBe("");
 
     await updateTestimonial(db, video.id, {
       quote: "Updated quote.",

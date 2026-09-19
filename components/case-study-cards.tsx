@@ -1,14 +1,13 @@
 import Link from "next/link";
 
 import type { CaseStudy } from "@/lib/case-studies";
+import { safeImageUrl } from "@/lib/case-study-story";
 
 type CaseStudyCardsProps = {
   caseStudies: CaseStudy[];
 };
 
-export function CaseStudyCards({
-  caseStudies,
-}: CaseStudyCardsProps) {
+export function CaseStudyCards({ caseStudies }: CaseStudyCardsProps) {
   return (
     <div>
       <div className="grid gap-6 lg:grid-cols-3">
@@ -17,6 +16,20 @@ export function CaseStudyCards({
             key={study.slug}
             className="group flex min-h-[360px] flex-col rounded-lg border border-[var(--lumivale-line)] bg-white/95 p-6 shadow-[0_14px_40px_rgba(42,47,82,0.07)] transition hover:-translate-y-1 hover:border-[var(--lumivale-accent)] hover:shadow-[0_18px_48px_rgba(42,47,82,0.1)]"
           >
+            {study.cover && safeImageUrl(study.cover.url) ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={study.cover.url.replace(
+                  "/image/upload/",
+                  "/image/upload/f_auto,q_auto,w_800,c_limit/",
+                )}
+                alt={study.cover.alt}
+                width={800}
+                height={450}
+                loading="lazy"
+                className="mb-6 aspect-video w-full rounded-lg object-cover"
+              />
+            ) : null}
             <div className="flex items-start justify-between gap-4">
               <p className="max-w-[14rem] text-base font-semibold leading-6 text-[var(--lumivale-ink)]">
                 {study.title}
@@ -61,7 +74,6 @@ export function CaseStudyCards({
           </article>
         ))}
       </div>
-
     </div>
   );
 }

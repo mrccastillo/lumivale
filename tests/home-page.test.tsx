@@ -8,7 +8,11 @@ import { getSiteContentForSite } from "@/lib/site-content";
 vi.mock("@/lib/site-content", () => ({
   getSiteContentForSite: vi.fn(async () => (await import("@/lib/site-content-defaults")).defaultSiteContent),
 }));
-import { getAllCaseStudies } from "@/lib/case-studies";
+import { getAllCaseStudies, getPublishedCaseStudiesForSite } from "@/lib/case-studies";
+vi.mock("@/lib/case-studies", async (importOriginal) => {
+  const original = await importOriginal<typeof import("@/lib/case-studies")>();
+  return { ...original, getPublishedCaseStudiesForSite: vi.fn(async () => original.defaultCaseStudies) };
+});
 import { getMongoDb } from "@/lib/mongodb";
 import { getPublishedFaqs } from "@/lib/faqs";
 import { getHeroClients } from "@/lib/hero-clients";
@@ -77,6 +81,41 @@ vi.mock("@/lib/hero-clients", () => ({
 }));
 
 describe("home page", () => {
+  test("preserves every results slot and section description", async () => {
+    const { container } = render(await Home());
+    const results = container.querySelector("#proof")!;
+    for (const index of [1, 2, 3, 4] as const) {
+      expect(results).toHaveTextContent(defaultSiteContent[`resultsMetric${index}Value`]);
+      expect(results).toHaveTextContent(defaultSiteContent[`resultsMetric${index}Label`]);
+    }
+    expect(container.querySelector("#case-studies")).toHaveTextContent("Explore our success stories across awareness, content, and outbound strategies with real client outcomes backed by consistent and measurable growth.");
+    expect(container.querySelector("#services")).toHaveTextContent("Stop the guesswork and choose from one of our proven channels to unlock targeted growth that turns attention into revenue.");
+    expect(container.querySelector("#faqs")).toHaveTextContent("Everything you need to know about Lumivale and how we help grow your customer channels.");
+  });
+  test("uses published records and omits the section when none are published", async () => {
+    vi.mocked(getPublishedCaseStudiesForSite).mockResolvedValueOnce([{ ...getAllCaseStudies()[0], title: "Admin story", slug: "admin-story" }]);
+    const { container, unmount } = render(await Home());
+    expect(screen.getByRole("link", { name: "Read the full story: Admin story" })).toHaveAttribute("href", "/case-studies/admin-story");
+    expect(container.querySelectorAll("#case-studies article")).toHaveLength(1);
+    unmount();
+    vi.mocked(getPublishedCaseStudiesForSite).mockResolvedValueOnce([]);
+    const empty = render(await Home());
+    expect(empty.container.querySelector("#case-studies")).toBeNull();
+  });
+  test("renders editable results in place of the old principles", async () => {
+    vi.mocked(getSiteContentForSite).mockResolvedValueOnce({
+      ...defaultSiteContent, resultsEyebrow: "Our impact", resultsHeading: "Results from our work",
+      resultsMetric1Value: "250K+", resultsMetric1Label: "People reached",
+    });
+    const { container } = render(await Home());
+    const section = container.querySelector("#proof")!;
+    expect(section).toHaveTextContent("Our impact");
+    expect(section).toHaveTextContent("Results from our work");
+    expect(section).toHaveTextContent("250K+");
+    expect(section).toHaveTextContent("People reached");
+    expect(section.querySelectorAll("article")).toHaveLength(4);
+    expect(section).not.toHaveTextContent("We keep it Simple.");
+  });
   test("renders saved hero copy and destination", async () => {
     vi.mocked(getSiteContentForSite).mockResolvedValueOnce({
       ...defaultSiteContent, heroHeading: "Build your next chapter", heroHighlight: "with us",
@@ -98,8 +137,8 @@ describe("home page", () => {
     expect(sections.map((section) => section.getAttribute("id"))).toEqual([
       "hero",
       "proof",
-      "services",
       "case-studies",
+      "services",
       "testimonials",
       "faqs",
       "conversion",
@@ -117,20 +156,10 @@ describe("home page", () => {
       "sm:pb-8",
       "sm:pt-20",
     );
-    expect(container.querySelector("#proof")).toHaveClass(
-      "px-4",
-      "pb-16",
-      "sm:px-6",
-      "sm:pb-20",
-    );
-    expect(container.querySelector("#services")).toHaveClass("py-16", "sm:py-24");
-    expect(container.querySelector("#case-studies")).toHaveClass("py-16", "sm:py-24");
-    expect(container.querySelector("#testimonials")?.firstElementChild).toHaveClass(
-      "py-16",
-      "sm:py-24",
-    );
-    expect(container.querySelector("#faqs")).toHaveClass("py-16", "sm:py-24");
-    expect(container.querySelector("#conversion")).toHaveClass("py-16", "sm:py-24");
+    expect(container.querySelector("#hero")?.closest("[data-homepage-concept]")).toBeNull();
+    for (const id of ["proof", "case-studies", "services", "testimonials", "faqs", "conversion"]) {
+      expect(container.querySelector(`#${id}`)?.closest("[data-homepage-concept]")).not.toBeNull();
+    }
   });
 
   test("renders Lumivale growth copy and a seeded case study link", async () => {
@@ -148,9 +177,9 @@ describe("home page", () => {
         "Lumivale helps early-stage teams find the channels that actually bring customers, then turns those channels into clear, repeatable growth actions.",
       ),
     ).toBeInTheDocument();
-    expect(screen.getByText("We keep it Simple.")).toBeInTheDocument();
-    expect(screen.getByText("Make it Affordable.")).toBeInTheDocument();
-    expect(screen.getByText("Ensure Excellence.")).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Growth you can measure." })).toBeInTheDocument();
+    expect(screen.getByText("Result 1 placeholder")).toBeInTheDocument();
+    expect(screen.getByText("Result 2 placeholder")).toBeInTheDocument();
     expect(
       screen
         .getAllByRole("link", { name: "Book a call" })
@@ -541,13 +570,6 @@ describe("home page", () => {
       ),
     ).toBeInTheDocument();
     expect(firstFaq).toHaveAttribute("open");
-    expect(firstFaq).toHaveClass(
-      "border-b",
-      "border-[var(--lumivale-line)]",
-      "py-5",
-      "sm:py-6",
-    );
-    expect(firstFaq).not.toHaveClass("rounded-lg", "bg-[#fbfcff]", "shadow-[0_14px_40px_rgba(42,47,82,0.04)]");
     expect(
       within(faqSection as HTMLElement).getByText("How soon can Lumivale start?"),
     ).toBeInTheDocument();

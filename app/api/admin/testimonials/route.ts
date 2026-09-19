@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 
+import { uploadTestimonialImage } from "@/app/api/admin/testimonials/upload-image";
 import { uploadTestimonialVideo } from "@/app/api/admin/testimonials/upload-video";
 import { requireAdminAccess } from "@/lib/admin-auth";
 import { getMongoDb } from "@/lib/mongodb";
@@ -34,10 +35,12 @@ export async function POST(request: Request) {
 
   try {
     const input = parseTestimonialFormData(formData);
+    const imageUrl = await uploadTestimonialImage(formData.get("imageFile"));
     const videoUrl = await uploadTestimonialVideo(formData.get("videoFile") as File | null);
 
     await createTestimonial(db, {
       ...input,
+      imageUrl: imageUrl || (formData.get("removeImage") === "on" ? "" : input.imageUrl),
       videoUrl: videoUrl || input.videoUrl,
     });
   } catch (error) {

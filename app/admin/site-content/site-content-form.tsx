@@ -42,7 +42,7 @@ export function SiteContentForm({ initialContent }: { initialContent: SiteConten
       onChange: (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => setContent({ ...content, [key]: event.target.value }),
       className: "mt-2 w-full rounded-lg border border-[var(--lumivale-line)] bg-white px-3 py-2.5 text-sm font-normal outline-none focus:border-[var(--lumivale-accent)]",
     };
-    return <label className="block text-sm font-semibold" htmlFor={key}>{label}{key === "heroDescription" ? <textarea {...props} rows={4} /> : <input {...props} type={key === "heroButtonUrl" || key === "logoUrl" ? "url" : "text"} />}</label>;
+    return <label className="block text-sm font-semibold" htmlFor={key}>{label}{key === "heroDescription" ? <textarea {...props} rows={4} /> : <input {...props} type={key === "footerEmail" ? "email" : ["heroButtonUrl", "logoUrl", "footerCtaButtonUrl", "footerLinkedinUrl"].includes(key) ? "url" : "text"} />}</label>;
   }
   const logo = logoFile ? previewUrl : content.logoUrl;
   return (
@@ -74,6 +74,50 @@ export function SiteContentForm({ initialContent }: { initialContent: SiteConten
           {field("heroDescription", "Description", 2000)}
           <div className="grid gap-5 sm:grid-cols-2">{field("heroPrompt", "Call-to-action prompt (optional)", 100, true)}{field("heroButtonText", "Button text", 80)}</div>
           {field("heroButtonUrl", "Button destination URL", 500)}
+        </section>
+        <section className="space-y-5 rounded-3xl border border-[var(--lumivale-admin-border)] bg-white p-6">
+          <h2 className="text-xl font-semibold">Homepage results</h2>
+          {field("resultsEyebrow", "Results section label", 80)}
+          {field("resultsHeading", "Results heading", 200)}
+          <p className="text-sm text-[var(--lumivale-muted)]">Enter your verified results. Values support numbers, percentages, and suffixes such as K or M. A dash means a result has not been entered.</p>
+          {([1, 2, 3, 4] as const).map((index) => (
+            <div key={index} className="grid gap-5 sm:grid-cols-2">
+              {field(`resultsMetric${index}Value`, `Result ${index} value`, 24)}
+              {field(`resultsMetric${index}Label`, `Result ${index} label`, 80)}
+            </div>
+          ))}
+        </section>
+        <section className="space-y-5 rounded-3xl border border-[var(--lumivale-admin-border)] bg-white p-6">
+          <h2 className="text-xl font-semibold">Footer call to action</h2>
+          <p className="text-sm text-[var(--lumivale-muted)]">The section above the footer on the homepage.</p>
+          {field("footerCtaPrompt", "Footer call-to-action prompt", 500)}
+          {field("footerCtaHeading", "Footer headline", 500)}
+          {field("footerCtaButtonText", "Footer button text", 80)}
+          {field("footerCtaButtonUrl", "Footer button destination URL", 500)}
+        </section>
+        <section className="space-y-5 rounded-3xl border border-[var(--lumivale-admin-border)] bg-white p-6">
+          <h2 className="text-xl font-semibold">Footer</h2>
+          <div className="grid gap-5 sm:grid-cols-2">
+            {field("footerBrandName", "Footer brand name", 80)}
+            {field("footerTagline", "Footer tagline", 500)}
+          </div>
+          <h3 className="font-semibold">Navigation links</h3>
+          <p className="text-xs text-[var(--lumivale-muted)]">Use a page path such as /about or a full https:// URL.</p>
+          <div className="grid gap-5 sm:grid-cols-2">
+            {field("footerHomeLabel", "First link text", 80)}
+            {field("footerHomeUrl", "First link destination", 500)}
+            {field("footerAboutLabel", "Second link text", 80)}
+            {field("footerAboutUrl", "Second link destination", 500)}
+            {field("footerBlogsLabel", "Third link text", 80)}
+            {field("footerBlogsUrl", "Third link destination", 500)}
+          </div>
+          <h3 className="font-semibold">Contact details</h3>
+          {field("footerContactHeading", "Contact heading", 100)}
+          {field("footerEmail", "Contact email", 254)}
+          {field("footerLinkedinUrl", "LinkedIn URL", 500)}
+          <h3 className="font-semibold">Bottom bar</h3>
+          {field("footerSiteLabel", "Website label", 80)}
+          {field("footerBottomText", "Bottom bar text", 500)}
         </section>
         <button type="submit" className="rounded-full bg-[var(--lumivale-accent)] px-6 py-3 text-sm font-semibold text-[#010807]">{saving ? "Saving…" : "Save changes"}</button>
       </fieldset>

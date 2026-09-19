@@ -7,9 +7,18 @@ import {
   updateCaseStudy,
 } from "@/lib/case-studies";
 import { getMongoDb } from "@/lib/mongodb";
+import {
+  checkStoryOrigin,
+  readStoryRequest,
+  refreshCaseStudies,
+  storyApiError,
+} from "@/lib/case-study-api";
 
 function redirectTo(path: string) {
-  const response = NextResponse.redirect(new URL(path, "http://localhost"), 303);
+  const response = NextResponse.redirect(
+    new URL(path, "http://localhost"),
+    303,
+  );
   response.headers.set("location", path);
 
   return response;
@@ -33,6 +42,18 @@ export async function POST(
 ) {
   await requireAdminAccess();
   const { slug } = await params;
+  const rejected = checkStoryOrigin(request);
+  if (rejected) return rejected;
+  if (request.headers.get("content-type")?.includes("application/json")) {
+    try {
+      const input = await readStoryRequest(request);
+      const study = await updateCaseStudy(await getMongoDb(), slug, input);
+      refreshCaseStudies(slug, study.slug);
+      return NextResponse.json({ study });
+    } catch (error) {
+      return storyApiError(error);
+    }
+  }
   const db = await getMongoDb();
   const formData = await request.formData();
   const action = String(formData.get("action") ?? "save");
@@ -40,6 +61,7 @@ export async function POST(
   try {
     if (action === "delete") {
       await deleteCaseStudy(db, slug);
+      refreshCaseStudies(slug);
 
       return redirectTo("/admin/case-studies");
     }
@@ -48,11 +70,17 @@ export async function POST(
       await updateCaseStudy(db, slug, {
         status: action === "publish" ? "published" : "draft",
       });
+      refreshCaseStudies(slug);
 
       return redirectTo("/admin/case-studies");
     }
 
-    const study = await updateCaseStudy(db, slug, parseCaseStudyFormData(formData));
+    const study = await updateCaseStudy(
+      db,
+      slug,
+      parseCaseStudyFormData(formData),
+    );
+    refreshCaseStudies(slug, study.slug);
 
     return redirectTo(`/admin/case-studies/${study.slug}/edit`);
   } catch (error) {
@@ -61,14 +89,17 @@ export async function POST(
 }
 
 export async function DELETE(
-  _request: Request,
+  request: Request,
   { params }: { params: Promise<{ slug: string }> },
 ) {
   await requireAdminAccess();
+  const rejected = checkStoryOrigin(request);
+  if (rejected) return rejected;
   const { slug } = await params;
   const db = await getMongoDb();
 
   await deleteCaseStudy(db, slug);
+  refreshCaseStudies(slug);
 
   return NextResponse.json({ ok: true });
 }

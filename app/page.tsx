@@ -1,6 +1,8 @@
 import Link from "next/link";
 
-import { CaseStudyCards } from "@/components/case-study-cards";
+import { HomepageCaseStudies } from "@/components/homepage-case-studies";
+import { HomepageFooter } from "@/components/homepage-footer";
+import styles from "@/components/homepage-concept.module.css";
 import { HeroClientMarquee } from "@/components/hero-client-marquee";
 import { HeroGlowBlob } from "@/components/hero-glow-blob";
 import { HomepageTestimonialsCarousel } from "@/components/homepage-testimonials-carousel";
@@ -9,43 +11,24 @@ import { MotionGroup, MotionItem } from "@/components/motion-group";
 import { Parallax } from "@/components/parallax";
 import { Reveal } from "@/components/reveal";
 import { TestimonialsSpotlight } from "@/components/testimonials-spotlight";
-import { getAllCaseStudies } from "@/lib/case-studies";
+import { getPublishedCaseStudiesForSite } from "@/lib/case-studies";
 import { defaultFaqs, getPublishedFaqs } from "@/lib/faqs";
 import { defaultHeroClients, getHeroClients, type HeroClientInput } from "@/lib/hero-clients";
 import { getMongoDb } from "@/lib/mongodb";
 import { getPublishedServicesForSite } from "@/lib/services";
-import { CALENDLY_URL } from "@/lib/site-config";
 import { getSiteContentForSite } from "@/lib/site-content";
 import { getPublishedTestimonials, type Testimonial } from "@/lib/testimonials";
 
-const metrics = [
-  {
-    value: "We keep it Simple.",
-    label:
-      "No complex strategies or agency jargon. Clear, actionable steps that work.",
-  },
-  {
-    value: "Make it Affordable.",
-    label:
-      "Dedicated growth support for a fraction of agency cost with flat-rate packages.",
-  },
-  {
-    value: "Ensure Excellence.",
-    label:
-      "Hands-on experience with startups, experiments, and quality execution.",
-  },
-];
-
 type HomepageTextTestimonialData = Pick<
   Testimonial,
-  "id" | "personName" | "personTitle" | "quote"
+  "id" | "personName" | "personTitle" | "quote" | "imageUrl"
 > & {
   placeholder?: boolean;
 };
 
 type HomepageVideoTestimonialData = Pick<
   Testimonial,
-  "id" | "personName" | "personTitle" | "quote" | "videoUrl"
+  "id" | "personName" | "personTitle" | "quote" | "imageUrl" | "videoUrl"
 > & {
   placeholder?: boolean;
 };
@@ -207,7 +190,7 @@ function ServiceIcon({ slug, title }: { slug: string; title: string }) {
 }
 
 export default async function Home() {
-  const caseStudies = getAllCaseStudies();
+  const caseStudies = await getPublishedCaseStudiesForSite();
   const [services, testimonials, faqs, heroClients, content] = await Promise.all([
     getPublishedServicesForSite(),
     getHomeTestimonials(),
@@ -222,7 +205,7 @@ export default async function Home() {
 
   return (
     <div className="bg-[#f7f8fb] text-[var(--lumivale-ink)]">
-      <div data-nav-surface="dark" className="relative isolate overflow-hidden bg-[radial-gradient(circle_at_50%_100%,rgba(8,20,14,0.22),transparent_42%),linear-gradient(180deg,#081d14_0%,#04110c_34%,#020605_68%,#000000_100%)] text-white">
+      <div data-nav-surface="dark" className={`${styles.heroBackdrop} relative isolate overflow-hidden bg-[radial-gradient(circle_at_50%_100%,rgba(8,20,14,0.22),transparent_42%),linear-gradient(180deg,#081d14_0%,#04110c_34%,#020605_68%,#000000_100%)] text-white`}>
         <HeroGlowBlob />
 
         <section id="hero" data-theme="dark" className="relative z-10 flex min-h-screen flex-col px-4 pb-6 pt-[72px] sm:px-6 sm:pb-8 sm:pt-20">
@@ -276,115 +259,61 @@ export default async function Home() {
           </MotionGroup>
         </section>
 
-        <section id="proof" className="relative z-10 -mt-2 px-4 pb-16 pt-10 text-white sm:px-6 sm:pb-20 sm:pt-12">
-          <Reveal data-testid="proof-reveal" className="mx-auto max-w-6xl text-center">
-            <h2 className="mx-auto max-w-4xl text-[1.72rem] font-medium leading-tight sm:text-[2.2rem]">
-              Keep growth simple, affordable, and excellent without the agency overhead.
-            </h2>
-            <p className="mx-auto mt-5 max-w-2xl text-[0.92rem] leading-7 text-[#9eb8ac] sm:mt-6 sm:text-[0.98rem] sm:leading-8">
-              Practical support across channel strategy, execution, and reporting, without
-              the layers and drag that usually come with agency retainers.
-            </p>
-            <MotionGroup className="mx-auto mt-10 grid max-w-5xl overflow-hidden rounded-[24px] border border-white/7 bg-[linear-gradient(180deg,rgba(255,255,255,0.035),rgba(255,255,255,0.015))] shadow-[0_22px_64px_rgba(0,0,0,0.2)] backdrop-blur-sm sm:mt-12 md:grid-cols-3">
-              {metrics.map((metric) => (
-                <MotionItem key={metric.value}>
-                  <article className="border-white/7 p-6 text-left sm:p-8 md:border-r last:border-r-0">
-                    <p className="text-[1.55rem] font-medium leading-[1.1] text-white sm:text-[2.05rem]">{metric.value}</p>
-                    <p className="mt-3 text-[0.88rem] leading-[1.85rem] text-[#abc4b8]">{metric.label}</p>
+      </div>
+      <div className={styles.scope} data-homepage-concept data-nav-surface="light">
+        <section id="proof" aria-labelledby="results-heading" className={styles.section}>
+          <Reveal data-testid="proof-reveal" className={styles.wrap}>
+            <div className={styles.head}>
+              <p className={styles.eyebrow}>{content.resultsEyebrow}</p>
+              <h2 id="results-heading">{content.resultsHeading}</h2>
+            </div>
+            <MotionGroup className={styles.metrics}>
+              {([1, 2, 3, 4] as const).map((index) => (
+                <MotionItem key={index} className={styles.metric}>
+                  <article>
+                    <p className={styles.metricValue}>{content[`resultsMetric${index}Value`]}</p>
+                    <p className={styles.metricLabel}>{content[`resultsMetric${index}Label`]}</p>
                   </article>
                 </MotionItem>
               ))}
             </MotionGroup>
           </Reveal>
         </section>
-      </div>
-
-      <section id="services" className="bg-white px-4 py-16 sm:px-6 sm:py-24">
-        <div className="mx-auto max-w-7xl">
-          <Reveal className="mx-auto max-w-3xl text-center">
-              <p className="text-sm font-semibold uppercase text-[var(--lumivale-accent)]">
-                Services
-              </p>
-              <h2 className="mt-4 text-2xl font-semibold leading-tight text-[var(--lumivale-ink)] sm:text-4xl">
-                How We Can Help
-              </h2>
-              <p className="mx-auto mt-4 max-w-2xl text-sm leading-7 text-[var(--lumivale-muted)] sm:mt-5 sm:text-base">
-                Stop the guesswork and choose from one of our proven channels to unlock
-                targeted growth that turns attention into revenue.
-              </p>
-          </Reveal>
-
-          <MotionGroup
-            data-testid="services-group"
-            className="mt-10 grid gap-5 sm:mt-14 md:grid-cols-2 xl:grid-cols-3"
-          >
-            {services.map((service) => (
-              <MotionItem key={service.slug}>
-                <article className="flex min-h-[220px] flex-col rounded-lg border border-[var(--lumivale-line)] bg-[#fbfcff] p-6 shadow-[0_20px_60px_rgba(42,47,82,0.06)] transition hover:-translate-y-1 hover:border-[var(--lumivale-accent)] hover:shadow-[0_24px_70px_rgba(42,47,82,0.1)] sm:p-7">
-                  <div className="flex items-start gap-4">
-                    <span className="grid size-12 shrink-0 place-items-center rounded-lg bg-[#eafaf2] text-[var(--lumivale-accent)]">
-                      <ServiceIcon slug={service.slug} title={service.title} />
-                    </span>
-                    <Link
-                      href={`/services/${service.slug}`}
-                      className="pt-2 text-lg font-semibold text-[var(--lumivale-ink)] transition hover:text-[var(--lumivale-accent)] sm:text-xl"
-                    >
-                      {service.title}
-                    </Link>
+        {caseStudies.length > 0 && <section id="case-studies" className={`${styles.section} ${styles.work}`}>
+          <div className={styles.wrap}>
+            <Reveal className={styles.head}>
+              <p className={styles.eyebrow}>Case studies</p>
+              <div><h2>Measured Growth, Built with Lumivale</h2>
+                <p className={styles.description}>Explore our success stories across awareness, content, and outbound strategies with real client outcomes backed by consistent and measurable growth.</p>
+              </div>
+            </Reveal>
+            <MotionGroup data-testid="case-studies-group"><MotionItem><HomepageCaseStudies caseStudies={caseStudies} /></MotionItem></MotionGroup>
+          </div>
+        </section>}
+        <section id="services" className={`${styles.section} ${styles.services}`}>
+          <div className={styles.wrap}>
+            <Reveal className={styles.head}>
+              <p className={styles.eyebrow}>Services</p>
+              <div><h2>How We Can Help</h2><p className={styles.description}>Stop the guesswork and choose from one of our proven channels to unlock targeted growth that turns attention into revenue.</p></div>
+            </Reveal>
+            <MotionGroup data-testid="services-group" className={styles.serviceList}>
+              {services.map((service) => <MotionItem key={service.slug}>
+                <article className={styles.service}><div>
+                  <div className={styles.serviceTitle}>
+                    <span><ServiceIcon slug={service.slug} title={service.title} /></span>
+                    <h3><Link href={`/services/${service.slug}`}>{service.title}</Link></h3>
                   </div>
-                  <p className="mt-5 flex-1 text-sm leading-7 text-[var(--lumivale-muted)]">
-                    {service.summary}
-                  </p>
-                  <Link
-                    href={`/services/${service.slug}`}
-                    aria-label={`Learn more: ${service.title}`}
-                    className="mt-6 w-fit text-sm font-semibold text-[var(--lumivale-accent)] transition hover:text-[var(--lumivale-ink)]"
-                  >
-                    Learn more
-                  </Link>
-                </article>
-              </MotionItem>
-            ))}
-          </MotionGroup>
-        </div>
-      </section>
-
-      <section id="case-studies" className="bg-[#f7f8fb] px-4 py-16 sm:px-6 sm:py-24">
-        <div className="mx-auto max-w-7xl">
-          <Reveal className="mx-auto max-w-3xl text-center">
-            <p className="text-sm font-semibold uppercase text-[var(--lumivale-accent)]">
-              Case studies
-            </p>
-            <h2 className="mt-4 text-2xl font-semibold leading-tight text-[var(--lumivale-ink)] sm:text-4xl">
-              Measured Growth, Built with Lumivale
-            </h2>
-            <p className="mx-auto mt-4 max-w-2xl text-sm leading-7 text-[var(--lumivale-muted)] sm:mt-5 sm:text-base">
-              Explore our success stories across awareness, content, and outbound
-              strategies with real client outcomes backed by consistent and measurable
-              growth.
-            </p>
-          </Reveal>
-
-          <MotionGroup data-testid="case-studies-group" className="mt-10 sm:mt-14">
-            <MotionItem>
-              <CaseStudyCards caseStudies={caseStudies} />
-            </MotionItem>
-          </MotionGroup>
-        </div>
-      </section>
-
-      <section data-nav-surface="dark" id="testimonials" className="relative isolate overflow-hidden bg-[radial-gradient(circle_at_50%_18%,rgba(12,78,50,0.34),transparent_42%),radial-gradient(circle_at_50%_100%,rgba(6,34,22,0.22),transparent_40%),linear-gradient(180deg,#020302_0%,#050505_100%)] text-white">
-        <TestimonialsSpotlight className="px-4 py-16 sm:px-6 sm:py-24">
-          <Reveal data-testid="testimonials-reveal" className="relative z-10 mx-auto max-w-7xl">
-            <div className="mx-auto max-w-4xl text-center">
-                  <p className="text-sm font-semibold uppercase text-[var(--lumivale-accent)]">
-              Testimonials
-            </p>
-              <h2 className="text-2xl font-semibold leading-tight sm:text-4xl">
-                Hear it from our clients
-              </h2>
-            </div>
-
+                  <p>{service.summary}</p>
+                  <Link href={`/services/${service.slug}`} aria-label={`Learn more: ${service.title}`} className={styles.textLink}>Learn more <span aria-hidden="true">&#8599;</span></Link>
+                </div></article>
+              </MotionItem>)}
+            </MotionGroup>
+          </div>
+        </section>
+        <section id="testimonials" className={`${styles.section} ${styles.testimonials}`}>
+          <TestimonialsSpotlight>
+            <Reveal data-testid="testimonials-reveal" className={styles.wrap}>
+              <div className={styles.head}><p className={styles.eyebrow}>Testimonials</p><h2>Hear it from our clients</h2></div>
             {showPlaceholderTestimonials ? (
               <div className="mt-10">
                 <div
@@ -411,67 +340,21 @@ export default async function Home() {
             ) : (
               <HomepageTestimonialsCarousel testimonials={textTestimonials} />
             )}
+            </Reveal>
+          </TestimonialsSpotlight>
+        </section>
+        <section id="faqs" className={`${styles.section} ${styles.faq}`}>
+          <Reveal data-testid="faqs-reveal" className={`${styles.wrap} ${styles.faqLayout}`}>
+            <div><p className={styles.eyebrow}>Questions</p><h2>FAQ</h2><p className={styles.description}>Everything you need to know about Lumivale and how we help grow your customer channels.</p></div>
+            <div className={styles.faqList}>
+              {faqs.map((faq, index) => <details key={faq.question} open={index === 0}>
+                <summary>{faq.question}<span aria-hidden="true">+</span></summary><p>{faq.answer}</p>
+              </details>)}
+            </div>
           </Reveal>
-        </TestimonialsSpotlight>
-      </section>
-
-      <section id="faqs" className="bg-white px-4 py-16 sm:px-6 sm:py-24">
-        <Reveal
-          data-testid="faqs-reveal"
-          className="mx-auto grid max-w-7xl gap-10 sm:gap-12 lg:grid-cols-[0.74fr_1.26fr] lg:gap-20"
-        >
-          <div className="lg:pt-2">
-            <p className="text-sm font-semibold uppercase text-[var(--lumivale-accent)]">
-              Questions
-            </p>
-            <h2 className="mt-5 text-4xl font-semibold leading-none text-[var(--lumivale-ink)] sm:mt-6 sm:text-6xl">
-              FAQ
-            </h2>
-            <p className="mt-5 max-w-md text-sm leading-7 text-[var(--lumivale-muted)] sm:mt-7 sm:text-base sm:leading-8">
-              Everything you need to know about Lumivale and how we help grow
-              your customer channels.
-            </p>
-          </div>
-          <div className="border-t border-[var(--lumivale-line)]">
-            {faqs.map((faq, index) => (
-              <details
-                key={faq.question}
-                open={index === 0}
-                className="group border-b border-[var(--lumivale-line)] py-5 sm:py-6"
-              >
-                <summary className="flex cursor-pointer list-none items-start justify-between gap-5 text-base font-semibold leading-7 text-[var(--lumivale-ink)] transition hover:text-[var(--lumivale-accent)] sm:gap-6 sm:text-lg [&::-webkit-details-marker]:hidden">
-                  {faq.question}
-                  <span className="mt-0.5 shrink-0 text-2xl font-light leading-none text-[var(--lumivale-muted)] transition group-open:rotate-45 group-open:text-[var(--lumivale-accent)]">
-                    +
-                  </span>
-                </summary>
-                <p className="mt-4 max-w-3xl text-sm leading-7 text-[var(--lumivale-muted)] sm:text-base">
-                  {faq.answer}
-                </p>
-              </details>
-            ))}
-          </div>
-        </Reveal>
-      </section>
-
-      <section id="conversion" data-nav-surface="dark" className="bg-[radial-gradient(circle_at_50%_0%,rgba(20,201,131,0.12),transparent_32%),linear-gradient(180deg,#03110c_0%,#02100b_44%,#010807_100%)] px-4 py-16 text-white sm:px-6 sm:py-24">
-        <Reveal data-testid="conversion-reveal" className="mx-auto max-w-4xl text-center">
-          <p className="text-sm font-semibold uppercase text-[var(--lumivale-accent)]">
-            Start here
-          </p>
-          <h2 className="mt-4 text-[1.8rem] font-medium leading-tight text-white sm:text-[3rem]">
-            Light up the next growth channel for your brand.
-          </h2>
-          <a
-            href={CALENDLY_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="mt-8 inline-flex rounded-full bg-[var(--lumivale-accent)] px-7 py-3 text-sm font-semibold text-[#010807] transition hover:bg-[var(--lumivale-accent-soft)]"
-          >
-            Book a call
-          </a>
-        </Reveal>
-      </section>
+        </section>
+        <HomepageFooter content={content} />
+      </div>
     </div>
   );
 }
@@ -514,6 +397,7 @@ function getHomepageTextTestimonials(testimonials: Testimonial[]) {
       id: testimonial.id,
       personName: testimonial.personName,
       personTitle: testimonial.personTitle,
+      imageUrl: testimonial.imageUrl,
       quote: testimonial.quote,
     }));
 
@@ -590,4 +474,3 @@ async function getHomeHeroClients(): Promise<HeroClientInput[]> {
     return defaultHeroClients;
   }
 }
-

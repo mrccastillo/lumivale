@@ -7,6 +7,7 @@ type HomepageTestimonialCardData = {
   id: string;
   personName: string;
   personTitle: string;
+  imageUrl?: string;
   quote: string;
   placeholder?: boolean;
 };
@@ -101,10 +102,18 @@ function HomepageTextTestimonialCard({
       </blockquote>
 
       <div className="mt-5 border-t border-white/6 pt-4">
+        <div className="flex items-center gap-3">
+          {testimonial.imageUrl ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={testimonial.imageUrl} alt="" loading="lazy" className="size-11 shrink-0 rounded-full object-cover" />
+          ) : null}
+          <div className="min-w-0">
         <p className="text-base font-semibold text-white">{testimonial.personName}</p>
         {testimonial.personTitle ? (
           <p className="mt-1 text-sm text-white/62">{testimonial.personTitle}</p>
         ) : null}
+          </div>
+        </div>
         {testimonial.placeholder ? (
           <p className="mt-3 text-[11px] font-medium text-white/38">
             Placeholder

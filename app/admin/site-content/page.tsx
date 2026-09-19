@@ -9,7 +9,7 @@ export default async function SiteContentPage() {
   return (
     <section className="mx-auto w-full max-w-5xl">
       <h1 className="text-3xl font-semibold text-[var(--lumivale-ink)]">Site Content</h1>
-      <p className="mt-3 text-sm leading-7 text-[var(--lumivale-muted)]">Customize your homepage hero and the brand shown in the website navigation.</p>
+      <p className="mt-3 text-sm leading-7 text-[var(--lumivale-muted)]">Customize your homepage hero, results, navigation branding, footer, and footer call to action.</p>
       <SiteContentForm initialContent={content} />
     </section>
   );
