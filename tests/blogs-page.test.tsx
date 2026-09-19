@@ -81,25 +81,21 @@ describe("blogs page", () => {
     const { container } = render(await BlogsPage());
 
     expect(screen.getByRole("heading", { name: "Blogs", level: 1 })).toBeInTheDocument();
-    expect(screen.getAllByText("Placeholder")).toHaveLength(3);
-    expect(
-      screen.getByRole("heading", {
-        name: "How comment campaigns can create warmer inbound attention.",
-        level: 3,
-      }),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByRole("heading", {
-        name: "What a practical UGC publishing cadence looks like for early teams.",
-        level: 3,
-      }),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByRole("heading", {
-        name: "Keeping outreach simple without losing consistency or intent.",
-        level: 3,
-      }),
-    ).toBeInTheDocument();
-    expect(container).toHaveTextContent("Placeholder article");
+    expect(screen.getByText("Articles are temporarily unavailable.")).toBeInTheDocument();
+    expect(container.querySelectorAll("article")).toHaveLength(0);
+  });
+
+  test("shows no fabricated articles when the database has no published posts", async () => {
+    vi.mocked(getPublicBlogPosts).mockResolvedValueOnce([]);
+    const { container } = render(await BlogsPage());
+    expect(screen.getByText("New perspectives are on the way.")).toBeInTheDocument();
+    expect(container.querySelectorAll("article")).toHaveLength(0);
+    expect(screen.queryByText("Placeholder")).not.toBeInTheDocument();
+  });
+
+  test("handles query failures without replacing articles with placeholders", async () => {
+    vi.mocked(getPublicBlogPosts).mockRejectedValueOnce(new Error("query failed"));
+    render(await BlogsPage());
+    expect(screen.getByText("Articles are temporarily unavailable.")).toBeInTheDocument();
   });
 });
