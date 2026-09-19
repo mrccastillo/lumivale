@@ -140,3 +140,32 @@ test("admin keeps edits when saving fails", async () => {
   await waitFor(() => expect(screen.getByRole("alert")).toHaveTextContent("Upload failed"));
   expect(screen.getByLabelText("Headline")).toHaveValue("Keep my edit");
 });
+
+
+test("section tabs preserve edits and support keyboard navigation", () => {
+  render(<SiteContentForm initialContent={defaultSiteContent} />);
+  fireEvent.change(screen.getByLabelText("Brand name"), { target: { value: "Updated brand" } });
+  const branding = screen.getByRole("tab", { name: /Branding/ });
+  fireEvent.keyDown(branding, { key: "ArrowRight" });
+  expect(screen.getByRole("tabpanel")).toHaveAttribute("id", "panel-hero");
+  expect(screen.getByRole("tab", { name: /Homepage hero/ })).toHaveFocus();
+  fireEvent.change(screen.getByLabelText("Headline"), { target: { value: "Updated headline" } });
+  fireEvent.click(branding);
+  expect(screen.getByLabelText("Brand name")).toHaveValue("Updated brand");
+  expect(screen.getByText("Unsaved changes")).toBeInTheDocument();
+  fireEvent.click(screen.getByRole("tab", { name: /Homepage hero/ }));
+  expect(screen.getByLabelText("Headline")).toHaveValue("Updated headline");
+});
+
+test("saving reveals invalid fields in a hidden tab before submitting", async () => {
+  const fetchMock = vi.fn();
+  vi.stubGlobal("fetch", fetchMock);
+  render(<SiteContentForm initialContent={defaultSiteContent} />);
+  fireEvent.click(screen.getByRole("tab", { name: /Homepage hero/ }));
+  fireEvent.change(screen.getByLabelText("Headline"), { target: { value: "" } });
+  fireEvent.click(screen.getByRole("tab", { name: /Branding/ }));
+  fireEvent.click(screen.getByRole("button", { name: "Save changes" }));
+  expect(screen.getByRole("tabpanel")).toHaveAttribute("id", "panel-hero");
+  await waitFor(() => expect(screen.getByLabelText("Headline")).toHaveFocus());
+  expect(fetchMock).not.toHaveBeenCalled();
+});

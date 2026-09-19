@@ -1,9 +1,11 @@
+import { ObjectId } from "mongodb";
 import { describe, expect, test } from "vitest";
 
 import {
   createTestimonial,
   deleteTestimonial,
   getAdminTestimonials,
+  getTestimonialById,
   getPublishedTestimonials,
   updateTestimonial,
   validateTestimonialVideoFile,
@@ -182,3 +184,31 @@ function createTestDb() {
 function matches(document: Record<string, unknown>, query: Record<string, unknown>) {
   return Object.entries(query).every(([key, value]) => document[key] === value);
 }
+
+
+test("repository results omit BSON IDs and database-only fields at client boundaries", async () => {
+  const document = {
+    _id: new ObjectId(), personName: "Client", personTitle: "Founder",
+    imageUrl: "https://example.com/logo.png", quote: "Great work", sortOrder: 1,
+    status: "published" as const, type: "text" as const, videoUrl: "",
+    createdAt: new Date(), updatedAt: new Date(), internalReference: new ObjectId(),
+  };
+  const db = { collection: () => ({
+    find: () => ({ sort: () => ({ toArray: async () => [document] }) }),
+    findOne: async () => document,
+    findOneAndUpdate: async () => document,
+  }) };
+  const results = [
+    await getTestimonialById(db, String(document._id)),
+    ...(await getAdminTestimonials(db)),
+    ...(await getPublishedTestimonials(db)),
+    await updateTestimonial(db, String(document._id), { quote: "Updated" }),
+  ];
+  const { _id, internalReference, ...fields } = document;
+  for (const result of results) {
+    expect(result).toEqual({ ...fields, id: String(_id) });
+    expect(result).not.toHaveProperty("_id");
+    expect(Object.values(result!)).not.toContain(internalReference);
+    expect(Object.values(result!).some(value => value instanceof ObjectId)).toBe(false);
+  }
+});

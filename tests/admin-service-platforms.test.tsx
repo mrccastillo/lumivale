@@ -10,6 +10,10 @@ function addPlatform(name: string) {
 }
 test("new services start empty; platform names validate and ordering can be edited", () => {
   const { container, unmount } = render(<ServiceForm />);
+    for (const name of ["title", "summary", "description", "highlights", "pricePreview", "heroDescription", "pricingLines"]) {
+      fireEvent.change(document.querySelector(`[name="${name}"]`)!, { target: { value: name === "pricingLines" ? "Monthly rate | $850" : "Service content" } });
+    }
+    fireEvent.click(screen.getByRole("tab", { name: /Examples$/ }));
   expect(screen.queryByRole("button", { name: "Add Example" })).toBeNull();
   addPlatform(" YouTube "); addPlatform("youtube");
   expect(screen.getByRole("alert")).toHaveTextContent("unique platform name");
@@ -23,6 +27,7 @@ test("new services start empty; platform names validate and ordering can be edit
   unmount();
   const service = getDefaultServices()[0];
   render(<ServiceForm service={{ ...service, privateContent: { ...service.privateContent, examplePlatforms: manifest.platforms, exampleCards: [] } }} />);
+    fireEvent.click(screen.getByRole("tab", { name: /Examples$/ }));
   expect(screen.getAllByLabelText("Platform name").map((input) => (input as HTMLInputElement).value)).toEqual(["Websites", "YouTube"]);
   fireEvent.click(within(screen.getByRole("region", { name: "Websites examples" })).getByRole("button", { name: "Remove platform" }));
   expect(screen.queryByRole("region", { name: "Websites examples" })).toBeNull();
@@ -35,6 +40,7 @@ test("moving a draft preserves files and IDs when another example is removed; ca
   service.privateContent.examplePlatforms = [{ id: "one", name: "Reddit" }, { id: "two", name: "YouTube" }];
   service.privateContent.exampleCards = [{ id: "saved", platformId: "one", title: "Saved", tag: "Proof", summary: "Summary", exampleType: "link", previewUrl: "https://example.com" }];
   render(<ServiceForm service={service} />);
+    fireEvent.click(screen.getByRole("tab", { name: /Examples$/ }));
   const reddit = screen.getByRole("region", { name: "Reddit examples" });
   expect(within(reddit).getByRole("button", { name: "Remove platform" })).toBeDisabled();
   fireEvent.click(within(reddit).getByRole("button", { name: "Add Example" }));
@@ -66,4 +72,27 @@ test("moving a draft preserves files and IDs when another example is removed; ca
   expect(manifest.examples[0]).toMatchObject({ platformId: "two", title: "Pending", tag: "Screenshot" });
   expect(form.get(`exampleCardImageFile-${manifest.examples[0].id}`)).toBe(photo);
   expect(form.get(`exampleCardVideoFile-${manifest.examples[0].id}`)).toBe(video);
+});
+
+
+test("platform tabs retain draft names, follow reordering, and select a remaining platform after removal", () => {
+  const service = getDefaultServices()[0];
+  service.privateContent.examplePlatforms = [{ id: "reddit", name: "Reddit" }, { id: "linkedin", name: "LinkedIn" }];
+  service.privateContent.exampleCards = [];
+  render(<ServiceForm service={service} />);
+  fireEvent.click(screen.getByRole("tab", { name: /Examples$/ }));
+  const reddit = screen.getByRole("tab", { name: "Reddit" });
+  fireEvent.change(within(screen.getByRole("region", { name: "Reddit examples" })).getByLabelText("Platform name"), { target: { value: "Reddit community" } });
+  fireEvent.keyDown(reddit, { key: "ArrowRight" });
+  expect(screen.getByRole("tab", { name: "LinkedIn" })).toHaveFocus();
+  expect(screen.queryByRole("region", { name: "Reddit examples" })).toBeNull();
+  fireEvent.click(reddit);
+  expect(within(screen.getByRole("region", { name: "Reddit examples" })).getByLabelText("Platform name")).toHaveValue("Reddit community");
+  fireEvent.click(screen.getByRole("button", { name: "Rename platform" }));
+  expect(screen.getByRole("tab", { name: "Reddit community" })).toHaveAttribute("aria-selected", "true");
+  fireEvent.click(screen.getByRole("button", { name: "Move down" }));
+  expect(screen.getByRole("tab", { name: "Reddit community" })).toHaveAttribute("aria-selected", "true");
+  fireEvent.click(screen.getByRole("button", { name: "Remove platform" }));
+  expect(screen.getByRole("tab", { name: "LinkedIn" })).toHaveAttribute("aria-selected", "true");
+  expect(screen.getByRole("region", { name: "LinkedIn examples" })).toBeVisible();
 });

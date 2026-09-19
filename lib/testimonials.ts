@@ -96,8 +96,17 @@ function validateInput(input: TestimonialInput) {
 
 function toTestimonial(document: TestimonialDocument): Testimonial {
   return {
-    ...document,
     id: String(document._id),
+    personName: document.personName,
+    personTitle: document.personTitle,
+    imageUrl: document.imageUrl,
+    quote: document.quote,
+    sortOrder: document.sortOrder,
+    status: document.status,
+    type: document.type,
+    videoUrl: document.videoUrl,
+    createdAt: document.createdAt,
+    updatedAt: document.updatedAt,
   };
 }
 

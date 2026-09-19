@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import "lenis/dist/lenis.css";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteNavbar } from "@/components/site-navbar";
 import { AppShellClient } from "@/components/app-shell-client";

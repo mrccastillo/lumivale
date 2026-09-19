@@ -5,6 +5,7 @@ import { HomepageFooter } from "@/components/homepage-footer";
 import styles from "@/components/homepage-concept.module.css";
 import { HeroClientMarquee } from "@/components/hero-client-marquee";
 import { HeroGlowBlob } from "@/components/hero-glow-blob";
+import { HeroScrollPin } from "@/components/hero-scroll-pin";
 import { HomepageTestimonialsCarousel } from "@/components/homepage-testimonials-carousel";
 import { HomepageVideoTestimonialCard } from "@/components/homepage-video-testimonial-card";
 import { MotionGroup, MotionItem } from "@/components/motion-group";
@@ -205,6 +206,7 @@ export default async function Home() {
 
   return (
     <div className="bg-[#f7f8fb] text-[var(--lumivale-ink)]">
+      <HeroScrollPin>
       <div data-nav-surface="dark" className={`${styles.heroBackdrop} relative isolate overflow-hidden bg-[radial-gradient(circle_at_50%_100%,rgba(8,20,14,0.22),transparent_42%),linear-gradient(180deg,#081d14_0%,#04110c_34%,#020605_68%,#000000_100%)] text-white`}>
         <HeroGlowBlob />
 
@@ -260,14 +262,15 @@ export default async function Home() {
         </section>
 
       </div>
+      </HeroScrollPin>
       <div className={styles.scope} data-homepage-concept data-nav-surface="light">
-        <section id="proof" aria-labelledby="results-heading" className={styles.section}>
+        <section id="proof" aria-labelledby="results-heading" className={`${styles.section} ${styles.resultsSection}`}>
           <Reveal data-testid="proof-reveal" className={styles.wrap}>
-            <div className={styles.head}>
+            <div className={styles.resultsHead} data-scroll-reveal>
               <p className={styles.eyebrow}>{content.resultsEyebrow}</p>
               <h2 id="results-heading">{content.resultsHeading}</h2>
             </div>
-            <MotionGroup className={styles.metrics}>
+            <MotionGroup className={styles.metrics} data-scroll-landscape>
               {([1, 2, 3, 4] as const).map((index) => (
                 <MotionItem key={index} className={styles.metric}>
                   <article>
@@ -282,8 +285,7 @@ export default async function Home() {
         {caseStudies.length > 0 && <section id="case-studies" className={`${styles.section} ${styles.work}`}>
           <div className={styles.wrap}>
             <Reveal className={styles.head}>
-              <p className={styles.eyebrow}>Case studies</p>
-              <div><h2>Measured Growth, Built with Lumivale</h2>
+              <div data-scroll-reveal><h2>Measured Growth, Built with Lumivale</h2>
                 <p className={styles.description}>Explore our success stories across awareness, content, and outbound strategies with real client outcomes backed by consistent and measurable growth.</p>
               </div>
             </Reveal>
@@ -293,12 +295,11 @@ export default async function Home() {
         <section id="services" className={`${styles.section} ${styles.services}`}>
           <div className={styles.wrap}>
             <Reveal className={styles.head}>
-              <p className={styles.eyebrow}>Services</p>
-              <div><h2>How We Can Help</h2><p className={styles.description}>Stop the guesswork and choose from one of our proven channels to unlock targeted growth that turns attention into revenue.</p></div>
+              <div data-scroll-reveal><h2>How We Can Help</h2><p className={styles.description}>Stop the guesswork and choose from one of our proven channels to unlock targeted growth that turns attention into revenue.</p></div>
             </Reveal>
             <MotionGroup data-testid="services-group" className={styles.serviceList}>
               {services.map((service) => <MotionItem key={service.slug}>
-                <article className={styles.service}><div>
+                <article className={styles.service} data-scroll-reveal><div>
                   <div className={styles.serviceTitle}>
                     <span><ServiceIcon slug={service.slug} title={service.title} /></span>
                     <h3><Link href={`/services/${service.slug}`}>{service.title}</Link></h3>
@@ -313,7 +314,7 @@ export default async function Home() {
         <section id="testimonials" className={`${styles.section} ${styles.testimonials}`}>
           <TestimonialsSpotlight>
             <Reveal data-testid="testimonials-reveal" className={styles.wrap}>
-              <div className={styles.head}><p className={styles.eyebrow}>Testimonials</p><h2>Hear it from our clients</h2></div>
+              <div className={styles.head} data-scroll-reveal><h2>Hear it from our clients</h2></div>
             {showPlaceholderTestimonials ? (
               <div className="mt-10">
                 <div
@@ -345,9 +346,9 @@ export default async function Home() {
         </section>
         <section id="faqs" className={`${styles.section} ${styles.faq}`}>
           <Reveal data-testid="faqs-reveal" className={`${styles.wrap} ${styles.faqLayout}`}>
-            <div><p className={styles.eyebrow}>Questions</p><h2>FAQ</h2><p className={styles.description}>Everything you need to know about Lumivale and how we help grow your customer channels.</p></div>
+            <div data-scroll-reveal><h2>FAQ</h2><p className={styles.description}>Everything you need to know about Lumivale and how we help grow your customer channels.</p></div>
             <div className={styles.faqList}>
-              {faqs.map((faq, index) => <details key={faq.question} open={index === 0}>
+              {faqs.map((faq, index) => <details data-scroll-reveal key={faq.question} open={index === 0}>
                 <summary>{faq.question}<span aria-hidden="true">+</span></summary><p>{faq.answer}</p>
               </details>)}
             </div>

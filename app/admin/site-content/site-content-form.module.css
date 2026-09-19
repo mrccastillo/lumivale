@@ -1,0 +1,27 @@
+.editor { margin-top: 28px; }
+.tabs { display: flex; flex-wrap: wrap; gap: 6px; padding: 6px; background: #e9ede2; border: 1px solid #d9ded2; border-radius: 8px; }
+.tabs button { display: flex; align-items: center; justify-content: center; gap: 9px; flex: 1 1 auto; padding: 13px 16px; border-radius: 5px; color: #56634f; font-size: 12px; font-weight: 550; cursor: pointer; }
+.tabs button:hover { background: #f4f5ed; }
+.tabs button[aria-selected="true"] { background: #122b22; color: #f4f5ed; }
+.tabNumber { font-size: 10px; opacity: .55; }
+.tabs button[aria-selected="true"] .tabNumber { color: #c0f275; opacity: 1; }
+.sectionIntro { padding: 26px 0 20px; }
+.sectionIntro > span { color: #657169; font-size: 9px; letter-spacing: .16em; }
+.sectionIntro p { margin-top: 6px; color: #657169; font-size: 13px; line-height: 1.7; }
+.panel { padding: 28px; border: 1px solid #d9ded2; border-radius: 7px; background: #fcfdf9; }
+.panel > * + * { margin-top: 22px; }
+.panel[hidden] { display: none; }
+.editor > fieldset { min-width: 0; }
+.saveBar { position: sticky; bottom: 16px; z-index: 20; display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 18px 22px; margin-top: 24px; background: #f4f5edf5; backdrop-filter: blur(16px); border: 1px solid #cdd5c5; border-radius: 7px; }
+.saveState { color: #122b22; font-size: 12px; font-weight: 600; }
+.saveHint { margin-top: 4px; color: #657169; font-size: 11px; line-height: 1.6; }
+.saveBar button { flex-shrink: 0; }
+.saveBar button:disabled { opacity: .6; cursor: wait; }
+@media (max-width: 600px) {
+  .tabs { gap: 4px; }
+  .tabs button { flex: 1 1 40%; padding: 12px 8px; }
+  .tabs button:last-child { flex-grow: 0; }
+  .panel { padding: 20px 16px; }
+  .saveBar { bottom: 8px; padding: 14px; flex-wrap: wrap; gap: 12px; }
+  .saveBar button { width: 100%; }
+}
