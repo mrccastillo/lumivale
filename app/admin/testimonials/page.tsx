@@ -61,10 +61,6 @@ export default async function AdminTestimonialsPage({
             <h1 className="mt-4 text-4xl font-semibold leading-tight text-white">
               Testimonials
             </h1>
-            <p className="mt-4 text-base leading-8 text-white/74">
-              Manage text and video testimonials with a faster review workflow,
-              clearer filters, and a dedicated create modal for new entries.
-            </p>
           </div>
           <div className="flex flex-wrap gap-3">
             <Link

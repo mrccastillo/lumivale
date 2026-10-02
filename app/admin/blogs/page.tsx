@@ -45,10 +45,6 @@ export default async function AdminBlogsPage({ searchParams }: AdminBlogsPagePro
             <h1 className="mt-4 text-4xl font-semibold leading-tight text-white">
               Blogs
             </h1>
-            <p className="mt-4 text-base leading-8 text-white/74">
-              Manage SEO-ready blog posts for the public landing site with a cleaner
-              editorial workflow, faster filtering, and clearer publish controls.
-            </p>
           </div>
           <div className="flex flex-wrap gap-3">
             <Link

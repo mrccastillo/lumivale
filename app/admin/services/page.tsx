@@ -49,10 +49,6 @@ export default async function AdminServicesPage({
             <h1 className="mt-4 text-4xl font-semibold leading-tight text-white">
               Services
             </h1>
-            <p className="mt-4 text-base leading-8 text-white/74">
-              Manage public service copy and private pricing for the services shown
-              across the Lumivale site.
-            </p>
           </div>
           <div className="flex flex-wrap gap-3">
             <Link

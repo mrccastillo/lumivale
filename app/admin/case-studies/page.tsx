@@ -47,10 +47,6 @@ export default async function AdminCaseStudiesPage({
             <h1 className="mt-4 text-4xl font-semibold leading-tight text-white">
               Case Studies
             </h1>
-            <p className="mt-4 text-base leading-8 text-white/74">
-              Manage the public success stories shown on the Lumivale case studies
-              page, including outcomes, metrics, and publish status.
-            </p>
           </div>
           <div className="flex flex-wrap gap-3">
             <Link
