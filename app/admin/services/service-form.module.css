@@ -18,7 +18,7 @@
   border-radius: 999px;
   background: #fcfdf9;
   color: #56634f;
-  font-size: 12px;
+  font-size: var(--text-caption);
   font-weight: 550;
   cursor: pointer;
   transition: background .18s, color .18s, border-color .18s;

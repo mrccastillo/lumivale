@@ -194,7 +194,7 @@ describe("home page", () => {
       name: /Light up your growth with simple execution systems/i,
     });
     expect(heroHeading).toBeInTheDocument();
-    expect(heroHeading).toHaveClass("text-[1.9rem]", "sm:text-[3.5rem]", "lg:text-[3.7rem]");
+    expect(heroHeading).toHaveClass("text-[length:var(--text-heading)]", "leading-[var(--heading-leading)]");
     expect(heroHeading).not.toHaveClass("text-3xl", "text-4xl", "sm:text-5xl", "lg:text-6xl");
     expect(
       screen.getByText(

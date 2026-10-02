@@ -219,7 +219,7 @@ export default async function Home() {
           >
             <MotionGroup className="flex w-full flex-col items-center" delay={0.08} stagger={0.16}>
               <MotionItem>
-                <h1 className="max-w-6xl text-[1.9rem] font-medium leading-[1.06] text-white sm:text-[3.5rem] lg:text-[3.7rem]">
+                <h1 className="max-w-6xl text-[length:var(--text-heading)] font-semibold leading-[var(--heading-leading)] text-white">
                   {content.heroHeading}{" "}
                   <span className="text-[var(--lumivale-accent-soft)]">{content.heroHighlight}</span>
                 </h1>
