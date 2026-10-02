@@ -1,5 +1,5 @@
 import Link from "next/link";
-import styles from "@/components/public-listing.module.css";
+import styles from "./pricing.module.css";
 import { notFound } from "next/navigation";
 
 import { getPublishedServicesForSite } from "@/lib/services";
@@ -26,12 +26,11 @@ export default async function PricingPage() {
       <section className={`${styles.wrap} ${styles.pricing}`} aria-label="Monthly services">
         <div className={styles.rateHeader}>
           <div><h2>Monthly services</h2><p>Current private monthly rates for approved client discussions.</p></div>
-          <span className={styles.eyebrow}>Rates</span>
+          <span className={styles.eyebrow}>Billed monthly</span>
         </div>
         <div className={styles.rates}>
-          {services.map((service, index) => (
+          {services.map((service) => (
             <article key={service.slug} className={styles.rate}>
-              <span className={styles.number} aria-hidden="true">{String(index + 1).padStart(2, "0")}</span>
               <div className={styles.serviceCopy}>
                 <h2>{service.title}</h2>
                 <p>{service.summary}</p>

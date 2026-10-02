@@ -1,0 +1,16 @@
+.image { margin: 0; overflow: hidden; background: #f0f2f5; }
+.photo { display: block; width: 100%; height: 300px; object-fit: contain; padding: 12px; transition: filter .25s; }
+.image a:hover .photo { filter: brightness(.97); }
+.preview { min-width: 0; overflow: hidden; background: #fff; }
+.embedViewport { position: relative; width: 100%; aspect-ratio: 16/9; overflow: hidden; }
+.embedViewport[data-portrait="true"] { aspect-ratio: 9/14; }
+/* Cross-origin frames cannot inherit scrollbar CSS. Place their scrollbar gutter outside the visible viewport while retaining native scrolling. */
+.embedViewport[data-scrollable="true"] .embed { width: calc(100% + 18px); }
+.embed { position: absolute; inset: 0 auto auto 0; display: block; width: 100%; height: 100%; border: 0; background: #f0f2f5; }
+.source { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px 16px; min-height: 48px; padding: 12px 16px; border-top: 1px solid #e6e9f2; background: #fff; font-size: var(--text-caption); line-height: 1.5; transition: background .2s; }
+.source:hover { background: #f7faf8; }
+.host { min-width: 0; overflow-wrap: anywhere; color: #68708a; }
+.open { color: #087a50; font-weight: 500; }
+.open > span:first-child { display: inline-block; margin-left: 5px; transition: transform .2s; }
+.source:hover .open > span:first-child { transform: translate(2px,-2px); }
+@media(prefers-reduced-motion: reduce) { .photo, .source, .open > span:first-child { transition: none; } }

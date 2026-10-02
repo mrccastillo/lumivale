@@ -192,3 +192,56 @@ test("About tab saves edited copy and founder details", async () => {
   expect(fetchMock.mock.calls[0][1].body.get("aboutHeading")).toBe("Our story");
   expect(fetchMock.mock.calls[0][1].body.get("aboutFounder1Name")).toBe("Alex");
 });
+
+
+test("dynamic footer links persist, including intentional empty lists", async () => {
+  const navigation = [{ label: " Work ", url: "/case-studies" }, { label: "Docs", url: "https://example.com/docs" }];
+  const socials = [{ label: "Instagram", url: "https://instagram.com/lumivale" }, { label: "X", url: "https://x.com/lumivale" }];
+  const response = await POST(request({ footerNavigationLinks: JSON.stringify(navigation), footerSocialLinks: JSON.stringify(socials) }));
+  expect(response.status).toBe(200);
+  const saved = (await response.json()).content;
+  expect(saved.footerNavigationLinks[0]).toEqual({ label: "Work", url: "/case-studies" });
+  expect(saved.footerSocialLinks).toEqual(socials);
+  findOne.mockResolvedValue(saved);
+  expect((await getSiteContent(db)).footerNavigationLinks).toEqual(saved.footerNavigationLinks);
+  const empty = await POST(request({ footerNavigationLinks: "[]", footerSocialLinks: "[]" }));
+  const cleared = (await empty.json()).content;
+  findOne.mockResolvedValue(cleared);
+  expect((await getSiteContent(db)).footerNavigationLinks).toEqual([]);
+  expect((await getSiteContent(db)).footerSocialLinks).toEqual([]);
+});
+
+test.each(["javascript:alert(1)", "//evil.test", "https://user:pass@example.com", "/\\evil.test"]) ("rejects unsafe dynamic footer destination %s", async (url) => {
+  const response = await POST(request({ footerNavigationLinks: JSON.stringify([{ label: "Link", url }]) }));
+  expect(response.status).toBe(400);
+  expect(updateOne).not.toHaveBeenCalled();
+});
+
+test("rejects malformed lists and incomplete platform entries", () => {
+  for (const value of ["bad json", "{}", JSON.stringify([{ label: "", url: "https://x.com" }]), JSON.stringify([{ label: "X", url: "/local" }])]) {
+    expect(() => parseSiteContent({ ...defaultSiteContent, footerSocialLinks: value })).toThrow();
+  }
+});
+
+test("admin can add and remove navigation and platforms and retains edits on errors", async () => {
+  const fetchMock = vi.fn().mockResolvedValue({ ok: false, json: async () => ({ error: "Try again" }) });
+  vi.stubGlobal("fetch", fetchMock);
+  render(<SiteContentForm initialContent={defaultSiteContent} />);
+  fireEvent.click(screen.getByRole("tab", { name: /Footer$/ }));
+  expect(screen.getByLabelText("Navigation link 1 text")).toHaveValue("Home");
+  expect(screen.getByLabelText("Social platform 1 name")).toHaveValue("LinkedIn");
+  fireEvent.click(screen.getByRole("button", { name: "Add navigation link" }));
+  fireEvent.change(screen.getByLabelText("Navigation link 4 text"), { target: { value: "Work" } });
+  fireEvent.change(screen.getByLabelText("Navigation link 4 destination"), { target: { value: "/case-studies" } });
+  fireEvent.click(screen.getByRole("button", { name: "Remove navigation link 2" }));
+  fireEvent.click(screen.getByRole("button", { name: "Add social platform" }));
+  fireEvent.change(screen.getByLabelText("Social platform 2 name"), { target: { value: "Instagram" } });
+  fireEvent.change(screen.getByLabelText("Social platform 2 URL"), { target: { value: "https://instagram.com/lumivale" } });
+  fireEvent.click(screen.getByRole("button", { name: "Remove social platform 1" }));
+  fireEvent.click(screen.getByRole("button", { name: "Save changes" }));
+  await waitFor(() => expect(screen.getByRole("alert")).toHaveTextContent("Try again"));
+  const data = fetchMock.mock.calls[0][1].body;
+  expect(JSON.parse(data.get("footerNavigationLinks")).map((link: { label: string }) => link.label)).toEqual(["Home", "Blogs", "Work"]);
+  expect(JSON.parse(data.get("footerSocialLinks"))).toEqual([{ label: "Instagram", url: "https://instagram.com/lumivale" }]);
+  expect(screen.getByLabelText("Social platform 1 name")).toHaveValue("Instagram");
+});

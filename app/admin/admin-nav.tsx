@@ -12,6 +12,7 @@ const adminLinks = [
   { href: "/admin/blogs", icon: BlogsIcon, label: "Blogs" },
   { href: "/admin/services", icon: ServicesIcon, label: "Services" },
   { href: "/admin/case-studies", icon: CaseStudiesIcon, label: "Case Studies" },
+  { href: "/admin/reels", icon: HeroClientsIcon, label: "Reels" },
   { href: "/admin/testimonials", icon: TestimonialsIcon, label: "Testimonials" },
   { href: "/admin/hero-clients", icon: HeroClientsIcon, label: "Hero Clients" },
   { href: "/admin/faqs", icon: FaqsIcon, label: "FAQs" },

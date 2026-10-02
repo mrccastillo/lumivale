@@ -1,0 +1,56 @@
+{
+  "source": "https://dianaguingab.vercel.app/",
+  "retrievedAt": "2026-10-02T17:19:29.656Z",
+  "metricsNote": "Manually copied portfolio-reported figures; not independently verified live Instagram counts.",
+  "created": 4,
+  "records": [
+    {
+      "_id": "6abfe79f8ae0445d69e73a78",
+      "title": "YouArt AI creator reel 1",
+      "clientName": "YouArt AI",
+      "url": "https://www.instagram.com/reel/DZX9hcUvKGW/",
+      "thumbnailUrl": "https://res.cloudinary.com/dm0kucb4e/image/upload/v1790961566/lumivale/reels/file_zhtxtr.jpg",
+      "views": "1.2M",
+      "likes": "27.7K",
+      "comments": "2.8K",
+      "sortOrder": 1,
+      "status": "published"
+    },
+    {
+      "_id": "6abfe79f8ae0445d69e73a79",
+      "title": "Eztrackr creator reel 2",
+      "clientName": "Eztrackr",
+      "url": "https://www.instagram.com/reel/DY5KPppyteF/",
+      "thumbnailUrl": "https://res.cloudinary.com/dm0kucb4e/image/upload/v1790961567/lumivale/reels/file_ayb0t9.jpg",
+      "views": "372K",
+      "likes": "2.4K",
+      "comments": "1.8K",
+      "sortOrder": 2,
+      "status": "published"
+    },
+    {
+      "_id": "6abfe7a08ae0445d69e73a7a",
+      "title": "YouArt AI creator reel 3",
+      "clientName": "YouArt AI",
+      "url": "https://www.instagram.com/reel/DaAWtzYz9Ud/",
+      "thumbnailUrl": "https://res.cloudinary.com/dm0kucb4e/image/upload/v1790961568/lumivale/reels/file_a0wrgl.jpg",
+      "views": "236K",
+      "likes": "5.2K",
+      "comments": "888",
+      "sortOrder": 3,
+      "status": "published"
+    },
+    {
+      "_id": "6abfe7a18ae0445d69e73a7b",
+      "title": "YouArt AI creator reel 4",
+      "clientName": "YouArt AI",
+      "url": "https://www.instagram.com/reel/DZktxcSvDXI/",
+      "thumbnailUrl": "https://res.cloudinary.com/dm0kucb4e/image/upload/v1790961569/lumivale/reels/file_d6avnl.jpg",
+      "views": "209K",
+      "likes": "3.4K",
+      "comments": "189",
+      "sortOrder": 4,
+      "status": "published"
+    }
+  ]
+}

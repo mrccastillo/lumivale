@@ -60,7 +60,7 @@ describe("private pricing service page", () => {
       expect(screen.getAllByText(line.value)).toHaveLength(1);
       expect(screen.queryByText(`${line.label}:`)).not.toBeInTheDocument();
     });
-    expect(screen.getByRole("heading", { name: "The work in action." })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Examples of Our Work" })).toBeInTheDocument();
     expect(screen.queryByText("Private detail")).not.toBeInTheDocument();
     expect(screen.queryByText("Example channel")).not.toBeInTheDocument();
     expect(screen.queryByText(/Placeholder visual panel/)).not.toBeInTheDocument();

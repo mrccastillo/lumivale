@@ -1,0 +1,31 @@
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { afterEach, expect, test, vi } from "vitest";
+import { ReelForm, ReelActions } from "@/app/admin/reels/reel-form";
+const router = vi.hoisted(() => ({ push: vi.fn(), refresh: vi.fn() }));
+vi.mock("next/navigation", () => ({ useRouter: () => router }));
+afterEach(() => { vi.unstubAllGlobals(); vi.clearAllMocks(); });
+const reel = { id: "abc", title: "Launch", clientName: "Client", platform: "Other", url: "https://example.com/reel", thumbnailUrl: "https://res.cloudinary.com/demo/x.jpg", views: "10K", likes: "", comments: "", status: "draft" as const, sortOrder: 2 };
+test("retains entered values on failure and submits multipart data for editing", async () => {
+  const fetch = vi.fn().mockResolvedValueOnce({ ok: false, json: async () => ({ error: "Upload failed" }) }).mockResolvedValueOnce({ ok: true, json: async () => ({ ok: true }) });
+  vi.stubGlobal("fetch", fetch);
+  render(<ReelForm reel={reel} />);
+  fireEvent.change(screen.getByLabelText("Reel title"), { target: { value: "Updated title" } });
+  fireEvent.click(screen.getByRole("button", { name: "Save reel" }));
+  expect(await screen.findByRole("alert")).toHaveTextContent("Upload failed");
+  expect(screen.getByLabelText("Reel title")).toHaveValue("Updated title");
+  fireEvent.click(screen.getByRole("button", { name: "Save reel" }));
+  await waitFor(() => expect(router.refresh).toHaveBeenCalled());
+  expect(fetch.mock.calls[1][0]).toBe("/api/admin/reels/abc");
+  const form = fetch.mock.calls[1][1].body as FormData;
+  expect(form.get("title")).toBe("Updated title"); expect(form.get("thumbnailUrl")).toBe(reel.thumbnailUrl);
+});
+test("deletion requires confirmation and publication uses the expected action", async () => {
+  const fetch = vi.fn().mockResolvedValue({ ok: true, json: async () => ({ ok: true }) }); vi.stubGlobal("fetch", fetch);
+  vi.spyOn(window, "confirm").mockReturnValue(false);
+  render(<ReelActions reel={reel} />);
+  fireEvent.click(screen.getByRole("button", { name: "Delete" })); expect(fetch).not.toHaveBeenCalled();
+  fireEvent.click(screen.getByRole("button", { name: "Publish" }));
+  await waitFor(() => expect(router.refresh).toHaveBeenCalled());
+  expect(fetch.mock.calls[0][1].body.get("action")).toBe("publish");
+  vi.restoreAllMocks();
+});

@@ -203,7 +203,7 @@ describe("site navbar", () => {
     });
   });
 
-  test("uses the ivory navbar treatment over light sections", async () => {
+  test("uses the white navbar treatment over light sections", async () => {
     hasTrustedClientAccessMock.mockResolvedValue(false);
     pathnameMock.mockReturnValue("/blogs");
     const { SiteNavbar } = await import("@/components/site-navbar");

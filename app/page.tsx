@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { HomepageReels } from "@/components/homepage-reels";
+import { getPublishedReelsForSite } from "@/lib/reels";
 
 import { HomepageCaseStudies } from "@/components/homepage-case-studies";
 import { HomepageFooter } from "@/components/homepage-footer";
@@ -193,12 +195,13 @@ function ServiceIcon({ slug, title }: { slug: string; title: string }) {
 
 export default async function Home() {
   const caseStudies = await getPublishedCaseStudiesForSite();
-  const [services, testimonials, faqs, heroClients, content] = await Promise.all([
+  const [services, testimonials, faqs, heroClients, content, reels] = await Promise.all([
     getPublishedServicesForSite(),
     getHomeTestimonials(),
     getHomeFaqs(),
     getHomeHeroClients(),
     getSiteContentForSite(),
+    getPublishedReelsForSite(),
   ]);
   const textTestimonials = getHomepageTextTestimonials(testimonials);
   const showPlaceholderTestimonials = !testimonials.some(
@@ -219,7 +222,7 @@ export default async function Home() {
           >
             <MotionGroup className="flex w-full flex-col items-center" delay={0.08} stagger={0.16}>
               <MotionItem>
-                <h1 className="max-w-6xl text-[1.9rem] font-medium leading-[1.06] text-white sm:text-[3.5rem] lg:text-[3.7rem]">
+                <h1 className="max-w-6xl text-[length:var(--text-heading)] font-semibold leading-[var(--heading-leading)] text-white">
                   {content.heroHeading}{" "}
                   <span className="text-[var(--lumivale-accent-soft)]">{content.heroHighlight}</span>
                 </h1>
@@ -281,11 +284,13 @@ export default async function Home() {
                 </div>
               ))}
             </div>
+            <HomepageReels reels={reels} />
           </div>
         </section>
         {caseStudies.length > 0 && <section id="case-studies" className={`${styles.section} ${styles.work}`}>
           <div className={styles.wrap}>
-            <Reveal className={styles.head}>
+            <Reveal className={`${styles.head} ${styles.workHead}`}>
+              <p className={styles.eyebrow}>Selected work</p>
               <div data-scroll-reveal><h2>Measured Growth, Built with Lumivale</h2>
                 <p className={styles.description}>Explore our success stories across awareness, content, and outbound strategies with real client outcomes backed by consistent and measurable growth.</p>
               </div>
@@ -312,7 +317,7 @@ export default async function Home() {
             </MotionGroup>
           </div>
         </section>
-        <section id="testimonials" className={`${styles.section} ${styles.testimonials}`}>
+        <section id="testimonials" data-nav-surface="dark" className={`${styles.section} ${styles.testimonials}`}>
           <TestimonialsSpotlight>
             <Reveal data-testid="testimonials-reveal" className={styles.wrap}>
               <div className={styles.head} data-scroll-reveal><h2>Hear it from our clients</h2></div>

@@ -1,9 +1,18 @@
+import { getPublishedReelsForSite } from "@/lib/reels";
+vi.mock("@/lib/reels", () => ({ getPublishedReelsForSite: vi.fn(async () => []) }));
 import { fireEvent, render, screen, within } from "@testing-library/react";
-import { describe, expect, test, vi } from "vitest";
+import type { ReactNode } from "react";
+import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 
 import Home from "@/app/page";
 import { defaultSiteContent } from "@/lib/site-content-defaults";
 import { getSiteContentForSite } from "@/lib/site-content";
+
+// Scroll pinning is verified in the browser; keep this content suite independent
+// of GSAP's asynchronous browser setup and jsdom teardown timing.
+vi.mock("@/components/hero-scroll-pin", () => ({
+  HeroScrollPin: ({ children }: { children: ReactNode }) => <div data-hero-scroll-pin>{children}</div>,
+}));
 
 vi.mock("@/lib/site-content", () => ({
   getSiteContentForSite: vi.fn(async () => (await import("@/lib/site-content-defaults")).defaultSiteContent),
@@ -79,6 +88,23 @@ vi.mock("@/lib/hero-clients", () => ({
     { clientName: "LinkedIn", logoUrl: "" },
   ],
 }));
+
+beforeEach(() => {
+  // jsdom has no matchMedia; render the existing motion components in their
+  // reduced-motion state while this suite checks content and interactions.
+  vi.stubGlobal("matchMedia", (query: string) => ({
+    matches: query.includes("prefers-reduced-motion: reduce"),
+    media: query,
+    onchange: null,
+    addListener: vi.fn(),
+    removeListener: vi.fn(),
+    addEventListener: vi.fn(),
+    removeEventListener: vi.fn(),
+    dispatchEvent: vi.fn(() => true),
+  }));
+});
+
+afterEach(() => vi.unstubAllGlobals());
 
 describe("home page", () => {
   test("preserves every results slot and section description", async () => {
@@ -170,16 +196,16 @@ describe("home page", () => {
       name: /Light up your growth with simple execution systems/i,
     });
     expect(heroHeading).toBeInTheDocument();
-    expect(heroHeading).toHaveClass("text-[1.9rem]", "sm:text-[3.5rem]", "lg:text-[3.7rem]");
+    expect(heroHeading).toHaveClass("text-[length:var(--text-heading)]", "leading-[var(--heading-leading)]");
     expect(heroHeading).not.toHaveClass("text-3xl", "text-4xl", "sm:text-5xl", "lg:text-6xl");
     expect(
       screen.getByText(
         "Lumivale helps early-stage teams find the channels that actually bring customers, then turns those channels into clear, repeatable growth actions.",
       ),
     ).toBeInTheDocument();
-    expect(screen.getByRole("heading", { name: "Growth you can measure." })).toBeInTheDocument();
-    expect(screen.getByText("Result 1 placeholder")).toBeInTheDocument();
-    expect(screen.getByText("Result 2 placeholder")).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: defaultSiteContent.resultsHeading })).toBeInTheDocument();
+    expect(screen.getByText(defaultSiteContent.resultsMetric1Label)).toBeInTheDocument();
+    expect(screen.getByText(defaultSiteContent.resultsMetric2Label)).toBeInTheDocument();
     expect(
       screen
         .getAllByRole("link", { name: "Book a call" })
@@ -354,7 +380,7 @@ describe("home page", () => {
 
     for (const study of getAllCaseStudies()) {
       expect(caseStudySection).toHaveTextContent(study.category);
-      expect(caseStudySection).toHaveTextContent(study.headline);
+      expect(caseStudySection).toHaveTextContent(study.clientName || study.title);
       for (const metric of study.metrics) {
         expect(caseStudySection).toHaveTextContent(metric.value);
         expect(caseStudySection).toHaveTextContent(metric.label);
@@ -561,6 +587,8 @@ describe("home page", () => {
     const [firstFaq] = faqItems;
 
     expect(faqItems).toHaveLength(5);
+    for (const faq of faqItems) expect(faq).toHaveAttribute("name", "homepage-faq");
+    expect(faqSection.querySelectorAll("details[open]")).toHaveLength(1);
     expect(faqSection.querySelectorAll("summary")).toHaveLength(faqItems.length);
     expect(faqSection.querySelector("article")).not.toBeInTheDocument();
     expect(screen.getByRole("heading", { level: 2, name: "FAQ" })).toBeInTheDocument();
@@ -631,4 +659,15 @@ describe("home page", () => {
     expect(faqSection).toHaveTextContent("Published question 5?");
     expect(faqSection).not.toHaveTextContent("Published question 6?");
   });
+});
+
+
+test("places published reels directly below Results and before case studies", async () => {
+  vi.mocked(getPublishedReelsForSite).mockResolvedValueOnce([{ id: "test-reel", title: "Campaign clip", clientName: "Client", platform: "YouTube", url: "https://youtube.com/shorts/example", thumbnailUrl: "https://res.cloudinary.com/demo/reel.jpg", views: "10K", likes: "", comments: "", status: "published", sortOrder: 0 }]);
+  const { container } = render(await Home());
+  const gallery = screen.getByRole("region", { name: "Campaign reels" });
+  const results = container.querySelector("#proof")!;
+  expect(results).toContainElement(gallery);
+  expect(results.querySelector("[data-scroll-landscape]")!.compareDocumentPosition(gallery) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  expect(gallery.compareDocumentPosition(container.querySelector("#case-studies")!) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
 });

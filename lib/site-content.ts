@@ -1,3 +1,4 @@
+import { parseFooterLinks } from "@/lib/footer-links";
 import type { Db } from "mongodb";
 import { getMongoDb } from "@/lib/mongodb";
 import { defaultSiteContent, type SiteContent } from "@/lib/site-content-defaults";
@@ -6,7 +7,7 @@ type SiteContentDocument = SiteContent & { _id: string; updatedAt: Date };
 
 export function parseSiteContent(input: Record<string, unknown>): SiteContent {
   const content = { ...defaultSiteContent };
-  for (const key of Object.keys(content) as (keyof SiteContent)[]) {
+  for (const key of Object.keys(content) as (keyof typeof defaultSiteContent)[]) {
     if (typeof input[key] !== "string") throw new Error(`Missing field: ${key}.`);
     content[key] = input[key].trim();
     if (content[key].length > (key === "heroDescription" ? 2000 : 500)) {
@@ -26,7 +27,7 @@ export function parseSiteContent(input: Record<string, unknown>): SiteContent {
   if (content.brandName.length > 80 || content.logoText.length > 3 || content.heroPrompt.length > 100 || content.heroButtonText.length > 80) {
     throw new Error("Use a brand name and button label under 80 characters, a letter mark under 4, and a prompt under 100.");
   }
-  for (const key of Object.keys(content) as (keyof SiteContent)[]) {
+  for (const key of Object.keys(content) as (keyof typeof defaultSiteContent)[]) {
     if (key.startsWith("about") && !key.startsWith("aboutFounder") && !content[key]) throw new Error(`Complete the ${key} field.`);
     if (key.startsWith("footer") && !content[key]) throw new Error(`Complete the ${key} field.`);
     if (key.startsWith("results")) {
@@ -38,14 +39,21 @@ export function parseSiteContent(input: Record<string, unknown>): SiteContent {
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(content.footerEmail)) {
     throw new Error("Enter a valid footer email address.");
   }
-  return content;
+  return {
+    ...content,
+    ...(input.footerNavigationLinks !== undefined ? { footerNavigationLinks: parseFooterLinks(input.footerNavigationLinks, "Footer navigation", true) } : {}),
+    ...(input.footerSocialLinks !== undefined ? { footerSocialLinks: parseFooterLinks(input.footerSocialLinks, "Social platforms", false) } : {}),
+  };
 }
 
 export async function getSiteContent(db: Db): Promise<SiteContent> {
   const document = await db.collection<SiteContentDocument>("siteContent").findOne({ _id: "main" });
-  return Object.fromEntries(Object.entries(defaultSiteContent).map(([key, fallback]) => [
+  const content = Object.fromEntries(Object.entries(defaultSiteContent).map(([key, fallback]) => [
     key, document?.[key as keyof SiteContent] ?? fallback,
   ])) as SiteContent;
+  if (document?.footerNavigationLinks !== undefined) content.footerNavigationLinks = parseFooterLinks(document.footerNavigationLinks, "Footer navigation", true);
+  if (document?.footerSocialLinks !== undefined) content.footerSocialLinks = parseFooterLinks(document.footerSocialLinks, "Social platforms", false);
+  return content;
 }
 
 export async function saveSiteContent(db: Db, input: SiteContent) {

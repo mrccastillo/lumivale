@@ -1,0 +1,468 @@
+[
+  {
+    "width": 1440,
+    "sectionSizes": [
+      {
+        "text": "Proven Across Start-Ups",
+        "size": "57px"
+      },
+      {
+        "text": "Measured Growth, Built with Lumivale",
+        "size": "57px"
+      },
+      {
+        "text": "How We Can Help",
+        "size": "57px"
+      },
+      {
+        "text": "Hear it from our clients",
+        "size": "57px"
+      },
+      {
+        "text": "FAQ",
+        "size": "57px"
+      },
+      {
+        "text": "Light up the next growth channel for your brand.",
+        "size": "57px"
+      }
+    ]
+  },
+  {
+    "width": 390,
+    "sectionSizes": [
+      {
+        "text": "Proven Across Start-Ups",
+        "size": "32px"
+      },
+      {
+        "text": "Measured Growth, Built with Lumivale",
+        "size": "32px"
+      },
+      {
+        "text": "How We Can Help",
+        "size": "32px"
+      },
+      {
+        "text": "Hear it from our clients",
+        "size": "32px"
+      },
+      {
+        "text": "FAQ",
+        "size": "32px"
+      },
+      {
+        "text": "Light up the next growth channel for your brand.",
+        "size": "32px"
+      }
+    ]
+  },
+  {
+    "path": "/",
+    "headings": [
+      {
+        "text": "Light up your growth with simple executi",
+        "family": "Poppins, \"Segoe UI\", sans-serif"
+      },
+      {
+        "text": "Proven Across Start-Ups",
+        "family": "Poppins, \"Segoe UI\", sans-serif"
+      },
+      {
+        "text": "YouArt AI",
+        "family": "Poppins, \"Segoe UI\", sans-serif"
+      },
+      {
+        "text": "Eztrackr",
+        "family": "Poppins, \"Segoe UI\", sans-serif"
+      },
+      {
+        "text": "YouArt AI",
+        "family": "Poppins, \"Segoe UI\", sans-serif"
+      },
+      {
+        "text": "YouArt AI",
+        "family": "Poppins, \"Segoe UI\", sans-serif"
+      },
+      {
+        "text": "Measured Growth, Built with Lumivale",
+        "family": "Poppins, \"Segoe UI\", sans-serif"
+      },
+      {
+        "text": "Northstar (fictional sample)",
+        "family": "Poppins, \"Segoe UI\", sans-serif"
+      },
+      {
+        "text": "Comment Awareness Sprint",
+        "family": "Poppins, \"Segoe UI\", sans-serif"
+      },
+      {
+        "text": "Creator Content Launch",
+        "family": "Poppins, \"Segoe UI\", sans-serif"
+      },
+      {
+        "text": "Outbound Pipeline Setup",
+        "family": "Poppins, \"Segoe UI\", sans-serif"
+      },
+      {
+        "text": "How We Can Help",
+        "family": "Poppins, \"Segoe UI\", sans-serif"
+      },
+      {
+        "text": "Comment Campaign",
+        "family": "Poppins, \"Segoe UI\", sans-serif"
+      },
+      {
+        "text": "UGC Content Creation",
+        "family": "Poppins, \"Segoe UI\", sans-serif"
+      },
+      {
+        "text": "Creator Collabs",
+        "family": "Poppins, \"Segoe UI\", sans-serif"
+      },
+      {
+        "text": "LinkedIn Outreaching",
+        "family": "Poppins, \"Segoe UI\", sans-serif"
+      },
+      {
+        "text": "Email B2B Campaigns",
+        "family": "Poppins, \"Segoe UI\", sans-serif"
+      },
+      {
+        "text": "Hear it from our clients",
+        "family": "Poppins, \"Segoe UI\", sans-serif"
+      },
+      {
+        "text": "FAQ",
+        "family": "Poppins, \"Segoe UI\", sans-serif"
+      },
+      {
+        "text": "Light up the next growth channel for you",
+        "family": "Poppins, \"Segoe UI\", sans-serif"
+      },
+      {
+        "text": "Lumivale",
+        "family": "Poppins, \"Segoe UI\", sans-serif"
+      }
+    ],
+    "body": "Inter, \"Segoe UI\", sans-serif",
+    "fonts": [
+      "Inter",
+      "Poppins",
+      "Poppins"
+    ]
+  },
+  {
+    "path": "/about",
+    "headings": [
+      {
+        "text": "We don't know what we're doing",
+        "family": "Poppins, \"Segoe UI\", sans-serif"
+      },
+      {
+        "text": "Meet the founders.",
+        "family": "Poppins, \"Segoe UI\", sans-serif"
+      },
+      {
+        "text": "Kenny Brosnan Muliamin",
+        "family": "Poppins, \"Segoe UI\", sans-serif"
+      },
+      {
+        "text": "Diana Iahhel Guingab",
+        "family": "Poppins, \"Segoe UI\", sans-serif"
+      },
+      {
+        "text": "Tyrone Matthew Wong",
+        "family": "Poppins, \"Segoe UI\", sans-serif"
+      },
+      {
+        "text": "Close to your team. Focused on the work.",
+        "family": "Poppins, \"Segoe UI\", sans-serif"
+      },
+      {
+        "text": "Light up the next growth channel for you",
+        "family": "Poppins, \"Segoe UI\", sans-serif"
+      },
+      {
+        "text": "Lumivale",
+        "family": "Poppins, \"Segoe UI\", sans-serif"
+      }
+    ],
+    "body": "Inter, \"Segoe UI\", sans-serif",
+    "fonts": [
+      "Inter",
+      "Poppins"
+    ]
+  },
+  {
+    "path": "/blogs",
+    "headings": [
+      {
+        "text": "Blogs.",
+        "family": "Poppins, \"Segoe UI\", sans-serif"
+      },
+      {
+        "text": "Practical industry insights to accelerat",
+        "family": "Poppins, \"Segoe UI\", sans-serif"
+      },
+      {
+        "text": "An Exciting Approach to Reddit Acquisiti",
+        "family": "Poppins, \"Segoe UI\", sans-serif"
+      },
+      {
+        "text": "Keep outreach consistent without making ",
+        "family": "Poppins, \"Segoe UI\", sans-serif"
+      },
+      {
+        "text": "Build a UGC publishing rhythm your team ",
+        "family": "Poppins, \"Segoe UI\", sans-serif"
+      },
+      {
+        "text": "How to build a useful comment campaign",
+        "family": "Poppins, \"Segoe UI\", sans-serif"
+      },
+      {
+        "text": "Light up the next growth channel for you",
+        "family": "Poppins, \"Segoe UI\", sans-serif"
+      },
+      {
+        "text": "Lumivale",
+        "family": "Poppins, \"Segoe UI\", sans-serif"
+      }
+    ],
+    "body": "Inter, \"Segoe UI\", sans-serif",
+    "fonts": [
+      "Inter",
+      "Poppins"
+    ]
+  },
+  {
+    "path": "/case-studies",
+    "headings": [
+      {
+        "text": "Light up your growth with simple executi",
+        "family": "Poppins, \"Segoe UI\", sans-serif"
+      },
+      {
+        "text": "Proven Across Start-Ups",
+        "family": "Poppins, \"Segoe UI\", sans-serif"
+      },
+      {
+        "text": "YouArt AI",
+        "family": "Poppins, \"Segoe UI\", sans-serif"
+      },
+      {
+        "text": "Eztrackr",
+        "family": "Poppins, \"Segoe UI\", sans-serif"
+      },
+      {
+        "text": "YouArt AI",
+        "family": "Poppins, \"Segoe UI\", sans-serif"
+      },
+      {
+        "text": "YouArt AI",
+        "family": "Poppins, \"Segoe UI\", sans-serif"
+      },
+      {
+        "text": "Measured Growth, Built with Lumivale",
+        "family": "Poppins, \"Segoe UI\", sans-serif"
+      },
+      {
+        "text": "Northstar (fictional sample)",
+        "family": "Poppins, \"Segoe UI\", sans-serif"
+      },
+      {
+        "text": "Comment Awareness Sprint",
+        "family": "Poppins, \"Segoe UI\", sans-serif"
+      },
+      {
+        "text": "Creator Content Launch",
+        "family": "Poppins, \"Segoe UI\", sans-serif"
+      },
+      {
+        "text": "Outbound Pipeline Setup",
+        "family": "Poppins, \"Segoe UI\", sans-serif"
+      },
+      {
+        "text": "How We Can Help",
+        "family": "Poppins, \"Segoe UI\", sans-serif"
+      },
+      {
+        "text": "Comment Campaign",
+        "family": "Poppins, \"Segoe UI\", sans-serif"
+      },
+      {
+        "text": "UGC Content Creation",
+        "family": "Poppins, \"Segoe UI\", sans-serif"
+      },
+      {
+        "text": "Creator Collabs",
+        "family": "Poppins, \"Segoe UI\", sans-serif"
+      },
+      {
+        "text": "LinkedIn Outreaching",
+        "family": "Poppins, \"Segoe UI\", sans-serif"
+      },
+      {
+        "text": "Email B2B Campaigns",
+        "family": "Poppins, \"Segoe UI\", sans-serif"
+      },
+      {
+        "text": "Hear it from our clients",
+        "family": "Poppins, \"Segoe UI\", sans-serif"
+      },
+      {
+        "text": "FAQ",
+        "family": "Poppins, \"Segoe UI\", sans-serif"
+      },
+      {
+        "text": "Light up the next growth channel for you",
+        "family": "Poppins, \"Segoe UI\", sans-serif"
+      },
+      {
+        "text": "Lumivale",
+        "family": "Poppins, \"Segoe UI\", sans-serif"
+      }
+    ],
+    "body": "Inter, \"Segoe UI\", sans-serif",
+    "fonts": [
+      "Inter",
+      "Poppins",
+      "Poppins"
+    ]
+  },
+  {
+    "path": "/services/comment-campaign",
+    "headings": [
+      {
+        "text": "Comment Campaign",
+        "family": "Poppins, \"Segoe UI\", sans-serif"
+      },
+      {
+        "text": "Your questions,answered.",
+        "family": "Poppins, \"Segoe UI\", sans-serif"
+      },
+      {
+        "text": "Light up the next growth channel for you",
+        "family": "Poppins, \"Segoe UI\", sans-serif"
+      },
+      {
+        "text": "Lumivale",
+        "family": "Poppins, \"Segoe UI\", sans-serif"
+      }
+    ],
+    "body": "Inter, \"Segoe UI\", sans-serif",
+    "fonts": [
+      "Inter",
+      "Poppins"
+    ]
+  },
+  {
+    "path": "/pricing",
+    "headings": [
+      {
+        "text": "Pricing.",
+        "family": "Poppins, \"Segoe UI\", sans-serif"
+      },
+      {
+        "text": "Monthly services",
+        "family": "Poppins, \"Segoe UI\", sans-serif"
+      },
+      {
+        "text": "Comment Campaign",
+        "family": "Poppins, \"Segoe UI\", sans-serif"
+      },
+      {
+        "text": "UGC Content Creation",
+        "family": "Poppins, \"Segoe UI\", sans-serif"
+      },
+      {
+        "text": "Creator Collabs",
+        "family": "Poppins, \"Segoe UI\", sans-serif"
+      },
+      {
+        "text": "LinkedIn Outreaching",
+        "family": "Poppins, \"Segoe UI\", sans-serif"
+      },
+      {
+        "text": "Email B2B Campaigns",
+        "family": "Poppins, \"Segoe UI\", sans-serif"
+      },
+      {
+        "text": "Light up the next growth channel for you",
+        "family": "Poppins, \"Segoe UI\", sans-serif"
+      },
+      {
+        "text": "Lumivale",
+        "family": "Poppins, \"Segoe UI\", sans-serif"
+      }
+    ],
+    "body": "Inter, \"Segoe UI\", sans-serif",
+    "fonts": [
+      "Inter",
+      "Poppins"
+    ]
+  },
+  {
+    "path": "/pricing/comment-campaign",
+    "headings": [
+      {
+        "text": "Comment Campaign",
+        "family": "Poppins, \"Segoe UI\", sans-serif"
+      },
+      {
+        "text": "The work in action.",
+        "family": "Poppins, \"Segoe UI\", sans-serif"
+      },
+      {
+        "text": "US Target Audience",
+        "family": "Poppins, \"Segoe UI\", sans-serif"
+      },
+      {
+        "text": "Light up the next growth channel for you",
+        "family": "Poppins, \"Segoe UI\", sans-serif"
+      },
+      {
+        "text": "Lumivale",
+        "family": "Poppins, \"Segoe UI\", sans-serif"
+      }
+    ],
+    "body": "Inter, \"Segoe UI\", sans-serif",
+    "fonts": [
+      "Inter",
+      "Poppins"
+    ]
+  },
+  {
+    "path": "/admin/reels?new=1",
+    "headings": [
+      {
+        "text": "Reels",
+        "family": "Poppins, \"Segoe UI\", sans-serif"
+      },
+      {
+        "text": "Add reel",
+        "family": "Poppins, \"Segoe UI\", sans-serif"
+      }
+    ],
+    "body": "Inter, \"Segoe UI\", sans-serif",
+    "fonts": [
+      "Inter",
+      "Poppins"
+    ]
+  },
+  {
+    "path": "/admin/login",
+    "headings": [
+      {
+        "text": "Admin Login",
+        "family": "Poppins, \"Segoe UI\", sans-serif"
+      }
+    ],
+    "body": "Inter, \"Segoe UI\", sans-serif",
+    "fonts": [
+      "Inter",
+      "Poppins"
+    ]
+  }
+]

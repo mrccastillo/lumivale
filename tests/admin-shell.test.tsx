@@ -68,6 +68,7 @@ describe("admin shell", () => {
       "/admin/blogs",
     );
     expect(blogsLink.querySelector("svg")).not.toBeNull();
+    expect(screen.getByRole("link", { name: "Reels" })).toHaveAttribute("href", "/admin/reels");
     expect(screen.getByRole("link", { name: "Testimonials" })).toHaveAttribute(
       "href",
       "/admin/testimonials",
@@ -135,7 +136,7 @@ describe("admin shell", () => {
     expect(shell).toHaveClass("md:pl-[17.5rem]");
     expect(screen.getByText("Lumivale")).toBeInTheDocument();
     expect(screen.getByText("Admin Portal")).toBeInTheDocument();
-    expect(screen.getAllByRole("link")).toHaveLength(10);
+    expect(screen.getAllByRole("link")).toHaveLength(11);
 
     fireEvent.click(screen.getByRole("button", { name: "Collapse navigation" }));
 
@@ -146,7 +147,7 @@ describe("admin shell", () => {
     expect(shell).toHaveClass("md:pl-[5.5rem]");
     expect(screen.queryByText("Lumivale")).not.toBeInTheDocument();
     expect(screen.queryByText("Admin Portal")).not.toBeInTheDocument();
-    expect(screen.getAllByRole("link")).toHaveLength(9);
+    expect(screen.getAllByRole("link")).toHaveLength(10);
   });
 
   test("marks the active section and closes the mobile menu with Escape", () => {

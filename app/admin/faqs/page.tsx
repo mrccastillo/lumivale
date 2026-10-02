@@ -64,11 +64,6 @@ export default async function AdminFaqsPage({ searchParams }: AdminFaqsPageProps
               Content Management
             </p>
             <h1 className="mt-4 text-4xl font-semibold leading-tight text-white">FAQs</h1>
-            <p className="mt-4 text-base leading-8 text-white/74">
-              Manage public questions and answers with clearer publishing controls,
-              search, and a faster create flow for the homepage FAQ section.
-              The homepage displays up to five published FAQs.
-            </p>
           </div>
           <div className="flex flex-wrap gap-3">
             <Link

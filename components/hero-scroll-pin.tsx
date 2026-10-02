@@ -10,24 +10,21 @@ export function HeroScrollPin({ children }: { children: ReactNode }) {
     let revert: (() => void) | undefined;
 
     let ready = false;
-    let scrollToSection: ((target: HTMLElement, immediate: boolean) => void) | undefined;
-    const navigateToHash = (immediate = false) => {
+    const navigateToHash = () => {
       if (!ready || disposed) return;
       const target = document.getElementById(window.location.hash.slice(1));
       if (!target) return;
-      if (scrollToSection) scrollToSection(target, immediate);
-      else if (target.id === "hero") window.scrollTo({ top: 0, behavior: immediate ? "instant" : "smooth" });
-      else target.scrollIntoView({ behavior: immediate ? "instant" : "smooth", block: "start" });
+      if (target.id === "hero") window.scrollTo({ top: 0, behavior: "instant" });
+      else target.scrollIntoView({ behavior: "instant", block: "start" });
     };
-    const onNavigate = () => navigateToHash(window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+    const onNavigate = () => navigateToHash();
     window.addEventListener("homepage:navigate", onNavigate);
     window.addEventListener("hashchange", onNavigate);
 
     async function setup() {
-      const [{ gsap }, { ScrollTrigger }, { default: Lenis }] = await Promise.all([
+      const [{ gsap }, { ScrollTrigger }] = await Promise.all([
         import("gsap"),
         import("gsap/ScrollTrigger"),
-        import("lenis"),
       ]);
       if (disposed || !hero.current) return;
       gsap.registerPlugin(ScrollTrigger);
@@ -37,20 +34,6 @@ export function HeroScrollPin({ children }: { children: ReactNode }) {
       if (!nextSection) return;
 
       media.add("(prefers-reduced-motion: no-preference)", () => {
-        const smoothScroll = new Lenis({
-          lerp: .1,
-          smoothWheel: true,
-          syncTouch: false,
-          anchors: false,
-          allowNestedScroll: true,
-          autoToggle: true,
-        });
-        scrollToSection = (target, immediate) => {
-          smoothScroll.scrollTo(target.id === "hero" ? 0 : target, { immediate, force: true });
-        };
-        const tick = (seconds: number) => smoothScroll.raf(seconds * 1000);
-        smoothScroll.on("scroll", ScrollTrigger.update);
-        gsap.ticker.add(tick);
         const heroContent = element.querySelector("#hero");
         const timeline = gsap.timeline({ scrollTrigger: {
           id: "homepage-hero-cover",
@@ -106,20 +89,14 @@ export function HeroScrollPin({ children }: { children: ReactNode }) {
             },
           });
         });
-        return () => {
-          gsap.ticker.remove(tick);
-          smoothScroll.off("scroll", ScrollTrigger.update);
-          smoothScroll.destroy();
-          scrollToSection = undefined;
-        };
       });
       revert = () => media.revert();
-      // Resolve route anchors only after fonts, pinning, and smooth scrolling are ready.
+      // Resolve route anchors only after fonts and pinning are ready.
       await document.fonts?.ready;
       if (disposed) return;
       ScrollTrigger.refresh();
       ready = true;
-      navigateToHash(true);
+      navigateToHash();
     }
 
     void setup();

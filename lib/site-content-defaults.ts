@@ -57,4 +57,8 @@ export const defaultSiteContent = {
   footerSiteLabel: "lumivale.net",
   footerBottomText: "Simple, affordable growth support for early-stage teams.",
 };
-export type SiteContent = typeof defaultSiteContent;
+export type FooterLink = { label: string; url: string };
+export type SiteContent = typeof defaultSiteContent & {
+  footerNavigationLinks?: FooterLink[];
+  footerSocialLinks?: FooterLink[];
+};
