@@ -5,7 +5,7 @@ Restore Lumivale's established public visual identity while retaining the newer 
 ## ADDED Requirements
 
 ### Requirement: Design-only change preserves current workings
-The change SHALL alter presentation only. Current application behavior SHALL be the baseline for every interaction and workflow, including navigation, links, FAQ state and grouping, carousels, pagination, scrolling, animation triggers, media controls, CMS editing, publication, fallback handling, APIs, persistence, authentication, and trusted access. The historical commit SHALL supply visual reference only. No functionality or link SHALL be added, removed, or reverted to historical behavior to achieve a visual match.
+The change SHALL alter presentation only. Current application behavior SHALL be the baseline for every interaction and workflow, including navigation, links, FAQ state and grouping, carousels, pagination, scrolling, animation triggers, media controls, CMS editing, publication, fallback handling, APIs, persistence, authentication, and trusted access. The historical commit SHALL supply visual reference only. No functionality or link SHALL be added, removed, or reverted to historical behavior to achieve a visual match, except the subsequently requested homepage Case Studies grid explicitly replaces slide navigation and adds a collection link.
 
 #### Scenario: Compare the same user journey before and after
 - **WHEN** a visitor or administrator performs the same actions with the same data and access state before and after the restyling
@@ -13,7 +13,7 @@ The change SHALL alter presentation only. Current application behavior SHALL be 
 - **AND** only layout, typography, colors, surfaces, and visual decoration differ
 
 ### Requirement: Historical visual reference and scope
-The shared public navigation and footers, homepage Services, Testimonials, and FAQs, and individual public service pages SHALL use the presentation at commit `e9cad74a7b0b46a588752beb9362d4b8a038587f` as their design reference. In-scope surfaces SHALL use Poppins, emerald `#14c983`, soft emerald `#7ee6b7`, ink `#031410`, deep green `#010807`, white, and cool neutral backgrounds and dividers from that reference. Results and Case Studies SHALL retain the supplied screenshot compositions with this theme. The homepage hero, other route bodies excluding the pricing listing, Blogs listing, and About Us, and admin interface SHALL retain their current presentation and behavior. Homepage section order and anchors SHALL remain intact.
+The shared public navigation and footers, homepage Services, Testimonials, and FAQs, and individual public service pages SHALL use the presentation at commit `e9cad74a7b0b46a588752beb9362d4b8a038587f` as their design reference. In-scope surfaces SHALL use Poppins, emerald `#14c983`, soft emerald `#7ee6b7`, ink `#031410`, deep green `#010807`, white, and cool neutral backgrounds and dividers from that reference. Results SHALL retain its supplied screenshot composition; Case Studies SHALL use the latest requested client-card reference with this theme. The homepage hero, other route bodies excluding the pricing listing, Blogs listing, and About Us, and admin interface SHALL retain their current presentation and behavior. Homepage section order and anchors SHALL remain intact.
 
 #### Scenario: Review the restored homepage
 - **WHEN** the homepage is compared with the historical reference at the same viewport and equivalent content
@@ -89,19 +89,20 @@ Results SHALL retain Image #1's centered eyebrow and heading above one rounded m
 - **AND** all values and labels are readable, including long and nonnumeric values
 - **AND** screenshot figures are not hard-coded over saved content
 
-### Requirement: Retained featured Case Studies carousel
-Case Studies SHALL retain Image #2's left-aligned section introduction, large split feature with cover image on the left and story information on the right, category, headline, full summary, metrics, full-story link, and centered previous/position/next controls. The section SHALL use Poppins, historical ink and muted text, white/cool neutral surfaces, and emerald accents in place of chalk, sage, and daylight colors. On mobile, image and copy SHALL stack and metrics SHALL wrap. The carousel SHALL preserve all published slides, ordering, keyboard navigation, touch/scroll behavior, and links to current full stories.
+### Requirement: Reference-inspired Case Studies grid
+The homepage Case Studies section SHALL display a centered introduction and a responsive collection of white client cards on a cool-neutral framed surface. It SHALL use current Poppins, ink, emerald, and muted colors. Each compact card SHALL show the saved client name or story title, an industry/timeframe subtitle when available, category, all metrics, and its existing full-story destination. Full headlines and summaries SHALL remain on the linked detail pages. The complete card SHALL be a keyboard-accessible link. Safe saved logos SHALL be preferred, with a safe cover or initials fallback. The browser-style collection frame SHALL use three desktop columns, two tablet columns and one mobile column, with compact cards matching the latest supplied reference. The existing section entrance and restrained hover treatments SHALL respect reduced motion.
 
-#### Scenario: Browse published stories
-- **WHEN** a visitor changes carousel slides
-- **THEN** the selected story and position indicator update while its complete content and detail link remain available in the retained split composition
-- **AND** the displayed cover and metrics belong to that published story rather than the example shown in the screenshot
+#### Scenario: Review published stories together
+- **WHEN** a visitor reaches the homepage Case Studies section
+- **THEN** all published stories appear in saved order without carousel pagination
+- **AND** each full-story link retains its current destination
+- **AND** a collection link opens `/case-studies`
 
-#### Scenario: Empty and incomplete case studies
+#### Scenario: Missing or unsafe media and empty collections
+- **WHEN** a story has no safe usable logo or cover
+- **THEN** its initials appear without rendering unsafe image URLs
 - **WHEN** there are no published stories
-- **THEN** the homepage omits the section as it currently does
-- **WHEN** a story lacks a safe usable cover, or only one story exists
-- **THEN** the existing safe media fallback is shown and single-story navigation remains disabled
+- **THEN** the homepage omits the section as before
 
 ### Requirement: Content and functional compatibility
 Restoration SHALL preserve current CMS values, complete visible content, media associations, publication rules, data-failure fallbacks, link inventory and destinations, interaction behavior, and authorization boundaries without functional exceptions. It SHALL NOT restore historical hard-coded content, overwrite stored records, expose unpublished or private content, or change admin and trusted-client access.
@@ -136,3 +137,19 @@ The pricing listing SHALL restore the compact introduction, rounded white rate t
 - **THEN** the requested historical styling appears while all current content and destinations remain available
 - **AND** Blogs retains its feature and carousel, and About retains its founder portraits and section structure
 - **AND** an unauthorized pricing request still returns not-found
+
+### Requirement: Unified heading and body typography
+Public and admin surfaces SHALL use Poppins for headings and Inter for body text, navigation, labels and controls. Shared font tokens SHALL replace Manrope and DM Sans overrides. Headings SHALL follow the Results reference with semibold weight and tight tracking, while retaining responsive size hierarchy. Large Results metrics SHALL retain the reference Poppins display; technical code and source editors MAY retain monospace.
+
+#### Scenario: Typography across routes
+- **WHEN** visitors navigate public routes or administrators open their workspace
+- **THEN** headings use Poppins and ordinary text uses Inter consistently
+- **AND** current content and controls remain usable without horizontal document overflow
+
+### Requirement: Consistent type size hierarchy
+Main public page and section headings SHALL use the Results reference scale of 57px at wide desktop widths, fluidly reducing to 32px on mobile. Supporting headings and card titles SHALL use shared 26-36px and 20-22px scales respectively. Body, small text and captions SHALL use shared 16-18px, 16px and 12px tokens. Route-specific mobile rules SHALL NOT shrink equivalent main headings differently.
+
+#### Scenario: Compare homepage section headings
+- **WHEN** Results, Case Studies, Services, Testimonials, FAQ and the closing CTA are compared at the same viewport
+- **THEN** all six headings have the same computed font size and primary line height
+- **AND** public and admin text reflows without document overflow

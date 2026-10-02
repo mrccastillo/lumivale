@@ -30,3 +30,15 @@
 - [x] 5.1 Restore the pricing listing table presentation from `e9cad74`, preserving service data, destinations, and trusted access.
 - [x] 5.2 Retheme Blogs and About Us to the historical palette and Poppins while retaining current layouts and interactions; isolate unrelated route bodies.
 - [x] 5.3 Verify content and destination parity, responsive widths, relevant behavior suites, lint and production build; record evidence.
+
+## 6. Latest client-card reference
+
+- [x] 6.1 Replace the homepage split carousel with a centered introduction and responsive client-card collection in the existing classic theme; preserve published content, safe media and story destinations.
+- [x] 6.2 Verify grid rendering, logo safety/fallback, complete metrics, mobile reflow, keyboard links, reduced motion, focused tests, lint and production build.
+
+## 7. Uniform typography
+
+- [x] 7.1 Apply shared Poppins heading/Inter body typography across public and admin surfaces, using Results as the heading reference.
+- [x] 7.2 Verify computed fonts and responsive wrapping on representative routes and complete the production build.
+
+- [x] 7.3 Standardize type sizes across public/admin routes and verify that all six homepage section headings match Results at desktop and mobile widths.

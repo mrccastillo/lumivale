@@ -33,3 +33,13 @@ None. `openspec list --specs` reports no main specs. The completed but unarchive
 - Code: `app/page.tsx`, `app/services/[slug]/page.tsx`; navbar, footer, homepage, carousel, testimonial, and shell components and their scoped styles. `components/service-detail.module.css` is shared with pricing, so public-service styling must be isolated. Global CSS is a token reference; unrelated route typography must not change.
 - Verification: existing homepage, navigation, footer, site-content, case-study carousel, testimonial-media, and admin-shell tests; visual comparison at mobile, tablet, and desktop sizes.
 - No MongoDB migration, API change, new dependency, Cloudinary upload, email change, or authorization change. Reuse `public/results-landscape.jpg` and current published cover media.
+
+## Latest user revision
+
+The new client-card reference supersedes the initial requirement to preserve the homepage split Case Studies carousel. Replace only that presentation with a centered introduction and responsive client-card grid in the current classic theme, retaining all published content and detail links. Add a link to the existing case-studies collection.
+
+The clearer follow-up reference requests compact identity/category/metric cards in a three-column browser-style frame. Full story headlines and summaries remain on existing detail pages, and each card links there. This supersedes the expanded preview-card layout.
+
+## Latest typography standard
+
+The user requests uniform typography across public pages and the admin workspace. The Results screenshot establishes Poppins semibold (600) and tight heading tracking as the heading standard; Inter is the body/UI font. Central `--font-heading` and `--font-body` tokens replace route-specific Poppins body, Manrope and DM Sans declarations. Preserve the large Results metric display in Poppins and technical code/source blocks in monospace. Existing responsive type sizes and functionality remain intact. This supersedes earlier Poppins-for-all-text requirements.

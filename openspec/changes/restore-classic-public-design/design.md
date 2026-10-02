@@ -84,3 +84,19 @@ No persistence migration or data backfill is needed. Implement as a presentation
 The user extends the scope to three additional route bodies. Restore `/pricing` with the historical compact introduction and rounded white bordered rate table, muted copy, right-aligned desktop rates, and bordered View more controls below service summaries. Preserve its current trusted-access check and published-service data. Keep pricing detail styles isolated.
 
 Retain all `/blogs` composition, featured media, carousel, copy and fallback behavior; apply a route-specific classic theme in the shared listing module so case-study listing styles stay unchanged. Retheme only colors and fonts in the About stylesheet, preserving founder grid, portraits, grayscale hover, CMS fields, and approach link. The visual direction is cool neutral and white surfaces, Poppins, ink text and emerald accents. No new motion or content is introduced; existing image hover, carousel transitions, and founder hover remain.
+
+## Latest revision: reference-inspired case-study grid
+
+The user now explicitly replaces the retained homepage split carousel with a client-card collection inspired by their new reference, keeping the current classic palette. This supersedes the earlier carousel-preservation requirement for this homepage section only. The centered introduction sits over a softly bordered cool-neutral collection with white cards, saved client identities/logos (safe cover or initials fallback), categories, complete headlines/summaries, all metrics and existing full-story destinations. Up to four stories use two desktop columns; larger collections use three, then two on tablet and one on mobile. Every published story is visible without pagination. A collection link leads to the existing case-studies listing. Existing entrance motion, restrained card lift and arrow hover respect reduced motion. No CMS schema, data, access, detail-page or other carousel behavior changes.
+
+### Refined compact reference
+
+The clearer reference at https://dianaguingab.vercel.app/ supersedes the expanded story-card treatment: use a 1040px browser-style frame with three neutral window dots and a muted collection label, three desktop columns, compact 36px identities, small category pills and ruled metric rows. Cards are full-area links. Headlines and summaries remain on the existing detail pages rather than inside these compact cards. Every saved metric is retained, including additional rows. Do not invent client records to fill the reference layout. Tablet uses two columns and mobile one.
+
+## Latest typography standard
+
+The user requests uniform typography across public pages and the admin workspace. The Results screenshot establishes Poppins semibold (600) and tight heading tracking as the heading standard; Inter is the body/UI font. Central `--font-heading` and `--font-body` tokens replace route-specific Poppins body, Manrope and DM Sans declarations. Preserve the large Results metric display in Poppins and technical code/source blocks in monospace. Existing responsive type sizes and functionality remain intact. This supersedes earlier Poppins-for-all-text requirements.
+
+### Uniform type sizes
+
+The user additionally requires consistent font sizes, using the Results heading as the reference. Shared tokens now define main page/section headings as `clamp(32px, 4vw, 57px)` with 1.13 leading; supporting headings use 26-36px, card titles 20-22px, body 16-18px, small text 16px and captions 12px. All six main homepage headings share the same scale, including Services, Testimonials, Case Studies, FAQ and closing CTA. Route-specific heading size overrides and conflicting mobile sizes use these tokens. Numeric metrics, icons and technical editor content retain role-specific sizing.

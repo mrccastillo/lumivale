@@ -56,3 +56,30 @@ The user subsequently extended the design-only scope to these three route bodies
 - Full suite: 340 passed, same four pre-existing failures documented above; no new failures.
 - Full lint: same pre-existing case-study-carousel test anchor error. Changed TSX files pass targeted ESLint.
 - Production build and OpenSpec strict validation passed. No data modules, authentication, API handlers or interaction logic changed.
+
+
+## Latest revision: client-card Case Studies grid
+
+The user requested a premium client-card composition inspired by a new reference. This explicitly replaces the previous homepage split carousel; earlier carousel-preservation notes describe the prior design.
+
+- Centered the current introduction over a softly framed collection with white cards, emerald labels, saved logos or safe thumbnail/initials fallbacks, complete story content, all metrics and original story links. Added the existing collection destination. Current four-story content uses two desktop columns; larger collections use three, tablet two, and mobile one.
+- Kept the CMS, publishing, ordering, data and access implementation unchanged. Other routes and carousels remain untouched.
+- Focused homepage/content suites: 25 tests passed, including logo preference, unsafe media rejection, complete metric inventory and collection destination. Changed TSX files pass ESLint. Production build and strict OpenSpec validation pass.
+- Browser captures at 360, 390, 768 and 1440px show all four current published stories with no document overflow; see `verification/client-grid-*.png`. Keyboard focus and Enter navigation to a story pass, hover lift works with normal motion and is disabled under reduced motion.
+
+### Compact reference refinement
+
+Inspected the linked portfolio in a browser and matched the supplied client-grid reference more closely: three desktop columns, browser dots and label, small identity marks, category pills, compact metrics and a full-card story link. Longer headlines/summaries remain on detail pages; no stored data changed. The four current published records are used without fabricated filler clients. Updated homepage tests verify identity, safe media, all metrics and original links (25 passing). Changed TSX lint passes. Refreshed `client-grid-*.png` at 360/390/768/1440 show no horizontal overflow.
+
+## Unified typography revision
+
+Centralized Poppins heading and Inter body/UI tokens, removed Manrope/DM Sans imports and scoped overrides, and aligned heading weight/tracking to the Results reference. Kept Poppins for large Results figures and monospace for technical code. Production build passed. Browser computed-style checks confirm Poppins headings and Inter body across homepage, About, Blogs, Case Studies listing, public service, trusted Pricing listing/detail, Reels admin, and admin login. All nine routes fit 1440px and 390px without document overflow. See `verification/typography-checks.json` and `typography-results-*.png`. This change is CSS-only and does not modify application behavior.
+
+### Type-size consistency
+
+Applied shared main heading, subheading, card title, body, small-text and caption sizes. Production build passed. Browser assertions compare all six homepage section headings and confirm identical 57px sizes at 1440px and 32px at 390px, with Poppins/Inter retained. Nine representative public/private/admin routes fit both widths without document overflow. Evidence: `verification/heading-scale-checks.json` and `heading-scale-results-*.png`.
+
+### Supporting text readability
+
+Increased subheadings to 26-36px, card titles to 20-22px, body/intro paragraphs to 16-18px, and small text to 16px. Main headings remain on the verified 32-57px scale, and captions remain 12px. The increase uses shared tokens to keep public and admin typography aligned. Production build passed.
+After the supporting-text increase, nine public/private/admin routes passed desktop/mobile overflow checks; all six homepage main headings remain exactly 57px at 1440px and 32px at 390px.
