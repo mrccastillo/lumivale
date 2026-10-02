@@ -1,0 +1,6 @@
+.controls { display: flex; align-items: center; justify-content: flex-end; gap: 12px; flex-shrink: 0; }
+.controls span { min-width: 38px; text-align: center; color: #68708a; font-size: 12px; font-variant-numeric: tabular-nums; }
+.controls button { display: grid; place-items: center; width: 40px; height: 40px; border: 1px solid #dce3e1; border-radius: 50%; background: #fff; color: #031410; cursor: pointer; transition: background .2s, border-color .2s; }
+.controls button:hover { background: #eef8f3; border-color: #087a50; }
+.controls button:focus-visible { outline: 2px solid #087a50; outline-offset: 3px; }
+@media(prefers-reduced-motion: reduce) { .controls button { transition: none; } }

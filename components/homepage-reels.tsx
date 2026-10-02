@@ -1,10 +1,17 @@
+"use client";
+
+import { useState } from "react";
 import type { Reel } from "@/lib/reels";
+import { GalleryPagination } from "./gallery-pagination";
 import styles from "./homepage-reels.module.css";
 export function HomepageReels({ reels }: { reels: Reel[] }) {
+  const [selectedPage, setPage] = useState(0);
+  const pages = Math.ceil(reels.length / 4);
+  const page = Math.min(selectedPage, Math.max(0, pages - 1));
   if (!reels.length) return null;
   return <section className={styles.gallery} aria-label="Campaign reels">
-    <div className={styles.grid}>
-      {reels.map(reel => <article key={reel.id} className={styles.card}>
+    <div className={styles.grid} key={page}>
+      {reels.slice(page * 4, (page + 1) * 4).map(reel => <article key={reel.id} className={styles.card}>
         <a className={styles.preview} href={reel.url} target="_blank" rel="noopener noreferrer" aria-label={`Watch ${reel.title} on ${reel.platform} (opens in a new tab)`}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={reel.thumbnailUrl} alt={reel.title} width={360} height={640} loading="lazy" />
@@ -19,5 +26,6 @@ export function HomepageReels({ reels }: { reels: Reel[] }) {
         </div>
       </article>)}
     </div>
+    {pages > 1 && <div className={styles.pagination}><GalleryPagination label="reels" page={page} pages={pages} onChange={setPage} /></div>}
   </section>;
 }

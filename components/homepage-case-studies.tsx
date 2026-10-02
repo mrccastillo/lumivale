@@ -1,9 +1,16 @@
+"use client";
+
+import { useState } from "react";
 import Link from "next/link";
+import { GalleryPagination } from "./gallery-pagination";
 import type { CaseStudy } from "@/lib/case-studies";
 import { safeImageUrl } from "@/lib/case-study-story";
 import styles from "./homepage-case-studies.module.css";
 
 export function HomepageCaseStudies({ caseStudies }: { caseStudies: CaseStudy[] }) {
+  const [selectedPage, setPage] = useState(0);
+  const pages = Math.ceil(caseStudies.length / 6);
+  const page = Math.min(selectedPage, Math.max(0, pages - 1));
   if (!caseStudies.length) return null;
 
   return (
@@ -13,8 +20,8 @@ export function HomepageCaseStudies({ caseStudies }: { caseStudies: CaseStudy[] 
         <span className={styles.collectionLabel}>Selected case studies</span>
         <span className={styles.collectionCount}>{String(caseStudies.length).padStart(2, "0")} {caseStudies.length === 1 ? "story" : "stories"}</span>
       </div>
-      <div className={styles.grid}>
-        {caseStudies.map((study) => {
+      <div className={styles.grid} key={page}>
+        {caseStudies.slice(page * 6, (page + 1) * 6).map((study) => {
           const logo = study.logo && safeImageUrl(study.logo.url) ? study.logo : undefined;
           const media = logo ?? (study.cover && safeImageUrl(study.cover.url) ? study.cover : undefined);
           const identity = study.clientName || study.title;
@@ -51,6 +58,7 @@ export function HomepageCaseStudies({ caseStudies }: { caseStudies: CaseStudy[] 
       </div>
       <div className={styles.collectionFooter}>
         <span>Discover the strategy behind each result.</span>
+        <GalleryPagination label="case studies" page={page} pages={pages} onChange={setPage} />
       </div>
     </div>
   );
