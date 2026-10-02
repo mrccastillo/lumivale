@@ -275,20 +275,6 @@ export function CaseStudyStory({ study }: { study: StoryInput }) {
       <div className={`${styles.wrap} ${styles.body}`}>
         {storySections(study).map((section) => <Section key={section.id} section={section} />)}
       </div>
-      {study.cta && (
-        <section className={styles.cta} data-nav-surface="dark">
-          <div className={styles.wrap}>
-            <div><h2>{study.cta.heading}</h2>
-              {study.cta.text && <p>{study.cta.text}</p>}
-            </div>
-            {safeStoryUrl(study.cta.buttonUrl) && (
-              <a href={study.cta.buttonUrl} className={styles.button}>
-                {study.cta.buttonText}<span aria-hidden="true">&#8599;</span>
-              </a>
-            )}
-          </div>
-        </section>
-      )}
       <div className={`${styles.wrap} ${styles.endNav}`}>
         <span>Lumivale / Case studies</span>
         <Link href="/#case-studies" scroll={false}>Explore more stories <span aria-hidden="true">&#8599;</span></Link>

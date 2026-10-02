@@ -144,16 +144,13 @@ describe("case-study story contract", () => {
     expect(JSON.stringify(legacy)).toBe(before);
     expect(storySections({ ...adapted, sections: [] })).toEqual([]);
   });
-  test("renders full evidence without cropping and exposes comparison, quote, and CTA", () => {
+  test("renders full evidence, comparison, and quote without the removed CTA banner", () => {
     const { container } = render(<CaseStudyStory study={fullStory()} />);
     expect(screen.getAllByRole("heading", { level: 1 })).toHaveLength(1);
     expect(screen.getByText("Before content")).toBeInTheDocument();
     expect(screen.getByText("After content")).toBeInTheDocument();
     expect(screen.getByText("Client Name")).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "Contact us" })).toHaveAttribute(
-      "href",
-      "/contact",
-    );
+    expect(screen.queryByRole("link", { name: "Contact us" })).not.toBeInTheDocument();
     expect(
       screen.getAllByRole("link", {
         name: "View full image: Campaign evidence",
