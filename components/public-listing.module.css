@@ -1,4 +1,5 @@
 .page { background: #f4f5ed; color: #142d23; font-family: "DM Sans",sans-serif; }
+.classic { background: #fff; color: #031410; font-family: "Poppins","Segoe UI",sans-serif; }
 .page * { box-sizing: border-box; }
 .page :is(h1,h2,h3) { font-family: "Manrope",sans-serif; font-weight: 500; letter-spacing: -.05em; }
 .page :is(h1,h2,h3,p,a) { overflow-wrap: anywhere; }
@@ -66,3 +67,20 @@
 @media(max-width: 1000px) { .wrap { width: calc(100% - 64px); } .heroRow { gap: 40px; } .featured .postCopy { padding: 28px; } .rate { grid-template-columns: 28px minmax(0,1fr) minmax(180px,.7fr); gap: 18px; } .amount { font-size: 23px; } }
 @media(max-width: 700px) { .wrap { width: calc(100% - 40px); } .hero { padding: 110px 0 36px; } .heroRow { display: block; margin-top: 22px; } .hero h1 { font-size: 64px; } .heroRow > p { font-size: 14px; margin-top: 24px; } .journal, .pricing { padding-block: 36px 64px; } .sectionIntro { display: block; } .sectionIntro h2 { margin-top: 18px; } .posts { grid-template-columns: 1fr; gap: 40px; } .featured { display: flex; } .featured .postImage { aspect-ratio: 16/9; min-height: 0; } .featured .postArtwork { padding: 24px; } .featured h3 { font-size: 28px; } .featured .postCopy { padding: 26px; } .postArtwork strong { font-size: 34px; } .rateHeader > span { display: none; } .rate { grid-template-columns: 22px minmax(0,1fr); padding-block: 30px; gap: 18px; } .price { grid-column: 2; text-align: left; margin-top: 8px; } .serviceCopy h2 { font-size: 25px; } .pricingNote { padding-left: 40px; } }
 @media(prefers-reduced-motion: reduce) { .page *, .page *::after { transition: none; } }
+/* Keep this theme scoped to the Blogs route; shared listing layouts stay intact. */
+.classic :is(h1,h2,h3), .classic .postArtwork strong { font-family: "Poppins","Segoe UI",sans-serif; }
+.classic .hero { border-color: #e6e9f2; }
+.classic .hero h1 > span { color: #14c983; }
+.classic :is(.eyebrow,.heroRow > p,.postMeta,.postCopy > p,.blogControls p) { color: #68708a; }
+.classic .postMeta > span:first-child { color: #087a50; }
+.classic .featured { background: #fbfcff; box-shadow: inset 0 0 0 1px #e6e9f2; border-radius: 18px; }
+.classic .postImage { background: #f7f8fb; }
+.classic .postArtwork { background: #010807; color: #7ee6b7; }
+.classic .post:nth-child(2n) .postArtwork, .classic .blogSlide:nth-child(odd) .postArtwork { background: #f7f8fb; color: #031410; }
+.classic .textLink { color: #087a50; border-color: #087a50; }
+.classic .blogControls button { color: #031410; border-color: #e6e9f2; background: #fff; }
+.classic .blogControls button:hover { background: #14c983; }
+.classic a:focus-visible, .classic .blogTrack:focus-visible, .classic .blogControls button:focus-visible { outline-color: #087a50; }
+.emptyState { border-top: 1px solid #e6e9f2; padding-block: 48px; }
+.emptyState h3 { font-size: 24px; }
+.emptyState p { margin-top: 16px; font-size: 14px; color: #68708a; }

@@ -312,7 +312,7 @@ export default async function Home() {
             </MotionGroup>
           </div>
         </section>
-        <section id="testimonials" className={`${styles.section} ${styles.testimonials}`}>
+        <section id="testimonials" data-nav-surface="dark" className={`${styles.section} ${styles.testimonials}`}>
           <TestimonialsSpotlight>
             <Reveal data-testid="testimonials-reveal" className={styles.wrap}>
               <div className={styles.head} data-scroll-reveal><h2>Hear it from our clients</h2></div>

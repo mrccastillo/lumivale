@@ -1,4 +1,4 @@
-import styles from "@/components/service-detail.module.css";
+import styles from "@/components/public-service-detail.module.css";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 

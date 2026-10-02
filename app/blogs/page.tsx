@@ -8,7 +8,7 @@ export default async function BlogsPage() {
   const posts = await getBlogsPagePosts();
 
   return (
-    <div className={styles.page} data-nav-surface="light">
+    <div className={`${styles.page} ${styles.classic}`} data-nav-surface="light">
       <header className={`${styles.wrap} ${styles.hero}`}>
         <p className={styles.eyebrow}>Lumivale / Journal</p>
         <div className={styles.heroRow}>
@@ -46,9 +46,9 @@ export default async function BlogsPage() {
               </article>
             </Link>;
           })}
-        </BlogCarousel> : <div className="border-t border-[#cdd6c5] py-12">
+        </BlogCarousel> : <div className={styles.emptyState}>
           <h3 className="text-2xl">{posts === null ? "Articles are temporarily unavailable." : "New perspectives are on the way."}</h3>
-          <p className="mt-4 text-sm text-[#657169]">{posts === null ? "Please try again shortly." : "Check back soon for our latest articles."}</p>
+          <p>{posts === null ? "Please try again shortly." : "Check back soon for our latest articles."}</p>
         </div>}
       </section>
     </div>

@@ -21,16 +21,21 @@ export function HomepageFooter({ content }: { content: SiteContent }) {
             <Link href={content.footerAboutUrl}>{content.footerAboutLabel}</Link>
             <Link href={content.footerBlogsUrl}>{content.footerBlogsLabel}</Link>
           </nav>
-          <div className={styles.footerContact}><p>{content.footerContactHeading}</p><a href={`mailto:${content.footerEmail}`}>{content.footerEmail}</a></div>
+          <div className={styles.footerContact}>
+            <p>{content.footerContactHeading}</p>
+            <a href={`mailto:${content.footerEmail}`}>{content.footerEmail}</a>
+            <a className={styles.socialLink} href={content.footerLinkedinUrl} target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
+              <span aria-hidden="true">in</span><span className={styles.socialLabel}>LinkedIn</span>
+            </a>
+          </div>
         </div>
         <div className={styles.closingBottom}>
           <p>{content.footerSiteLabel}</p>
           <div className={styles.footerLinks}>
-            <a href={content.footerLinkedinUrl} target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">LinkedIn <span aria-hidden="true">↗</span></a>
             <span>© {new Date().getFullYear()} {content.footerBrandName}</span>
           </div>
+          <p className={styles.footerNote}>{content.footerBottomText}</p>
         </div>
-        <p className={styles.footerNote}>{content.footerBottomText}</p>
       </div>
     </footer>
   </section>;

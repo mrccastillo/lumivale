@@ -1,5 +1,5 @@
 import Link from "next/link";
-import styles from "@/components/public-listing.module.css";
+import styles from "./pricing.module.css";
 import { notFound } from "next/navigation";
 
 import { getPublishedServicesForSite } from "@/lib/services";
@@ -29,17 +29,16 @@ export default async function PricingPage() {
           <span className={styles.eyebrow}>Rates</span>
         </div>
         <div className={styles.rates}>
-          {services.map((service, index) => (
+          {services.map((service) => (
             <article key={service.slug} className={styles.rate}>
-              <span className={styles.number} aria-hidden="true">{String(index + 1).padStart(2, "0")}</span>
               <div className={styles.serviceCopy}>
                 <h2>{service.title}</h2>
                 <p>{service.summary}</p>
+                <Link href={`/pricing/${service.slug}`} className={styles.textLink}>View more <span aria-hidden="true">&#8599;</span></Link>
               </div>
               <div className={styles.price}>
                 <p className={styles.eyebrow}>Monthly rate</p>
                 <p className={styles.amount}>{service.privateContent.pricePreview}</p>
-                <Link href={`/pricing/${service.slug}`} className={styles.textLink}>View more <span aria-hidden="true">&#8599;</span></Link>
               </div>
             </article>
           ))}

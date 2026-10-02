@@ -22,6 +22,7 @@ test("renders only public fields, ordered native disclosures, and public navigat
   expect(screen.getByRole("link", { name: /All services/ })).toHaveAttribute("href", "/#services");
   expect(Array.from(container.querySelectorAll("summary")).map(row => row.textContent)).toEqual(["Second question?+", "First question?+"]);
   expect(container.querySelectorAll("details[open]")).toHaveLength(0);
+  for (const faq of container.querySelectorAll("details")) expect(faq).toHaveAttribute("name", "service-faq");
   expect(container.querySelector("script")).toBeNull();
   expect(screen.getByText(/Line one/)).toHaveClass("whitespace-pre-line");
 });

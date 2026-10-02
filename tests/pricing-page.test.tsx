@@ -1,7 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, test, vi } from "vitest";
 
-import styles from "@/components/public-listing.module.css";
+import styles from "@/app/pricing/pricing.module.css";
 import { getAllServices } from "@/lib/services";
 
 const hasTrustedClientAccessMock = vi.hoisted(() => vi.fn());

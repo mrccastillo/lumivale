@@ -15,6 +15,8 @@ test("preserves all editable footer content and destinations", () => {
   for (const key of ["footerBrandName", "footerCtaPrompt", "footerCtaHeading", "footerTagline", "footerContactHeading", "footerSiteLabel", "footerBottomText"] as const) expect(container).toHaveTextContent(content[key]);
   for (const [label, href] of [[content.footerCtaButtonText, content.footerCtaButtonUrl], [content.footerHomeLabel, content.footerHomeUrl], [content.footerAboutLabel, content.footerAboutUrl], [content.footerBlogsLabel, content.footerBlogsUrl], [content.footerEmail, `mailto:${content.footerEmail}`], ["LinkedIn", content.footerLinkedinUrl]]) expect(screen.getByRole("link", { name: label })).toHaveAttribute("href", href);
   expect(container.querySelectorAll("footer")).toHaveLength(1);
+  expect(screen.getAllByRole("link")).toHaveLength(6);
+  expect(screen.queryByRole("link", { name: "Admin login" })).toBeNull();
   expect(screen.queryByText("Brand & components")).toBeNull();
 });
 

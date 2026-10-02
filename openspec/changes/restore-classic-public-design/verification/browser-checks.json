@@ -1,0 +1,57 @@
+{
+  "reports": [
+    {
+      "check": "baseline content, link inventory, FAQ grouping, carousel next/previous/keyboard, testimonial wraparound",
+      "passed": true
+    },
+    {
+      "width": 360,
+      "home": {
+        "width": 360,
+        "document": 360
+      },
+      "metricsColumns": "144px 144px",
+      "font": "Poppins, \"Segoe UI\", sans-serif"
+    },
+    {
+      "width": 390,
+      "home": {
+        "width": 390,
+        "document": 390
+      },
+      "metricsColumns": "159px 159px",
+      "font": "Poppins, \"Segoe UI\", sans-serif"
+    },
+    {
+      "width": 768,
+      "home": {
+        "width": 768,
+        "document": 768
+      },
+      "metricsColumns": "157px 157px 157px 157px",
+      "font": "Poppins, \"Segoe UI\", sans-serif"
+    },
+    {
+      "width": 1440,
+      "home": {
+        "width": 1440,
+        "document": 1440
+      },
+      "metricsColumns": "297px 297px 297px 297px",
+      "font": "Poppins, \"Segoe UI\", sans-serif"
+    },
+    {
+      "check": "public pricing remains protected",
+      "passed": true
+    },
+    {
+      "check": "admin shell remains separate",
+      "passed": true
+    },
+    {
+      "check": "normal-motion hero anchors and dark/light/scrolled navbar",
+      "passed": true
+    }
+  ],
+  "pageErrors": []
+}
