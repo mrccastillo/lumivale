@@ -48,9 +48,7 @@ export default async function PrivatePricingServicePage({
           <div className={styles.pricingHero}>
             <div><p className={styles.eyebrow}>Lumivale / Monthly services</p><h1>{service.title}</h1><p className={styles.description}>{service.privateContent.heroDescription}</p></div>
             <aside className={styles.ratePanel} aria-label="Service rates">
-              <p className={styles.rateEyebrow}>Your investment</p>
               <dl>{service.privateContent.pricingLines.map((line, index) => <div key={`${line.label}-${index}`}><dt>{line.label}</dt><dd>{line.value}</dd></div>)}</dl>
-              <p className={styles.rateNote}>Focused support for your next growth channel.</p>
             </aside>
           </div>
 
@@ -58,7 +56,7 @@ export default async function PrivatePricingServicePage({
       </section>
       <section className={styles.section} data-nav-surface="light" aria-labelledby="examples-title">
         <div className={styles.wrap}>
-          <div className={styles.sectionHead}><div><p className={styles.eyebrow}>From plan to practice</p><h2 id="examples-title">The work in action.</h2></div><p className={styles.muted}>Explore the formats and execution behind this service.</p></div>
+          <div className={styles.sectionHead}><div><p className={styles.eyebrow}>From plan to practice</p><h2 id="examples-title">Examples of Our Work</h2></div></div>
           <ServiceExamplePlatforms content={service.privateContent} />
         </div>
       </section>

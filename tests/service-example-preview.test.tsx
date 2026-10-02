@@ -72,3 +72,14 @@ test("standalone photos open full-size and retain captions", () => {
   expect(screen.getByRole("link", { name: "Open Photo full-size image (opens in a new tab)" })).toHaveAttribute("href", "https://example.com/full.png");
   expect(screen.getByText("Results screenshot")).toBeInTheDocument();
 });
+
+
+test.each([
+  ["https://x.com/user/status/123456789", "X"],
+  ["https://linkedin.com/feed/update/urn:li:activity:123456789/", "LinkedIn"],
+])("retains native scrolling for %s", (url, provider) => {
+  render(<ServiceExamplePreview card={{ title: "Scrollable post", summary: "", tag: provider, previewUrl: url }} />);
+  const frame = screen.getByTitle(`${provider} preview: Scrollable post`);
+  expect(frame).toHaveAttribute("scrolling", "auto");
+  expect(frame.parentElement).toHaveAttribute("data-scrollable", "true");
+});
