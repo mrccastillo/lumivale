@@ -22,15 +22,16 @@ export default async function ServiceDetailPage({
 
   return (
     <div className={styles.page} data-nav-surface="light">
-      <section className={styles.hero}>
+      <section className={styles.hero} data-nav-surface="dark">
         <div className={styles.wrap}>
-          <Link href="/#services" scroll={false} className={styles.back}>&larr; All services</Link>
-          <p className={styles.eyebrow}>Lumivale / Services</p>
-          <h1>{service.title}</h1>
-          <p className={styles.description}>{service.description}</p>
           <nav aria-label="Lumivale Services" className={styles.serviceNav}>
             {services.map((item) => <Link key={item.slug} href={`/services/${item.slug}`} aria-current={item.slug === service.slug ? "page" : undefined}>{item.title}</Link>)}
           </nav>
+          <Link href="/#services" scroll={false} className={styles.back}>&larr; All services</Link>
+          <div className={styles.heroCopy}>
+            <h1>{service.title}</h1>
+            <p className={styles.description}>{service.description}</p>
+          </div>
         </div>
       </section>
       <section aria-labelledby="service-faqs-title" className={styles.section}>
