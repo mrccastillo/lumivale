@@ -26,7 +26,7 @@ export default async function PricingPage() {
       <section className={`${styles.wrap} ${styles.pricing}`} aria-label="Monthly services">
         <div className={styles.rateHeader}>
           <div><h2>Monthly services</h2><p>Current private monthly rates for approved client discussions.</p></div>
-          <span className={styles.eyebrow}>Rates</span>
+          <span className={styles.eyebrow}>Billed monthly</span>
         </div>
         <div className={styles.rates}>
           {services.map((service) => (
@@ -34,11 +34,11 @@ export default async function PricingPage() {
               <div className={styles.serviceCopy}>
                 <h2>{service.title}</h2>
                 <p>{service.summary}</p>
-                <Link href={`/pricing/${service.slug}`} className={styles.textLink}>View more <span aria-hidden="true">&#8599;</span></Link>
               </div>
               <div className={styles.price}>
                 <p className={styles.eyebrow}>Monthly rate</p>
                 <p className={styles.amount}>{service.privateContent.pricePreview}</p>
+                <Link href={`/pricing/${service.slug}`} className={styles.textLink}>View more <span aria-hidden="true">&#8599;</span></Link>
               </div>
             </article>
           ))}

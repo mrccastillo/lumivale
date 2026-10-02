@@ -43,7 +43,7 @@ export function ServiceExamplePlatforms({ content }: { content: PrivateServiceCo
         className={styles.platformTab}
       >{platform.name}</button>)}
     </div>
-    <div key={selected} role="tabpanel" tabIndex={0} id={`${prefix}-panel-${selected}`} aria-labelledby={`${prefix}-tab-${selected}`} className={styles.examples}>
+    <div key={selected} role="tabpanel" tabIndex={0} id={`${prefix}-panel-${selected}`} aria-labelledby={`${prefix}-tab-${selected}`} className={styles.examples} data-count={normalized.exampleCards.filter((card) => card.platformId === selected).length}>
       {normalized.exampleCards.filter((card) => card.platformId === selected).map((card) => (
               <article
                 key={card.id}
