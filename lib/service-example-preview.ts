@@ -39,6 +39,29 @@ export function getExamplePreview(value?: string): ExamplePreview | null {
       preview.embedUrl = `https://www.tiktok.com/player/v1/${id}?autoplay=0&controls=1`;
       preview.portrait = true;
     }
+  } else if (["instagram.com", "m.instagram.com"].includes(host)) {
+    preview.provider = "Instagram";
+    const post = url.pathname.match(/^\/(p|reel|reels|tv)\/([\w-]+)(?:\/embed)?\/?$/);
+    if (post) {
+      const kind = post[1] === "reels" ? "reel" : post[1];
+      preview.embedUrl = `https://www.instagram.com/${kind}/${post[2]}/embed/`;
+      preview.portrait = true;
+    }
+  } else if (["x.com", "twitter.com", "mobile.twitter.com", "mobile.x.com"].includes(host)) {
+    preview.provider = "X";
+    const id = url.pathname.match(/^\/(?:[\w]+\/status|i\/web\/status|i\/status)\/(\d+)(?:\/(?:photo|video)\/\d+)?\/?$/)?.[1];
+    if (id) {
+      preview.embedUrl = `https://platform.twitter.com/embed/Tweet.html?id=${id}&dnt=true&theme=light`;
+      preview.portrait = true;
+    }
+  } else if (["linkedin.com", "m.linkedin.com"].includes(host)) {
+    preview.provider = "LinkedIn";
+    const urn = url.pathname.match(/^\/(?:embed\/)?feed\/update\/(urn:li:(?:activity|share|ugcPost):\d+)\/?$/)?.[1];
+    const post = url.pathname.match(/^\/posts\/[^/]*-(activity|ugcPost|share)-(\d+)(?:-[\w-]+)?\/?$/);
+    if (urn || post) {
+      preview.embedUrl = `https://www.linkedin.com/embed/feed/update/${urn || `urn:li:${post![1]}:${post![2]}`}`;
+      preview.portrait = true;
+    }
   } else if (["facebook.com", "m.facebook.com", "web.facebook.com"].includes(host)) {
     preview.provider = "Facebook";
     const video = /^\/[^/]+\/videos\/\d+\/?$/.test(url.pathname)

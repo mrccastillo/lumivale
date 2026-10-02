@@ -4,6 +4,16 @@ import { getExamplePreview } from "@/lib/service-example-preview";
 import { ServiceExamplePreview } from "@/components/service-example-preview";
 
 test.each([
+  ["https://www.instagram.com/reel/DZX9hcUvKGW/?igsh=test", "Instagram"],
+  ["https://instagram.com/p/ABC_123-xyz/", "Instagram"],
+  ["https://instagram.com/reels/ABC123/", "Instagram"],
+  ["https://x.com/creator/status/123456789?s=20", "X"],
+  ["https://twitter.com/creator/status/123456789/photo/1", "X"],
+  ["https://x.com/i/web/status/123456789", "X"],
+  ["https://www.linkedin.com/posts/creator_growth-activity-123456789-abcd?utm_source=share", "LinkedIn"],
+  ["https://www.linkedin.com/posts/creator_topic-ugcPost-7470434559361449985-8Gup/", "LinkedIn"],
+  ["https://www.linkedin.com/feed/update/urn:li:activity:123456789/", "LinkedIn"],
+  ["https://www.linkedin.com/embed/feed/update/urn:li:ugcPost:123456789", "LinkedIn"],
   ["https://youtube.com/watch?v=M7lc1UVf-VE", "YouTube"],
   ["https://youtu.be/M7lc1UVf-VE", "YouTube"],
   ["https://www.youtube.com/shorts/M7lc1UVf-VE", "YouTube"],
@@ -25,6 +35,10 @@ test.each([
 });
 
 test.each([
+  "https://instagram.com/creator/", "https://x.com/creator", "https://linkedin.com/in/creator",
+  "https://instagram.com.evil.test/reel/ABC123/", "https://x.com.evil.test/user/status/123",
+  "https://linkedin.com.evil.test/feed/update/urn:li:activity:123", "https://x.com/user/status/not-a-number",
+  "https://instagram.com:8443/reel/ABC123/", "https://linkedin.com/posts/test-activity-123/extra",
   "https://chatgpt.com/share/example", "https://example.com/article", "https://linkedin.com/posts/test",
   "https://vm.tiktok.com/example/", "https://facebook.com/share/v/test/", "https://youtube.com/@channel",
   "https://youtube.com.evil.test/watch?v=M7lc1UVf-VE", "https://youtube.com:8443/watch?v=M7lc1UVf-VE",
