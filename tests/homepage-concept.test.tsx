@@ -37,18 +37,34 @@ test("changes footer selection only for home and preserves route transitions", (
   expect(screen.queryByText("Legacy footer")).toBeNull();
 });
 
-test("retains complete study content with covers and absent or unsafe media", () => {
+test("renders compact client identities and all metrics with safe media and story links", () => {
   const studies = [
     { ...defaultCaseStudies[0], slug: "cover", cover: { url: "https://res.cloudinary.com/demo/image/upload/cover.jpg", alt: "Campaign screenshot" } },
     { ...defaultCaseStudies[1], slug: "missing", cover: undefined },
     { ...defaultCaseStudies[2], slug: "unsafe", cover: { url: "javascript:alert(1)", alt: "Unsafe" } },
   ];
   const { container } = render(<HomepageCaseStudies caseStudies={studies} />);
-  expect(screen.getByAltText("Campaign screenshot")).toHaveAttribute("src", "https://res.cloudinary.com/demo/image/upload/f_auto,q_auto,w_1000,c_limit/cover.jpg");
+  expect(screen.getByAltText("Campaign screenshot")).toHaveAttribute("src", "https://res.cloudinary.com/demo/image/upload/f_auto,q_auto,w_160,c_limit/cover.jpg");
   expect(container.querySelectorAll("img")).toHaveLength(1);
   expect(container.querySelectorAll("article")).toHaveLength(3);
   for (const study of studies) {
-    for (const value of [study.title, study.category, study.headline, study.summary, ...study.metrics.flatMap(m => [m.value, m.label])]) expect(container).toHaveTextContent(value);
+    for (const value of [study.title, study.category, ...study.metrics.flatMap(m => [m.value, m.label])]) expect(container).toHaveTextContent(value);
     expect(screen.getByRole("link", { name: `Read the full story: ${study.title}` })).toHaveAttribute("href", `/case-studies/${study.slug}`);
   }
+});
+
+test("shows every study in a grid with safe client logos and no collection link", () => {
+  const studies = [
+    { ...defaultCaseStudies[0], clientName: "Example Client", logo: { url: "https://res.cloudinary.com/demo/logo.svg", alt: "Example Client logo" }, cover: { url: "https://example.com/cover.jpg", alt: "Unused cover" } },
+    { ...defaultCaseStudies[1], logo: { url: "javascript:alert(1)", alt: "Unsafe logo" }, cover: undefined },
+  ];
+  const { container } = render(<HomepageCaseStudies caseStudies={studies} />);
+  expect(screen.getByAltText("Example Client logo")).toHaveAttribute("src", "https://res.cloudinary.com/demo/logo.svg");
+  expect(screen.queryByAltText("Unused cover")).toBeNull();
+  expect(screen.queryByAltText("Unsafe logo")).toBeNull();
+  expect(screen.getByText("Example Client")).toBeVisible();
+  expect(container.querySelectorAll("article")).toHaveLength(2);
+  expect(container.querySelectorAll("[data-case-study-metric]")).toHaveLength(studies.reduce((count, study) => count + study.metrics.length, 0));
+  expect(screen.queryByRole("region", { name: "Case studies" })).toBeNull();
+  expect(screen.queryByRole("link", { name: "View all case studies" })).not.toBeInTheDocument();
 });

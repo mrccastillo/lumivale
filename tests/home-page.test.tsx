@@ -380,7 +380,7 @@ describe("home page", () => {
 
     for (const study of getAllCaseStudies()) {
       expect(caseStudySection).toHaveTextContent(study.category);
-      expect(caseStudySection).toHaveTextContent(study.headline);
+      expect(caseStudySection).toHaveTextContent(study.clientName || study.title);
       for (const metric of study.metrics) {
         expect(caseStudySection).toHaveTextContent(metric.value);
         expect(caseStudySection).toHaveTextContent(metric.label);

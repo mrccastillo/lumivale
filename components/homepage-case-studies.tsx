@@ -1,25 +1,57 @@
 import Link from "next/link";
 import type { CaseStudy } from "@/lib/case-studies";
 import { safeImageUrl } from "@/lib/case-study-story";
-import styles from "./homepage-concept.module.css";
-import { CaseStudyCarousel } from "./case-study-carousel";
+import styles from "./homepage-case-studies.module.css";
 
 export function HomepageCaseStudies({ caseStudies }: { caseStudies: CaseStudy[] }) {
-  return <CaseStudyCarousel>{caseStudies.map((study) => (
-    <article className={styles.case} key={study.slug}>
-      <div className={styles.caseMedia}>
-        {study.cover && safeImageUrl(study.cover.url) ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={study.cover.url.replace("/image/upload/", "/image/upload/f_auto,q_auto,w_1000,c_limit/")} alt={study.cover.alt} width={1000} height={700} loading="lazy" />
-        ) : <div className={styles.caseFallback} aria-hidden="true"><span className={styles.caseInitial}>{study.title.slice(0, 2)}</span></div>}
+  if (!caseStudies.length) return null;
+
+  return (
+    <div className={styles.collection}>
+      <div className={styles.collectionHeader}>
+        <span className={styles.windowDots} aria-hidden="true"><i /><i /><i /></span>
+        <span className={styles.collectionLabel}>Selected case studies</span>
+        <span className={styles.collectionCount}>{String(caseStudies.length).padStart(2, "0")} {caseStudies.length === 1 ? "story" : "stories"}</span>
       </div>
-      <div className={styles.caseCopy} data-scroll-reveal>
-        <div className={styles.caseMeta}><p className={styles.caseTitle}>{study.title}</p><span className={styles.tag}>{study.category}</span></div>
-        <h3>{study.headline}</h3>
-        <p>{study.summary}</p>
-        <div className={styles.caseMetrics}>{study.metrics.map((metric, index) => <div key={`${metric.label}-${index}`}><strong data-case-study-metric>{metric.value}</strong><p>{metric.label}</p></div>)}</div>
-        <Link className={styles.textLink} href={`/case-studies/${study.slug}`} aria-label={`Read the full story: ${study.title}`}>Read the full story <span aria-hidden="true">↗</span></Link>
+      <div className={styles.grid}>
+        {caseStudies.map((study) => {
+          const logo = study.logo && safeImageUrl(study.logo.url) ? study.logo : undefined;
+          const media = logo ?? (study.cover && safeImageUrl(study.cover.url) ? study.cover : undefined);
+          const identity = study.clientName || study.title;
+          const initials = identity.trim().split(/\s+/).slice(0, 2).map(word => word[0]).join("");
+
+          return (
+            <article className={styles.card} key={study.slug}>
+              <Link className={styles.cardLink} href={`/case-studies/${study.slug}`} aria-label={`Read the full story: ${study.title}`}>
+              <div className={styles.identity}>
+                <div className={styles.mark} data-logo={Boolean(logo)}>
+                  {media ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={media.url.replace("/image/upload/", "/image/upload/f_auto,q_auto,w_160,c_limit/")} alt={media.alt} width={48} height={48} loading="lazy" />
+                  ) : <span aria-hidden="true">{initials}</span>}
+                </div>
+                <div className={styles.identityCopy}>
+                  <h3 className={styles.name}>{identity}</h3>
+                  <p className={styles.industry}>{study.industry || study.timeframe || "Case study"}</p>
+                </div>
+              </div>
+              <span className={styles.category}>{study.category}</span>
+              <dl className={styles.metrics} data-paired={study.metrics.length === 2 || study.metrics.length === 4}>
+                {study.metrics.map((metric, index) => (
+                  <div key={`${metric.label}-${index}`}>
+                    <dt>{metric.label}</dt>
+                    <dd data-case-study-metric>{metric.value}</dd>
+                  </div>
+                ))}
+              </dl>
+              </Link>
+            </article>
+          );
+        })}
       </div>
-    </article>
-  ))}</CaseStudyCarousel>;
+      <div className={styles.collectionFooter}>
+        <span>Discover the strategy behind each result.</span>
+      </div>
+    </div>
+  );
 }

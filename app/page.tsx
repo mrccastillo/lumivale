@@ -289,7 +289,8 @@ export default async function Home() {
         </section>
         {caseStudies.length > 0 && <section id="case-studies" className={`${styles.section} ${styles.work}`}>
           <div className={styles.wrap}>
-            <Reveal className={styles.head}>
+            <Reveal className={`${styles.head} ${styles.workHead}`}>
+              <p className={styles.eyebrow}>Selected work</p>
               <div data-scroll-reveal><h2>Measured Growth, Built with Lumivale</h2>
                 <p className={styles.description}>Explore our success stories across awareness, content, and outbound strategies with real client outcomes backed by consistent and measurable growth.</p>
               </div>
