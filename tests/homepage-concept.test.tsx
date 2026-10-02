@@ -68,3 +68,14 @@ test("shows every study in a grid with safe client logos and no collection link"
   expect(screen.queryByRole("region", { name: "Case studies" })).toBeNull();
   expect(screen.queryByRole("link", { name: "View all case studies" })).not.toBeInTheDocument();
 });
+
+
+test("footer renders editable link collections and respects empty lists", () => {
+  const { rerender } = render(<HomepageFooter content={{ ...defaultSiteContent, footerNavigationLinks: [{ label: "Our work", url: "/case-studies" }], footerSocialLinks: [{ label: "Instagram", url: "https://instagram.com/example" }, { label: "X", url: "https://x.com/example" }] }} />);
+  expect(screen.getByRole("link", { name: "Our work" })).toHaveAttribute("href", "/case-studies");
+  expect(screen.getByRole("link", { name: "Instagram" })).toHaveAttribute("href", "https://instagram.com/example");
+  expect(screen.queryByRole("link", { name: "LinkedIn" })).not.toBeInTheDocument();
+  rerender(<HomepageFooter content={{ ...defaultSiteContent, footerNavigationLinks: [], footerSocialLinks: [] }} />);
+  expect(screen.queryByRole("navigation", { name: "Footer" })).not.toBeInTheDocument();
+  expect(screen.queryByRole("link", { name: "Instagram" })).not.toBeInTheDocument();
+});

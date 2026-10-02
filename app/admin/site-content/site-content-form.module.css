@@ -25,3 +25,12 @@
   .saveBar { bottom: 8px; padding: 14px; flex-wrap: wrap; gap: 12px; }
   .saveBar button { width: 100%; }
 }
+
+.linkEditor { display: grid; gap: 16px; }
+.linkRow { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1.5fr) auto; gap: 16px; align-items: end; }
+.linkRow label { display: grid; gap: 8px; font-size: 14px; font-weight: 500; }
+.linkRow input { min-width: 0; width: 100%; padding: 10px 12px; border: 1px solid var(--lumivale-line); border-radius: 8px; background: white; font-weight: 400; }
+.linkRow button, .addLink { min-height: 44px; padding: 10px 14px; border: 1px solid var(--lumivale-line); border-radius: 8px; font-size: 14px; }
+.addLink { justify-self: start; color: #087a50; background: #eef8f3; }
+.linkRow button:hover { background: #fff1f1; color: #a22; }
+@media(max-width: 700px) { .linkRow { grid-template-columns: 1fr; padding-bottom: 16px; border-bottom: 1px solid var(--lumivale-line); } .linkRow button { justify-self: start; } }

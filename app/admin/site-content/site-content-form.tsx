@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, type ChangeEvent, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
+import { footerNavigation, footerSocials } from "@/lib/footer-links";
 import type { SiteContent } from "@/lib/site-content-defaults";
 
 import styles from "./site-content-form.module.css";
@@ -17,8 +18,9 @@ const sections = [
 type SectionId = (typeof sections)[number]["id"];
 
 export function SiteContentForm({ initialContent }: { initialContent: SiteContent }) {
-  const [content, setContent] = useState(initialContent);
-  const [savedContent, setSavedContent] = useState(initialContent);
+  const initial = { ...initialContent, footerNavigationLinks: footerNavigation(initialContent), footerSocialLinks: footerSocials(initialContent) };
+  const [content, setContent] = useState<SiteContent>(initial);
+  const [savedContent, setSavedContent] = useState<SiteContent>(initial);
   const [activeSection, setActiveSection] = useState<SectionId>("branding");
   const [founderFiles, setFounderFiles] = useState<Record<string, File>>({});
   const [logoFile, setLogoFile] = useState<File | null>(null);
@@ -47,7 +49,7 @@ export function SiteContentForm({ initialContent }: { initialContent: SiteConten
     setSaving(true); setMessage(""); setError("");
     try {
       const data = new FormData();
-      Object.entries(content).forEach(([key, value]) => data.set(key, value));
+      Object.entries(content).forEach(([key, value]) => data.set(key, typeof value === "string" ? value : JSON.stringify(value)));
       Object.entries(founderFiles).forEach(([key, file]) => data.set(key, file));
       if (logoFile) data.set("logoFile", logoFile);
       const response = await fetch("/api/admin/site-content", { method: "POST", body: data });
@@ -63,13 +65,30 @@ export function SiteContentForm({ initialContent }: { initialContent: SiteConten
     } finally { setSaving(false); }
   }
 
-  function field(key: keyof SiteContent, label: string, maxLength: number, optional = false) {
+  function field(key: Exclude<keyof SiteContent, "footerNavigationLinks" | "footerSocialLinks">, label: string, maxLength: number, optional = false) {
     const props = {
       id: key, name: key, value: content[key], maxLength, required: !optional,
       onChange: (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => setContent({ ...content, [key]: event.target.value }),
       className: "mt-2 w-full rounded-lg border border-[var(--lumivale-line)] bg-white px-3 py-2.5 text-sm font-normal outline-none focus:border-[var(--lumivale-accent)]",
     };
     return <label className="block text-sm font-semibold" htmlFor={key}>{label}{(key === "heroDescription" || key.endsWith("Description") || key.endsWith("Summary")) ? <textarea {...props} rows={4} /> : <input {...props} type={key === "footerEmail" ? "email" : ["heroButtonUrl", "logoUrl", "footerCtaButtonUrl", "footerLinkedinUrl"].includes(key) ? "url" : "text"} />}</label>;
+  }
+  function linkEditor(key: "footerNavigationLinks" | "footerSocialLinks") {
+    const social = key === "footerSocialLinks";
+    const links = social ? footerSocials(content) : footerNavigation(content);
+    const group = social ? "Social platform" : "Navigation link";
+    function update(index: number, field: "label" | "url", value: string) {
+      setContent(current => ({ ...current, [key]: links.map((link, i) => i === index ? { ...link, [field]: value } : link) }));
+    }
+    return <div className={styles.linkEditor}>
+      {links.map((link, index) => <div className={styles.linkRow} key={`${key}-${index}`}>
+        <label>{group} {index + 1} {social ? "name" : "text"}<input required maxLength={80} value={link.label} onChange={event => update(index, "label", event.target.value)} /></label>
+        <label>{group} {index + 1} {social ? "URL" : "destination"}<input required type={social ? "url" : "text"} maxLength={500} value={link.url} onChange={event => update(index, "url", event.target.value)} /></label>
+        <button type="button" aria-label={`Remove ${group.toLowerCase()} ${index + 1}`} onClick={() => setContent(current => ({ ...current, [key]: links.filter((_, i) => i !== index) }))}>Remove</button>
+      </div>)}
+      {!links.length && <p className="text-sm text-[var(--lumivale-muted)]">No {social ? "social platforms" : "navigation links"} added.</p>}
+      <button type="button" className={styles.addLink} disabled={links.length >= 50} onClick={() => setContent(current => ({ ...current, [key]: [...links, { label: "", url: "" }] }))}>Add {social ? "social platform" : "navigation link"}</button>
+    </div>;
   }
   const logo = logoFile ? previewUrl : content.logoUrl;
   const dirty = Object.keys(founderFiles).length > 0 || logoFile !== null || JSON.stringify(content) !== JSON.stringify(savedContent);
@@ -181,18 +200,12 @@ export function SiteContentForm({ initialContent }: { initialContent: SiteConten
           </div>
           <h3 className="font-semibold">Navigation links</h3>
           <p className="text-xs text-[var(--lumivale-muted)]">Use a page path such as /about or a full https:// URL.</p>
-          <div className="grid gap-5 sm:grid-cols-2">
-            {field("footerHomeLabel", "First link text", 80)}
-            {field("footerHomeUrl", "First link destination", 500)}
-            {field("footerAboutLabel", "Second link text", 80)}
-            {field("footerAboutUrl", "Second link destination", 500)}
-            {field("footerBlogsLabel", "Third link text", 80)}
-            {field("footerBlogsUrl", "Third link destination", 500)}
-          </div>
+          {linkEditor("footerNavigationLinks")}
           <h3 className="font-semibold">Contact details</h3>
           {field("footerContactHeading", "Contact heading", 100)}
           {field("footerEmail", "Contact email", 254)}
-          {field("footerLinkedinUrl", "LinkedIn URL", 500)}
+          <h3 className="font-semibold">Social platforms</h3>
+          {linkEditor("footerSocialLinks")}
           <h3 className="font-semibold">Bottom bar</h3>
           {field("footerSiteLabel", "Website label", 80)}
           {field("footerBottomText", "Bottom bar text", 500)}
