@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { HomepageReels } from "@/components/homepage-reels";
+import { getPublishedReelsForSite } from "@/lib/reels";
 
 import { HomepageCaseStudies } from "@/components/homepage-case-studies";
 import { HomepageFooter } from "@/components/homepage-footer";
@@ -193,12 +195,13 @@ function ServiceIcon({ slug, title }: { slug: string; title: string }) {
 
 export default async function Home() {
   const caseStudies = await getPublishedCaseStudiesForSite();
-  const [services, testimonials, faqs, heroClients, content] = await Promise.all([
+  const [services, testimonials, faqs, heroClients, content, reels] = await Promise.all([
     getPublishedServicesForSite(),
     getHomeTestimonials(),
     getHomeFaqs(),
     getHomeHeroClients(),
     getSiteContentForSite(),
+    getPublishedReelsForSite(),
   ]);
   const textTestimonials = getHomepageTextTestimonials(testimonials);
   const showPlaceholderTestimonials = !testimonials.some(
@@ -281,6 +284,7 @@ export default async function Home() {
                 </div>
               ))}
             </div>
+            <HomepageReels reels={reels} />
           </div>
         </section>
         {caseStudies.length > 0 && <section id="case-studies" className={`${styles.section} ${styles.work}`}>

@@ -1,3 +1,5 @@
+import { getPublishedReelsForSite } from "@/lib/reels";
+vi.mock("@/lib/reels", () => ({ getPublishedReelsForSite: vi.fn(async () => []) }));
 import { fireEvent, render, screen, within } from "@testing-library/react";
 import type { ReactNode } from "react";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
@@ -657,4 +659,15 @@ describe("home page", () => {
     expect(faqSection).toHaveTextContent("Published question 5?");
     expect(faqSection).not.toHaveTextContent("Published question 6?");
   });
+});
+
+
+test("places published reels directly below Results and before case studies", async () => {
+  vi.mocked(getPublishedReelsForSite).mockResolvedValueOnce([{ id: "test-reel", title: "Campaign clip", clientName: "Client", platform: "YouTube", url: "https://youtube.com/shorts/example", thumbnailUrl: "https://res.cloudinary.com/demo/reel.jpg", views: "10K", likes: "", comments: "", status: "published", sortOrder: 0 }]);
+  const { container } = render(await Home());
+  const gallery = screen.getByRole("region", { name: "Campaign reels" });
+  const results = container.querySelector("#proof")!;
+  expect(results).toContainElement(gallery);
+  expect(results.querySelector("[data-scroll-landscape]")!.compareDocumentPosition(gallery) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  expect(gallery.compareDocumentPosition(container.querySelector("#case-studies")!) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
 });
