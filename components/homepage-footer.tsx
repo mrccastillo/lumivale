@@ -11,7 +11,6 @@ export function HomepageFooter({ content }: { content: SiteContent }) {
       <div className={styles.wrap}>
         <div data-testid="conversion-reveal" className={styles.invitation}>
           <div className={styles.invitationCopy}>
-            <p className={styles.eyebrow}><span aria-hidden="true" />{content.footerCtaPrompt}</p>
             <h2>{content.footerCtaHeading}</h2>
           </div>
           <a className={styles.booking} href={content.footerCtaButtonUrl} target="_blank" rel="noopener noreferrer">
