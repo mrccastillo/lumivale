@@ -2,12 +2,13 @@
 @import "tailwindcss";
 
 :root {
-  --text-heading: clamp(32px, 4vw, 57px);
-  --text-subheading: clamp(26px, 2.5vw, 36px);
-  --text-card-title: clamp(20px, 1.6vw, 22px);
-  --text-body: clamp(16px, 1.25vw, 18px);
-  --text-small: 16px;
-  --text-caption: 12px;
+  --text-heading: clamp(30px, 3.75vw, 53px);
+  --text-section-heading: calc(var(--text-heading) - 2px);
+  --text-subheading: clamp(22px, calc(2.3vw - 2px), 31px);
+  --text-card-title: clamp(18px, calc(1.6vw - 2px), 20px);
+  --text-body: clamp(14px, calc(1.25vw - 2px), 16px);
+  --text-small: 14px;
+  --text-caption: 10px;
   --heading-leading: 1.13;
   --font-heading: "Poppins", "Segoe UI", sans-serif;
   --font-body: "Inter", "Segoe UI", sans-serif;
@@ -51,6 +52,7 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-sans);
+  font-size: 14px;
   font-weight: 400;
 }
 
@@ -63,6 +65,9 @@ h1, h2, h3, h4, h5, h6 {
 h1 { font-size: var(--text-heading); line-height: var(--heading-leading); }
 h2 { font-size: var(--text-subheading); line-height: 1.25; }
 h3 { font-size: var(--text-card-title); line-height: 1.4; }
+
+/* Results metrics retain their display typography; other paragraphs stay at 14px. */
+p:not([data-result-metric]) { font-size: 14px !important; }
 
 button, input, select, textarea {
   font-family: var(--font-body);
@@ -99,7 +104,7 @@ button, input, select, textarea {
 
 .lumivale-visual-editor p {
   display: block !important;
-  font-size: 1rem !important;
+  font-size: 14px !important;
   font-weight: 400 !important;
   line-height: 1.75 !important;
 }

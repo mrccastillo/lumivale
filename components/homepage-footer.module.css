@@ -18,12 +18,12 @@
 .eyebrow span { width: 6px; height: 6px; border-radius: 50%; background: #14c983; }
 .invitation h2 { font-family: var(--font-heading); font-size: var(--text-subheading); font-weight: 600; line-height: var(--heading-leading); letter-spacing: -.035em; text-wrap: balance; }
 .booking { display: inline-flex; align-items: center; justify-content: space-between; gap: 12px; flex-shrink: 0; max-width: 100%; min-height: 44px; padding: 10px 19px; border: 1px solid #14c983; border-radius: 999px; background: #14c983; color: #031410; font-size: var(--text-small); font-weight: 600; transition: background .25s, transform .25s; }
-.booking span { flex-shrink: 0; font-size: 18px; line-height: 1; transition: transform .25s; }
+.booking span { flex-shrink: 0; font-size: 16px; line-height: 1; transition: transform .25s; }
 .booking:hover { background: #7ee6b7; transform: translateY(-3px); }
 .booking:hover span { transform: translate(2px, -2px); }
 .directory { display: grid; grid-template-columns: 1.2fr .6fr 1fr; gap: 40px; padding-block: 32px; border-top: 1px solid #ffffff1a; }
 .directory > * { min-width: 0; }
-.brand h3 { font-family: var(--font-heading); font-size: 24px; font-weight: 600; line-height: 1.2; letter-spacing: -.04em; }
+.brand h3 { font-family: var(--font-heading); font-size: 22px; font-weight: 600; line-height: 1.2; letter-spacing: -.04em; }
 .brand h3 span { color: #14c983; }
 .brand > p { margin-top: 8px; color: #9fb6ae; font-size: var(--text-small); line-height: 1.8; max-width: 300px; }
 .label { margin-bottom: 8px; font-size: var(--text-caption); font-weight: 500; letter-spacing: .12em; text-transform: uppercase; color: #88a297; }

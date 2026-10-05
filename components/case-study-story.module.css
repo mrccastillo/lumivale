@@ -60,7 +60,7 @@
 .quote figcaption p + p { color: #68708a; }
 .cta { background: linear-gradient(120deg, #010807, #0b2921); color: #fff; padding: 88px 0; }
 .cta > div { display: flex; justify-content: space-between; align-items: center; gap: 48px; }
-.cta h2 { font-size: var(--text-heading); line-height: var(--heading-leading); max-width: 740px; }
+.cta h2 { font-size: var(--text-section-heading); line-height: var(--heading-leading); max-width: 740px; }
 .cta p { font-size: var(--text-small); line-height: 1.8; color: #b8cdc4; max-width: 620px; margin-top: 18px; }
 .button { flex-shrink: 0; display: inline-flex; align-items: center; justify-content: space-between; gap: 28px; max-width: 100%; background: #14c983; color: #031410; min-height: 48px; padding: 14px 22px; border-radius: 999px; font-size: var(--text-small); font-weight: 550; transition: background .2s; }
 .button span { font-size: 20px; transition: transform .2s; }

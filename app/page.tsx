@@ -278,8 +278,8 @@ export default async function Home() {
               {([1, 2, 3, 4] as const).map((index) => (
                 <div key={index} className={styles.metric}>
                   <article>
-                    <p className={styles.metricValue}><ResultCount value={content[`resultsMetric${index}Value`]} /></p>
-                    <p className={styles.metricLabel}>{content[`resultsMetric${index}Label`]}</p>
+                    <p data-result-metric className={styles.metricValue}><ResultCount value={content[`resultsMetric${index}Value`]} /></p>
+                    <p data-result-metric className={styles.metricLabel}>{content[`resultsMetric${index}Label`]}</p>
                   </article>
                 </div>
               ))}

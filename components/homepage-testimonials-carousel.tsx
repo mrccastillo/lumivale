@@ -35,7 +35,7 @@ export function HomepageTestimonialsCarousel({
   }
 
   return (
-    <div className="mt-10 md:mt-12">
+    <div className="mx-auto mt-8 max-w-[1120px] md:mt-10">
       <div className="grid items-center gap-4 md:grid-cols-[auto_minmax(0,1fr)_auto]">
         {canPaginate ? (
           <PagerButton
