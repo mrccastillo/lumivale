@@ -40,7 +40,7 @@ export function CaseStudyCards({ caseStudies }: CaseStudyCardsProps) {
             </div>
 
             <div className="mt-5 border-t border-[var(--lumivale-line)] pt-5">
-              <h2 className="text-xl font-semibold leading-snug text-[var(--lumivale-ink)]">
+              <h2 className="text-lg font-semibold leading-snug text-[var(--lumivale-ink)]">
                 {study.headline}
               </h2>
               <p className="mt-4 text-sm leading-6 text-[var(--lumivale-muted)]">

@@ -13,7 +13,7 @@
 .heroRow > p { max-width: 520px; color: #657169; font-size: var(--text-body); line-height: 1.85; }
 .journal, .pricing { padding-block: 56px 104px; }
 .sectionIntro { display: grid; grid-template-columns: 1fr 2fr; gap: 40px; margin-bottom: 36px; align-items: start; }
-.sectionIntro h2 { max-width: 720px; font-size: var(--text-heading); line-height: var(--heading-leading); }
+.sectionIntro h2 { max-width: 720px; font-size: var(--text-section-heading); line-height: var(--heading-leading); }
 .sectionIntro .eyebrow { padding-top: 7px; }
 .blogCarousel { margin-top: 56px; }
 .blogTrack { position: relative; display: flex; gap: 32px; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; overscroll-behavior-x: contain; }

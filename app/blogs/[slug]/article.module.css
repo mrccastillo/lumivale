@@ -50,7 +50,7 @@
 .articleEnd a { text-decoration: none; }
 .related { padding-block: 64px 88px; background: var(--background); }
 .relatedHead { display: flex; justify-content: space-between; align-items: center; gap: 24px; margin-bottom: 36px; }
-.relatedHead h2 { font-size: var(--text-heading); line-height: var(--heading-leading); }
+.relatedHead h2 { font-size: var(--text-section-heading); line-height: var(--heading-leading); }
 .relatedHead > a { font-size: var(--text-caption); border-bottom: 1px solid var(--lumivale-ink); padding-bottom: 8px; }
 .relatedGrid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 32px; }
 .relatedPost { min-width: 0; }

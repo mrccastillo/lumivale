@@ -25,7 +25,7 @@
 .scope ::selection { background: var(--daylight); color: var(--ink); }
 .wrap { width: min(1280px, calc(100% - 112px)); margin-inline: auto; }
 .section { padding-block: var(--section-space); scroll-margin-top: 90px; }
-.section h2 { font-size: var(--text-heading); line-height: var(--heading-leading); }
+.section h2 { font-size: var(--text-section-heading); line-height: var(--heading-leading); }
 .head { margin-bottom: var(--section-heading-gap); }
 .eyebrow { display: flex; align-items: center; gap: 10px; font-size: var(--text-caption); font-weight: 600; letter-spacing: .15em; text-transform: uppercase; }
 .eyebrow::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: currentColor; flex-shrink: 0; }
@@ -41,7 +41,7 @@
 .metric { min-width: 0; display: flex; }
 .metric article { width: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 26px 16px; border: 1px solid #ffffff55; border-radius: 22px; background: linear-gradient(135deg, #052b2080, #03141066); box-shadow: inset 0 1px 0 #ffffff70, inset 0 -1px 0 #ffffff14, 0 12px 32px #031b2426; -webkit-backdrop-filter: blur(18px) saturate(1.2); backdrop-filter: blur(18px) saturate(1.2); color: #ffffff; text-shadow: 0 1px 4px #08241970; }
 .metricValue { font: 700 clamp(35px, 4vw, 57px)/1.12 var(--font-heading); letter-spacing: -.035em; overflow-wrap: anywhere; max-width: 100%; }
-.metricLabel { margin-top: 10px; color: #ffffff; font-size: var(--text-small); line-height: 1.6; overflow-wrap: anywhere; }
+.metricLabel { margin-top: 10px; color: #ffffff; font-size: 16px; line-height: 1.6; overflow-wrap: anywhere; }
 .work { background: var(--paper); }
 .workHead { max-width: 800px; margin-inline: auto; text-align: center; }
 .workHead > .eyebrow { justify-content: center; color: #087a50; margin-bottom: 22px; }
@@ -81,26 +81,26 @@
 .services { background: linear-gradient(180deg, var(--paper) 0%, #fbfcfd 140px, #fff 320px); }
 .services .head, .testimonials .head { max-width: 768px; margin: 0 auto var(--section-heading-gap); text-align: center; }
 .services .description { margin: 20px auto 0; max-width: 672px; font-size: var(--text-body); line-height: 1.75; }
-.services h2, .testimonials h2 { font-size: var(--text-heading); font-weight: 600; line-height: var(--heading-leading); letter-spacing: -.035em; }
-.serviceList { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; }
-.service { height: 100%; min-height: 220px; padding: 28px; border: 1px solid var(--line); border-radius: 8px; background: #fbfcff; box-shadow: 0 20px 60px #2a2f520f; transition: border-color .2s, box-shadow .2s; }
+.services h2, .testimonials h2 { font-size: var(--text-section-heading); font-weight: 600; line-height: var(--heading-leading); letter-spacing: -.035em; }
+.serviceList { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; max-width: 1180px; margin-inline: auto; }
+.service { height: 100%; padding: 18px; border: 1px solid var(--line); border-radius: 16px; background: #fbfcff; box-shadow: 0 7px 18px #03141007; transition: border-color .2s, box-shadow .2s; }
 .service:hover { border-color: var(--daylight); box-shadow: 0 24px 70px #2a2f521a; }
 .service > div { height: 100%; display: flex; flex-direction: column; }
-.serviceTitle { display: flex; align-items: flex-start; gap: 16px; }
-.serviceTitle > span { display: grid; place-items: center; width: 48px; height: 48px; border-radius: 8px; background: #eafaf2; color: #087a50; flex-shrink: 0; }
-.service h3 { padding-top: 8px; font-size: var(--text-card-title); font-weight: 600; line-height: 1.4; letter-spacing: -.035em; }
+.serviceTitle { display: flex; align-items: center; gap: 10px; }
+.serviceTitle > span { display: grid; place-items: center; width: 36px; height: 36px; border-radius: 8px; background: #eafaf2; color: #087a50; flex-shrink: 0; }
+.service h3 { font-size: var(--text-card-title); font-weight: 600; line-height: 1.4; letter-spacing: -.035em; }
 .service h3 a:hover { color: #087a50; }
-.service p { flex: 1; font-size: var(--text-small); line-height: 2; color: var(--muted); margin: 20px 0 24px; }
-.service .textLink { align-self: start; border: 0; padding: 0; color: #087a50; font-size: var(--text-small); font-weight: 600; }
+.service p { flex: 1; font-size: calc(var(--text-small) - 2px); line-height: 1.6; color: var(--muted); margin: 12px 0 14px; }
+.service .textLink { align-self: start; border: 0; padding: 0; color: #087a50; font-size: calc(var(--text-small) - 2px); font-weight: 600; }
 .section.testimonials { padding-block: 0; position: relative; isolation: isolate; overflow: hidden; background: radial-gradient(circle at 50% 18%, #0c4e3257, transparent 42%), radial-gradient(circle at 50% 100%, #06221638, transparent 40%), linear-gradient(180deg, #020302, #050505); color: #fff; }
 /* The testimonial components already own the original dark glass-card styles. */
 .testimonials :global([data-testid="testimonials-spotlight"]) { padding-block: calc(var(--section-space) + 40px); }
-.testimonials :global([data-testid="testimonials-text-grid"]) { gap: 20px; }
-.testimonials :global([data-testid="homepage-text-testimonial"]) { display: flex; flex-direction: column; padding: clamp(24px, 2.4vw, 36px); border-color: #ffffff14; background: linear-gradient(145deg, #ffffff08, #ffffff03); box-shadow: inset 0 1px 0 #ffffff08; backdrop-filter: blur(12px); }
+.testimonials :global([data-testid="testimonials-text-grid"]) { gap: 16px; }
+.testimonials :global([data-testid="homepage-text-testimonial"]) { display: flex; flex-direction: column; padding: clamp(20px, 2vw, 24px); border-color: #ffffff14; background: linear-gradient(145deg, #ffffff08, #ffffff03); box-shadow: inset 0 1px 0 #ffffff08; backdrop-filter: blur(12px); }
 .testimonials :global([data-testid="homepage-text-testimonial"]):hover { border-color: #14c98355; background: linear-gradient(145deg, #ffffff0c, #14c98306); }
-.testimonials :global([data-testid="homepage-text-testimonial"]) blockquote { font-size: var(--text-body); line-height: 1.8; color: #f3f7f5; margin-bottom: 28px; }
-.testimonials :global([data-testid="homepage-text-testimonial"]) blockquote + div { margin-top: auto; padding-top: 22px; border-color: #ffffff10; }
-.testimonials :global([data-testid="homepage-text-testimonial"]) img { border: 2px solid #ffffff20; width: 48px; height: 48px; }
+.testimonials :global([data-testid="homepage-text-testimonial"]) blockquote { font-size: var(--text-small); line-height: 1.65; color: #f3f7f5; margin-bottom: 20px; }
+.testimonials :global([data-testid="homepage-text-testimonial"]) blockquote + div { margin-top: auto; padding-top: 16px; border-color: #ffffff10; }
+.testimonials :global([data-testid="homepage-text-testimonial"]) img { border: 2px solid #ffffff20; width: 40px; height: 40px; }
 .testimonials button { border-color: #ffffff20; background: #ffffff06; }
 .testimonials button:hover { border-color: #14c98380; background: #14c98318; }
 .testimonials button:focus-visible { outline: 2px solid #14c983; outline-offset: 5px; }
@@ -111,7 +111,7 @@
 .faq { background: #fff; }
 .faqLayout { display: grid; grid-template-columns: .74fr 1.26fr; align-items: start; gap: 80px; }
 .faqLayout > * { min-width: 0; }
-.faq h2 { margin-top: 0; font-size: var(--text-heading); font-weight: 600; line-height: var(--heading-leading); letter-spacing: -.035em; }
+.faq h2 { margin-top: 0; font-size: var(--text-section-heading); font-weight: 600; line-height: var(--heading-leading); letter-spacing: -.035em; }
 .faq h2::before { content: ""; display: block; width: 40px; height: 3px; margin-bottom: 24px; background: #14c983; border-radius: 2px; }
 .faq .description { max-width: 360px; margin-top: 24px; font-size: var(--text-body); line-height: 1.85; color: #63736c; }
 .faqList { border-top: 1px solid #dce7e0; }
@@ -131,7 +131,7 @@
 .closing { background: #010807; color: #fff; overflow: hidden; scroll-margin-top: 90px; }
 .closing > .wrap { width: 100%; max-width: none; background: radial-gradient(circle at 50% 0%, #14c9831f, transparent 32%), linear-gradient(180deg, #03110c, #02100b 44%, #010807); }
 .closingTop { max-width: 944px; margin: auto; padding: var(--section-space) 24px; text-align: center; }
-.closing h2 { font-size: var(--text-heading); font-weight: 600; line-height: var(--heading-leading); letter-spacing: -.035em; text-wrap: balance; }
+.closing h2 { font-size: var(--text-section-heading); font-weight: 600; line-height: var(--heading-leading); letter-spacing: -.035em; text-wrap: balance; }
 .closingTop .eyebrow { display: block; color: #14c983; font-size: var(--text-caption); letter-spacing: .18em; margin-bottom: 24px; }
 .closingTop .eyebrow::before { display: none; }
 .button { margin-top: 32px; min-height: 52px; max-width: 100%; padding: 12px 28px; display: inline-flex; align-items: center; justify-content: center; gap: 18px; border-radius: 999px; background: #14c983; color: #010807; font-size: var(--text-small); font-weight: 600; transition: background .2s, transform .2s; }
@@ -171,27 +171,27 @@
 @media(max-width: 767px) {
   .wrap { width: calc(100% - 32px); }
   .scope { --section-space: 64px; --section-heading-gap: 32px; }
-  .section h2 { font-size: var(--text-heading); }
+  .section h2 { font-size: var(--text-section-heading); }
   .description { font-size: var(--text-small); margin-top: 18px; }
   .metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; padding: 30px 14px; border-radius: 24px; }
   .metric article { padding: 24px 10px; border-radius: 17px; }
   .metricValue { font-size: 35px; }
-  .metricLabel { font-size: var(--text-caption); }
+  .metricLabel { font-size: 12px; }
   .case { display: block; }
   .caseMedia, .caseFallback { min-height: 260px; }
   .caseCopy { padding: 28px; }
   .caseCopy > p { font-size: var(--text-small); }
   .serviceList { grid-template-columns: minmax(0, 1fr); }
-  .service { padding: 24px; }
+  .service { padding: 18px; }
   .service h3 { font-size: var(--text-card-title); }
-  .services h2, .testimonials h2 { font-size: var(--text-heading); }
+  .services h2, .testimonials h2 { font-size: var(--text-section-heading); }
   .services .description { font-size: var(--text-small); }
-  .faq h2 { font-size: var(--text-heading); }
+  .faq h2 { font-size: var(--text-section-heading); }
   .faq .description { font-size: var(--text-small); margin-top: 20px; }
   .faqList summary { font-size: var(--text-body); gap: 16px; padding: 20px 12px; }
   .faqList details p { padding: 0 12px 24px; }
   .closingTop { padding: var(--section-space) 16px; }
-  .closing h2 { font-size: var(--text-heading); }
+  .closing h2 { font-size: var(--text-section-heading); }
   .footerInfo { grid-template-columns: minmax(0, 1fr); gap: 28px; padding-block: 36px; }
   .footerNav { flex-direction: row; flex-wrap: wrap; gap: 8px 28px; }
   .footerNav a { padding-block: 12px; }
