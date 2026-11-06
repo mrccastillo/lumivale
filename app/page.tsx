@@ -325,7 +325,7 @@ export default async function Home() {
             {videoTestimonials.length > 0 ? (
               <div
                 data-testid="testimonials-video-grid"
-                className="mt-10 grid gap-3 sm:grid-cols-2 xl:grid-cols-4"
+                className={`mx-auto mt-10 flex max-w-[1120px] flex-wrap justify-start gap-6 sm:gap-8 ${textTestimonials.length > HOMEPAGE_TEXT_TESTIMONIAL_PAGE_SIZE ? "md:px-16" : ""}`}
               >
                 {videoTestimonials.map((testimonial) => (
                   <HomepageVideoTestimonialCard key={testimonial.id} testimonial={testimonial} />

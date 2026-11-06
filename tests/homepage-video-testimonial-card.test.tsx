@@ -4,7 +4,7 @@ import { describe, expect, test } from "vitest";
 import { HomepageVideoTestimonialCard } from "@/components/homepage-video-testimonial-card";
 
 describe("homepage video testimonial card", () => {
-  test("hides the on-video text overlay while a real video is playing", () => {
+  test("keeps client details outside the player and visible during playback", () => {
     const { container } = render(
       <HomepageVideoTestimonialCard
         testimonial={{
@@ -21,6 +21,9 @@ describe("homepage video testimonial card", () => {
     if (!video) {
       throw new Error("Expected video element to render");
     }
+    expect(video).toHaveAttribute("controls");
+    expect(video).toHaveAttribute("playsinline");
+    expect(video.parentElement).not.toHaveTextContent("Jon Ramos");
 
     expect(screen.getByText("Jon Ramos")).toBeInTheDocument();
     expect(screen.getByText("CEO, Signal Labs")).toBeInTheDocument();
@@ -28,7 +31,7 @@ describe("homepage video testimonial card", () => {
 
     fireEvent.play(video);
 
-    expect(screen.queryByText("Jon Ramos")).not.toBeInTheDocument();
+    expect(screen.getByText("Jon Ramos")).toBeInTheDocument();
 
     fireEvent.pause(video);
 
@@ -40,7 +43,7 @@ describe("homepage video testimonial card", () => {
     expect(screen.getByText("Jon Ramos")).toBeInTheDocument();
   });
 
-  test("keeps placeholder overlay content visible when there is no video file", () => {
+  test("keeps placeholder caption visible when there is no video file", () => {
     render(
       <HomepageVideoTestimonialCard
         testimonial={{
