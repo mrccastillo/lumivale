@@ -204,9 +204,10 @@ export default async function Home() {
     getPublishedReelsForSite(),
   ]);
   const textTestimonials = getHomepageTextTestimonials(testimonials);
-  const showPlaceholderTestimonials = !testimonials.some(
-    (testimonial) => testimonial.type === "text",
+  const videoTestimonials = testimonials.filter(
+    (testimonial) => testimonial.type === "video",
   );
+  const showPlaceholderTestimonials = testimonials.length === 0;
 
   return (
     <div className="bg-[#f7f8fb] text-[var(--lumivale-ink)]">
@@ -321,6 +322,16 @@ export default async function Home() {
           <TestimonialsSpotlight>
             <Reveal data-testid="testimonials-reveal" className={styles.wrap}>
               <div className={styles.head} data-scroll-reveal><h2>Hear it from our clients</h2></div>
+            {videoTestimonials.length > 0 ? (
+              <div
+                data-testid="testimonials-video-grid"
+                className="mt-10 grid gap-3 sm:grid-cols-2 xl:grid-cols-4"
+              >
+                {videoTestimonials.map((testimonial) => (
+                  <HomepageVideoTestimonialCard key={testimonial.id} testimonial={testimonial} />
+                ))}
+              </div>
+            ) : null}
             {showPlaceholderTestimonials ? (
               <div className="mt-10">
                 <div
@@ -344,9 +355,9 @@ export default async function Home() {
                   ))}
                 </div>
               </div>
-            ) : (
+            ) : textTestimonials.length > 0 ? (
               <HomepageTestimonialsCarousel testimonials={textTestimonials} />
-            )}
+            ) : null}
             </Reveal>
           </TestimonialsSpotlight>
         </section>

@@ -397,7 +397,7 @@ describe("home page", () => {
     ).not.toBeInTheDocument();
   });
 
-  test("renders published text testimonials from MongoDB and skips the video row", async () => {
+  test("renders published video testimonials alongside the text carousel", async () => {
     vi.mocked(getPublishedTestimonials).mockResolvedValueOnce([
       {
         id: "video-1",
@@ -461,10 +461,40 @@ describe("home page", () => {
     expect(screen.getByText("Page 1 of 2")).toBeInTheDocument();
     expect(screen.getAllByRole("button", { name: "Previous testimonials" })).toHaveLength(2);
     expect(screen.getAllByRole("button", { name: "Next testimonials" })).toHaveLength(2);
-    expect(testimonialSection).not.toHaveTextContent("Jon Ramos");
-    expect(testimonialSection).not.toHaveTextContent("Mina Park");
-    expect(testimonialSection?.querySelector("video")).not.toBeInTheDocument();
-    expect(container.querySelector("[data-testid='testimonials-video-grid']")).not.toBeInTheDocument();
+    expect(testimonialSection).toHaveTextContent("Jon Ramos");
+    expect(testimonialSection).toHaveTextContent("Mina Park");
+    const videos = testimonialSection?.querySelectorAll("video");
+    expect(videos).toHaveLength(2);
+    expect(videos?.[0]).toHaveAttribute("src", "https://res.cloudinary.com/demo/video/upload/video-1.mp4");
+    expect(videos?.[1]).toHaveAttribute("src", "https://res.cloudinary.com/demo/video/upload/video-2.mp4");
+    expect(container.querySelector("[data-testid='testimonials-video-grid']")).toBeInTheDocument();
+    expect(testimonialSection).not.toHaveTextContent("Video placeholder");
+  });
+
+  test("renders published videos when there are no text testimonials", async () => {
+    vi.mocked(getPublishedTestimonials).mockResolvedValueOnce([
+      {
+        id: "video-only",
+        personName: "Video Client",
+        personTitle: "Founder",
+        quote: "A great result.",
+        sortOrder: 1,
+        status: "published",
+        type: "video",
+        videoUrl: "https://example.com/testimonial.mp4",
+        createdAt: new Date("2026-05-03T08:00:00.000Z"),
+        updatedAt: new Date("2026-05-03T08:00:00.000Z"),
+      },
+    ]);
+
+    const { container } = render(await Home());
+    const section = container.querySelector("#testimonials");
+
+    expect(section).toHaveTextContent("Video Client");
+    expect(section?.querySelectorAll("video")).toHaveLength(1);
+    expect(section?.querySelector("video")).toHaveAttribute("src", "https://example.com/testimonial.mp4");
+    expect(section).not.toHaveTextContent("placeholder");
+    expect(section?.querySelector("[data-testid='testimonials-text-grid']")).not.toBeInTheDocument();
   });
 
   test("renders legacy video and text placeholders when no published testimonials are available", async () => {
@@ -559,6 +589,7 @@ describe("home page", () => {
     render(await Home());
 
     expect(screen.getByText("Page 1 of 2")).toBeInTheDocument();
+    expect(screen.queryByTestId("testimonials-video-grid")).not.toBeInTheDocument();
     expect(screen.getAllByRole("button", { name: "Previous testimonials" })).toHaveLength(2);
     expect(screen.getAllByRole("button", { name: "Next testimonials" })).toHaveLength(2);
     expect(screen.getByText("Maya Lee")).toBeInTheDocument();
