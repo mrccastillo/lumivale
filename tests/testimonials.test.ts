@@ -92,8 +92,9 @@ describe("testimonial repository", () => {
 
   test("validates uploaded testimonial video files", () => {
     const validVideo = new File(["video"], "clip.mp4", { type: "video/mp4" });
+    Object.defineProperty(validVideo, "size", { value: 100 * 1024 * 1024 });
     const invalidVideo = new File(["video"], "clip.txt", { type: "text/plain" });
-    const largeVideo = new File([new Uint8Array(50 * 1024 * 1024 + 1)], "clip.mp4", {
+    const largeVideo = new File([new Uint8Array(100 * 1024 * 1024 + 1)], "clip.mp4", {
       type: "video/mp4",
     });
 
@@ -102,7 +103,7 @@ describe("testimonial repository", () => {
       "Testimonial video must be an MP4, WEBM, or MOV file.",
     );
     expect(validateTestimonialVideoFile(largeVideo)).toBe(
-      "Testimonial video must be 50MB or smaller.",
+      "Testimonial video must be 100MB or smaller.",
     );
   });
 });

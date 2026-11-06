@@ -111,14 +111,14 @@ describe("admin testimonials dashboard", () => {
       await AdminTestimonialsPage({
         searchParams: Promise.resolve({
           mode: "create",
-          error: "Testimonial video must be 50MB or smaller.",
+          error: "Testimonial video must be 100MB or smaller.",
         }),
       }),
     );
 
     expect(screen.getByRole("dialog", { name: "Create Testimonial" })).toBeInTheDocument();
     expect(screen.getByRole("alert")).toHaveTextContent(
-      "Testimonial video must be 50MB or smaller.",
+      "Testimonial video must be 100MB or smaller.",
     );
     expect(screen.getByRole("button", { name: "Create testimonial" })).toBeInTheDocument();
   });

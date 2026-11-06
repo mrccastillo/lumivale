@@ -80,7 +80,7 @@ describe("admin testimonials create route", () => {
 
   test("reopens the create modal when the uploaded video is invalid", async () => {
     uploadTestimonialVideoMock.mockRejectedValue(
-      new Error("Testimonial video must be 50MB or smaller."),
+      new Error("Testimonial video must be 100MB or smaller."),
     );
     const { POST } = await import("@/app/api/admin/testimonials/route");
 
@@ -96,7 +96,7 @@ describe("admin testimonials create route", () => {
     expect(redirectUrl.pathname).toBe("/admin/testimonials");
     expect(redirectUrl.searchParams.get("mode")).toBe("create");
     expect(redirectUrl.searchParams.get("error")).toBe(
-      "Testimonial video must be 50MB or smaller.",
+      "Testimonial video must be 100MB or smaller.",
     );
   });
 

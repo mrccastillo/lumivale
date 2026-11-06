@@ -2,7 +2,7 @@ export async function uploadTestimonialMedia(file: File, resourceType: "image" |
   const types = resourceType === "video"
     ? ["video/mp4", "video/webm", "video/quicktime"]
     : ["image/jpeg", "image/png", "image/webp"];
-  const maxMB = resourceType === "video" ? 50 : 5;
+  const maxMB = resourceType === "video" ? 100 : 5;
   if (!types.includes(file.type)) throw new Error(`Unsupported testimonial ${resourceType} format.`);
   if (file.size > maxMB * 1024 * 1024) throw new Error(`Testimonial ${resourceType} must be ${maxMB}MB or smaller.`);
 

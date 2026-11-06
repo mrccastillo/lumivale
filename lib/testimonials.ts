@@ -58,7 +58,7 @@ type TestimonialDb = {
 
 const COLLECTION = "testimonials";
 
-export const TESTIMONIAL_VIDEO_MAX_BYTES = 50 * 1024 * 1024;
+export const TESTIMONIAL_VIDEO_MAX_BYTES = 100 * 1024 * 1024;
 export const TESTIMONIAL_VIDEO_TYPES = new Set([
   "video/mp4",
   "video/quicktime",
@@ -126,7 +126,7 @@ export function validateTestimonialVideoFile(file: File | null) {
   }
 
   if (file.size > TESTIMONIAL_VIDEO_MAX_BYTES) {
-    return "Testimonial video must be 50MB or smaller.";
+    return "Testimonial video must be 100MB or smaller.";
   }
 
   return null;

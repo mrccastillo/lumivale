@@ -5,6 +5,7 @@ afterEach(() => vi.unstubAllGlobals());
 
 test("sends video bytes to Cloudinary and only metadata to the signing endpoint", async () => {
   const file = new File(["video"], "client.mp4", { type: "video/mp4" });
+  Object.defineProperty(file, "size", { value: 100 * 1024 * 1024 });
   const fetchMock = vi.fn()
     .mockResolvedValueOnce({ ok: true, json: async () => ({
       apiKey: "public-key", timestamp: 123, signature: "signed", folder: "lumivale/testimonials",
@@ -22,8 +23,8 @@ test("rejects oversized videos before making a request", async () => {
   const fetchMock = vi.fn();
   vi.stubGlobal("fetch", fetchMock);
   const file = new File(["video"], "client.mp4", { type: "video/mp4" });
-  Object.defineProperty(file, "size", { value: 51 * 1024 * 1024 });
-  await expect(uploadTestimonialMedia(file, "video")).rejects.toThrow("50MB");
+  Object.defineProperty(file, "size", { value: 100 * 1024 * 1024 + 1 });
+  await expect(uploadTestimonialMedia(file, "video")).rejects.toThrow("100MB");
   expect(fetchMock).not.toHaveBeenCalled();
 });
 

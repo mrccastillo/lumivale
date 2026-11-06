@@ -182,7 +182,7 @@ export function TestimonialForm({
             className={fieldClassName}
           />
           <p className="mt-2 text-xs leading-6 text-[var(--lumivale-muted)]">
-            Supported formats: MP4, WEBM, and MOV. Maximum file size: 50MB.
+            Supported formats: MP4, WEBM, and MOV. Maximum file size: 100MB.
           </p>
           {testimonial?.videoUrl ? (
             <p className="mt-2 text-xs leading-6 text-[var(--lumivale-muted)]">
