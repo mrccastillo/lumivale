@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useId, useState, type ReactNode } from "react";
+import { useEffect, useId, useRef, useState, type ReactNode, type FormEvent } from "react";
+import { uploadTestimonialMedia } from "./upload-media";
 
 import type { Testimonial } from "@/lib/testimonials";
 
@@ -26,6 +27,38 @@ export function TestimonialForm({
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState("");
   const [removeImage, setRemoveImage] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [uploadError, setUploadError] = useState("");
+  const submitting = useRef(false);
+
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (submitting.current) return;
+    submitting.current = true;
+    setSaving(true);
+    setUploadError("");
+    const data = new FormData(event.currentTarget);
+    try {
+      // Send file bytes directly to storage, keeping the save request small.
+      for (const [field, urlField, kind] of [
+        ["imageFile", "imageUrl", "image"],
+        ["videoFile", "videoUrl", "video"],
+      ] as const) {
+        const file = data.get(field);
+        data.delete(field);
+        if (file instanceof File && file.size > 0) {
+          data.set(urlField, await uploadTestimonialMedia(file, kind));
+        }
+      }
+      const response = await fetch(action, { method: "POST", body: data });
+      if (!response.ok) throw new Error("Could not save testimonial. Please try again.");
+      window.location.assign(response.redirected ? response.url : "/admin/testimonials");
+    } catch (error) {
+      setUploadError(error instanceof Error ? error.message : "Could not save testimonial. Please try again.");
+      submitting.current = false;
+      setSaving(false);
+    }
+  }
   useEffect(() => {
     if (!imagePreview) return;
     return () => URL.revokeObjectURL(imagePreview);
@@ -38,18 +71,20 @@ export function TestimonialForm({
       action={action}
       method="post"
       encType="multipart/form-data"
+      onSubmit={handleSubmit}
+      aria-busy={saving}
       className="grid gap-6 rounded-[24px] border border-[var(--lumivale-line)] bg-white p-6 shadow-[0_20px_60px_rgba(42,47,82,0.06)] sm:p-7"
     >
       <input type="hidden" name="action" value="save" />
       <input type="hidden" name="imageUrl" value={testimonial?.imageUrl ?? ""} />
       <input type="hidden" name="videoUrl" value={testimonial?.videoUrl ?? ""} />
 
-      {errorMessage ? (
+      {uploadError || errorMessage ? (
         <div
           role="alert"
           className="rounded-[18px] border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
         >
-          {errorMessage}
+          {uploadError || errorMessage}
         </div>
       ) : null}
 
@@ -160,9 +195,10 @@ export function TestimonialForm({
       <div className="flex flex-wrap gap-3">
         <button
           type="submit"
+          disabled={saving}
           className="inline-flex min-h-12 items-center justify-center rounded-xl bg-[var(--lumivale-accent)] px-6 text-sm font-semibold text-[#010807] transition hover:bg-[var(--lumivale-accent-soft)]"
         >
-          {submitLabel ?? (testimonial ? "Save testimonial" : "Create testimonial")}
+          {saving ? "Uploading and saving…" : submitLabel ?? (testimonial ? "Save testimonial" : "Create testimonial")}
         </button>
         {cancelHref ? (
           <a

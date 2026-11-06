@@ -26,6 +26,21 @@ function configureCloudinary() {
   isConfigured = true;
 }
 
+export function signTestimonialUpload(resourceType: CloudinaryResourceType) {
+  configureCloudinary();
+  const params = {
+    timestamp: Math.floor(Date.now() / 1000),
+    folder: resourceType === "video" ? "lumivale/testimonials" : "lumivale/testimonials/images",
+  };
+  const config = cloudinary.config();
+  return {
+    ...params,
+    signature: cloudinary.utils.api_sign_request(params, config.api_secret!),
+    apiKey: config.api_key,
+    uploadUrl: `https://api.cloudinary.com/v1_1/${config.cloud_name}/${resourceType}/upload`,
+  };
+}
+
 export async function uploadMediaToCloudinary(
   file: File,
   {
