@@ -136,6 +136,7 @@ export async function sendTrustedClientMagicLink({
 
   await transporter.sendMail({
     from: config.from,
+    replyTo: "admin@lumivale.net",
     to: email,
     subject: "Your Lumivale pricing access link",
     html: template.html,

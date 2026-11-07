@@ -1,0 +1,70 @@
+BREVO SETUP FOR LUMIVALE
+
+Hi Kenny, here are the steps to set up Brevo for Lumivale's website emails.
+
+1. ADD AND AUTHENTICATE THE DOMAIN
+
+1) Log in to your new Brevo account.
+2) Go to Settings > Senders, Domains, IPs > Domains.
+3) Click Add a domain and enter lumivale.net (without https:// or www).
+4) Choose Authenticate the domain automatically.
+5) Follow the prompts to sign in to Spaceship and authorize the setup.
+6) Return to Brevo and check that the domain shows Authenticated.
+
+If automatic setup does not work, choose manual authentication. Add the
+DNS records Brevo provides wherever the domain's DNS is managed. Keep
+the existing website and Spacemail records. If prompted to replace an
+existing DMARC record, send me a screenshot before changing it.
+
+Guide: https://help.brevo.com/hc/en-us/articles/12163873383186
+
+2. ADD THE SENDER
+
+1) Go to Settings > Senders, Domains, IPs > Senders.
+2) Click Add sender.
+3) Enter these details:
+   From Name: Lumivale
+   From Email: noreply@lumivale.net
+4) Save and complete any verification Brevo requests.
+
+This is the name and address customers will see on automated website emails.
+
+3. GENERATE THE WEBSITE'S SMTP KEY
+
+1) Go to Settings > SMTP & API.
+2) Open the SMTP tab.
+3) Click Generate a new SMTP key.
+4) Name it Lumivale website.
+5) Choose Standard and select an expiration option. If you choose an
+   expiry date, we will need to replace the key before it expires.
+6) Generate the key and save it securely. The full key is shown only once.
+
+For our SMTP connection, we need an SMTP key, not an API key or your
+Brevo account password.
+
+Guide: https://help.brevo.com/hc/en-us/articles/7959631848850
+
+4. PROVIDE THE CONNECTION DETAILS
+
+Please provide:
+
+SMTP server: smtp-relay.brevo.com
+SMTP port: Port shown in the SMTP settings
+SMTP login/username: Exact SMTP login shown in your account
+SMTP password: The newly generated SMTP key
+Sender name: Lumivale
+Sender email: noreply@lumivale.net
+Reply-To address: Your existing Spacemail mailbox, if you want customer replies
+
+Please share the SMTP key through a secure password-manager sharing link.
+I do not need your Google, Brevo, or Spaceship password.
+
+5. WEBSITE CONNECTION AND TESTING
+
+Once the domain and sender are verified and the connection details are
+ready, I will update the website's email settings and test delivery.
+
+We will confirm that emails show Lumivale <noreply@lumivale.net> and
+that replies go to your chosen mailbox.
+
+Your regular Spacemail inbox will continue working as before.
